@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% block title %}Credit Memo Detail{% endblock title %}
+{% block bodycontent %}
+
+<section id="extended">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+              <h4 class="card-title">Credit Memo Details</h4>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Date</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.date|default:"-"}}">
+                        </fieldset>
+                        {% comment %} <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">Date</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control col-md-9" id="readonlyInput" readonly="readonly" value="{{object.date|default:"-"}}">
+                        </div>
+                        </div> {% endcomment %}
+                    </div>
+                    <div class="col-md-1 col-12">
+                      <fieldset class="form-group">
+                        <label for="default-input">Status</label>
+                        <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.status|default:"-"|title}}">
+                      </fieldset>
+                      {% comment %} <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">Date</label>
+                      <div class="col-md-9">
+                          <input type="text" class="form-control col-md-9" id="readonlyInput" readonly="readonly" value="{{object.date|default:"-"}}">
+                      </div>
+                      </div> {% endcomment %}
+                  </div>
+                    <div class="col-md-2 col-12">
+                      <fieldset class="form-group">
+                        <label for="default-input">Customer</label>
+                        <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.customer|default:"-"}}">
+                      </fieldset>
+                        {% comment %} <div class="form-group row">
+                        <label class="col-md-4 col-form-label" for="horizontal-form-1">Customer</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.customer|default:"-"}}">
+                        </div>
+                        </div> {% endcomment %}
+                    </div>
+                    <div class="col-md-2 col-12">
+                      <fieldset class="form-group">
+                        <label for="default-input">Credit Type</label>
+                        <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.credit_type|default:"-"}}">
+                      </fieldset>
+                        {% comment %} <div class="form-group row">
+                        <label class="col-md-4 col-form-label" for="horizontal-form-1">Credit Type</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.credit_type|default:"-"}}">
+                        </div>
+                        </div> {% endcomment %}
+                    </div>
+                    <div class="col-md-5 col-12">
+                      <fieldset class="form-group">
+                        <label for="default-input">Remark</label>
+                        <textarea type="text" class="form-control" id="readonlyInput" rows="1" readonly="readonly">{{object.remark|default:"-"}}</textarea>
+                      </fieldset>
+                        {% comment %} <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">Remark</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.remark|default:"-"}}">
+                        </div>
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <small><b>Products list</b></small>
+                </div>
+                <div class="card-content">
+                    <div class="card-body table-responsive">
+                      <table id="table_added_products" class="table text-center m-0">
+                        <thead>
+                          <tr>
+                                <th>SR NO.</th>
+                                <th>Product Name</th>
+                                <th>Unit Type</th>
+                                <th>Quantity</th>
+                                <th>Fresh Quantity</th>
+                                <th>Damage Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total Price</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in credit_memo_products %}
+                            <tr data-id="product_2" product-id="2" purchase-order-product="new" class="product-row">
+                                <td data-title="product-id">{{forloop.counter}}</td>
+                                <td data-title="product-id">{{product.product.name}}</td>
+                                <td data-title="product-id">{{product.unit_type}}({{product.get_unit_type_pieces}})</td>
+                                <td data-title="product-id">{{product.return_quantity}}</td>
+                                <td data-title="product-id">{{product.fresh_return_quantity}}</td>
+                                <td data-title="product-id">{{product.damage_return_quantity}}</td>
+                                <td data-title="product-id">{{product.unit_price}}</td>
+                                <td data-title="product-id">{{product.total_price}}</td>
+                            </tr>
+                            {% comment %} <tr data-id="product_2" product-id="2" purchase-order-product="new" class="product-row">
+                                <td data-title="product-id">{{forloop.counter}}</td>
+                                <td data-title="product-name">Farrah Ortiz<input type="hidden" name="product_2__id" value="2"></td>
+                                <td data-title="unit-type-text">Piece<input type="hidden" name="product_2__unit_type" value="Piece"></td>
+                                <td data-title="quantity"><input type="number" min="1" max="10" name="product_2__quantity" class="form-control text-center" value="1"></td>
+                                <input type="hidden" min="0.00" step="0.01" data-default-value="1" name="product_2__totalpieces" class="form-control text-center" value="1">
+                                <td data-title="unit-price"><input type="number" min="0.00" step="0.01" name="product_2__unitprice" class="form-control text-center" value="12.0" readonly=""></td>
+                                <td data-title="total-price"><input type="number" min="0.00" step="0.01" name="product_2__totalprice" class="form-control text-center product-total-price" value="12.00" readonly=""></td>
+                            </tr> {% endcomment %}
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <small><b>Pricing Details</b></small>
+              </div>
+            </div>
+            
+            <div class="card-content">
+              <div class="card-body">
+                  <div class="row">
+                      <div class="col-md-3 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Item Total</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.item_total}}">
+                        </fieldset>
+                          {% comment %} <div class="form-group row">
+                          <label class="col-md-4 col-form-label" for="horizontal-form-1">Item Total</label>
+                          <div class="col-md-8">
+                              <input type="text" class="form-control col-md-9" id="readonlyInput" readonly="readonly" value="{{object.item_total}}">
+                          </div>
+                          </div> {% endcomment %}
+                      </div>
+                      <div class="col-md-2 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Discount(%)</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.discount}}">
+                        </fieldset>
+                          {% comment %} <div class="form-group row">
+                          <label class="col-md-4 col-form-label" for="horizontal-form-1">Discount(%)</label>
+                          <div class="col-md-8">
+                              <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.discount}}">
+                          </div>
+                          </div> {% endcomment %}
+                      </div>
+                      <div class="col-md-2 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Discount Amount</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.discount_amount}}">
+                        </fieldset>
+                      </div>
+                      <div class="col-md-2 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Adjustment</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.adjustment}}">
+                        </fieldset>
+                          {% comment %} <div class="form-group row">
+                          <label class="col-md-4 col-form-label" for="horizontal-form-1">Adjustment</label>
+                          <div class="col-md-8">
+                              <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.adjustment}}">
+                          </div>
+                          </div> {% endcomment %}
+                      </div>
+                      <div class="col-md-3 col-12">
+                        <fieldset class="form-group">
+                          <label for="default-input">Grand Total</label>
+                          <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.grand_total}}">
+                        </fieldset>
+                          {% comment %} <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">Grand Total</label>
+                          <div class="col-md-9">
+                              <input type="text" class="form-control" id="readonlyInput" readonly="readonly" value="{{object.grand_total}}">
+                          </div>
+                          </div> {% endcomment %}
+                      </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex flex-sm-row flex-column justify-content-end">
+              <button type="button" value="go back" class="btn btn-primary ml-2" onclick="history.back()">Back</button>
+          </div>
+        </div>
+      </div>
+  </section>
+
+{% endblock bodycontent %}

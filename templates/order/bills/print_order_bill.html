@@ -1,0 +1,457 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html class="loading" lang="en">
+
+    <head>
+        <title>Order Bill-{{order.order_id}}</title>
+        {% comment %} <link rel="shortcut icon" type="image/x-icon" href="https://pixinvent.com/apex-angular-4-bootstrap-admin-template/app-assets/img/ico/favicon.ico">
+        <link rel="shortcut icon" type="image/png" href="{% static 'app-assets/img/ico/favicon-32.png' %}">
+        
+        <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500,700,900%7CMontserrat:300,400,500,600,700,800,900" rel="stylesheet">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/feather/style.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/simple-line-icons/style.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/font-awesome/css/font-awesome.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/perfect-scrollbar.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/prism.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/switchery.min.css' %}">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap-extended.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/colors.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/components.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/themes/layout-dark.min.css' %}">
+        <link rel="stylesheet" href="{% static 'app-assets/css/plugins/switchery.min.css' %}">
+
+        <link rel="stylesheet" href="{% static 'app-assets/css/pages/page-invoice.min.css' %}">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}"> {% endcomment %}
+
+        <style>
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+
+            @page {
+                margin: 25px 15px;
+
+            }
+
+            @media (prefers-reduced-motion: no-preference) {
+                :root {
+                    scroll-behavior: smooth;
+                }
+            }
+
+            body {
+                margin: 0;
+                font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #212529;
+                text-align: left;
+                background-color: #fff;
+                -webkit-text-size-adjust: 100%;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+            .my-5 {
+                margin-top: 3rem !important;
+                margin-bottom: 3rem !important;
+            }
+
+            .d-flex {
+                display: flex !important;
+            }
+
+            .justify-content-center {
+                justify-content: center !important;
+            }
+
+            .justify-content-between {
+                justify-content: space-between !important;
+            }
+
+            .mt-2 {
+                margin-top: 0.5rem !important;
+            }
+
+            .ml-2 {
+                margin-left: 0.5rem !important;
+            }
+
+            .pt-2 {
+                padding-top: 0.5rem !important;
+            }
+
+            .pr-2 {
+                padding-right: 0.5rem !important;
+            }
+
+            .pr-4 {
+                padding-right: 1rem !important;
+            }
+
+            .my-2 {
+                margin-top: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            .my-4 {
+                margin-top: 1.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+
+            .text-start {
+                text-align: left !important;
+            }
+            
+            .text-end {
+                text-align: right !important;
+            }
+
+            .text-center {
+                text-align: center !important;
+            }
+
+            .text-muted {
+                color: #838294 !important;
+            }
+
+            .w-100 {
+                width: 100% !important;
+            }
+
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                color: #031b4e;
+            }
+
+            .table thead th {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .table thead td{
+                padding-top: 0.25rem;
+                padding-bottom: 0.25rem;
+            }
+
+
+            .table thead th,
+            .table tbody td {
+                vertical-align: top;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+            }
+
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+                /* background-color: #5683ff2e; */
+            
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #5683ff2e;
+                /* background-color: #f0eeff; */
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <section class="my-5">
+            <div class="my-5 text-center">
+                <table class="my-2 text-start">
+                    <tr>
+                        <td style="width: 5%">TO</td>
+                        <td style="width: 1%">: </td>
+                        <td style="width: 20%"><h2><b>{{ order.customer.customer_name|upper }}</b></h2></td>
+                        <td style="width: 58%" class="text-center pr-4"><b><h2>{{ order.customer.area|upper }}</b></h2></td>
+                        <td style="width: 5%">NO</td>
+                        <td style="width: 1%">: </td>
+                        <td style="width: 10%"><b><h2>{{ order_bill.slip_no }}</b></h2></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 5%">ZONE</td>
+                        <td style="width: 1%">: </td>
+                        <td style="width: 20%"><h2><b>{{ order.customer.zone.zone_code }}</b></h2></td>
+                        <td style="width: 58%"></td>
+                        <td style="width: 5%">DATE</td>
+                        <td style="width: 1%">: </td>
+                        <td style="width: 10%"><h2><b>{{ order_bill.bill_date|date:"d-m-Y" }}</b></h2></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="table-responsive my-4">
+                <table class="table table-striped w-100">
+                    <thead class="text-start">
+                        <tr>
+                            <th style="width:3%" class="text-start">No.</th>
+                            <th style="width:9%" class="text-start">Code</th>
+                            <th style="width:36%" class="text-start">Item</th>
+                            <th style="width:10%" class="text-start">Brand</th>
+                            <th style="width:12%" class="text-start">Vehicle</th>
+                            <th style="width:3%" class="text-start">Qty</th>
+                            <th style="width:8%" class="text-end">Rate</th>
+                            <th style="width:4%"></th> <!-- Spacer column -->
+                            <th style="width:5%" class="text-start" style="margin-left:3px !important;">Per</th>
+                            <th style="width:9%" class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for order_product in order_products %}
+                        <tr>
+                            <td style="width:3%">{{ forloop.counter }}</td>
+                            <td style="width:9%">{{ order_product.product.code }}</td>
+                            <td style="width:36%">{{ order_product.product.name }}</td>
+                            <td style="width:10%">{{ order_product.product.brand.name }}</td>
+                            <td style="width:12%">{{ order_product.product.vehicle|default:"-" }}</td>
+                            <td style="width:3%">{{ order_product.quantity }}{% if order_product.free_quantity %}+{{ order_product.free_quantity }}{% endif %}</td>
+                            <td style="width:8%" class="text-end">{{ order_product.unit_price }}</td>
+                            <th style="width:4%"></th> <!-- Spacer column -->
+                            <td style="width:5%" class="text-start" style="margin-left:3px !important;">{{ order_product.product.unit|default:"-" }}</td>
+                            <td style="width:9%" class="text-end">{{ order_product.get_net_price }}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="10">
+                                <table>
+                                    <tr>
+                                        <td colspan="6" style="border-top: none; padding: 0px; padding-top: 0.5rem;"><b>{{ amount_in_words }}</b></td>
+                                        <td style="border-top: 1px solid black; padding: 0px; padding-top: 0.5rem;" class="text-end">Gross Total :</td>
+                                        <td class="text-end pr-2" style="border-top: 1px solid black; padding: 0px; padding-top: 0.5rem;">
+                                            <div>{{ order.item_total }}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table>
+                                    <tr>
+                                        <td colspan="6" style="border-top: none; margin: 0px; padding: 0px;">
+                                            {% if order_bill.due_date %}
+                                            <span>Due Date :- </span> {{ order_bill.due_date|date:"d-m-Y" }} {% if due_days %}( {{ due_days }} ){% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end" style="border-top: 1px solid black; margin: 0px; padding: 0px; padding-top: 0.5rem;">
+                                            <div class="col-6">Total :</div>
+                                        </td>
+                                        <td class="text-end pr-2" style="border-top: 1px solid black; margin: 0px; padding: 0px; padding-top: 0.5rem;">
+                                            {% if order.packing_charges > 0 or order.shipping_charges > 0 %}
+                                            <div class="col-6">{{ order.item_total }}</div>
+                                            {% else %}
+                                            <div class="col-6"><b>{{ order.item_total }}</b></div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                                {% if order.packing_charges > 0 or order.shipping_charges > 0 %}
+                                <table>
+                                    <tr>
+                                        {% if order.packing_charges > 0 %}
+                                        <td class="pt-2" style="border-top: none; margin: 0px; padding: 0px;">
+                                            <div>W</div>
+                                            <div>{{ order_bill.written_by|default:"-" }}</div>
+                                        </td>
+                                        <td class="pt-2" style="border-top: none; margin: 0px; padding: 0px;">
+                                            <div>P</div>
+                                            <div>{{ order_bill.packed_by|default:"-" }}</div>
+                                        </td>
+                                        <td class="pt-2" style="border-top: none; margin: 0px; padding: 0px;">
+                                            <div>C</div>
+                                            <div>{{ order_bill.checked_by|default:"-" }}</div>
+                                        </td>
+                                        {% else %}
+                                        <td class="pt-2" colspan="6" style="border-top: none; margin: 0px; padding: 0px;"></td>
+                                        {% endif %}
+                                        <td class="col-3 text-end pt-2" style="border-top: none; margin: 0px; padding: 0px;">
+                                            {% if order.packing_charges > 0 %}
+                                            <table style="margin: 0px; padding: 0px;">
+                                                <tr style="margin: 0px; padding: 0px;">
+                                                    <td style="border-top: none; margin: 0px; padding: 0px;">Packing :</td>
+                                                    <td style="border-top: none; margin: 0px; padding: 0px;">{{ order.packing_charges }}</td>
+                                                </tr>
+                                            </table>
+                                            {% endif %}
+                                            {% if order.shipping_charges > 0 %}
+                                            <table style="margin: 0px; padding: 0px;">
+                                                <tr style="margin: 0px; padding: 0px;">
+                                                    <td style="border-top: none; margin: 0px; padding: 0px;">T. C. Paid :</td>
+                                                    <td style="border-top: none; margin: 0px; padding: 0px;">{{ order.shipping_charges }}</td>
+                                                </tr>
+                                            </table>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="mt-2">
+                                    <tr>
+                                        <td colspan="6" style="border-top: none; padding: 0px; padding-top: 0.5rem;"></td>
+                                        <td class="text-end pt-2" style="border-top: 1px solid black; padding: 0px; padding-top: 0.5rem;">
+                                            <div class="col-6">Net Total: </div>
+                                        </td>
+                                        <td class="text-end pt-2 pr-2" style="border-top: 1px solid black; padding: 0px; padding-top: 0.5rem;">
+                                            <div class="col-6"><b>{{ order.grand_total }}</b></div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                {% endif %}
+                                {% if not order_bill.is_local_bill %}
+                                <table>
+                                    <tr>
+                                        <td style="border-top: none; padding: 0px; margin: 0px;">Transport : {{ order_bill.transporter|default:"-" }}</td>
+                                        <td style="border-top: none; padding: 0px; margin: 0px;">Boxes : {{ order_bill.case_number|default:"0" }}</td>
+                                        <td style="border-top: none; padding: 0px; margin: 0px;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border-top: none; padding: 0px; padding-top: 0.5rem;">G.R. No : {{ order_bill.gr_number|default:"-" }}</td>
+                                        <td style="border-top: none; padding: 0px; padding-top: 0.5rem;">G.R. Date : {% if order_bill.gr_date %}{{ order_bill.gr_date|date:"d-m-Y" }} {% else %} - {% endif %}</td>
+                                        <td style="border-top: none; padding: 0px; padding-top: 0.5rem;"></td>
+                                    </tr>
+                                </table>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div>
+                <div class="my-2">
+                    <b><u>Note :- We do not hold any responsibillity for the damaged , plastic , glass or open goods</u></b>
+                </div>
+            </div>
+            {% if local_bill == "false" %}
+            <table>
+                <tr>
+                    <td style="width: 13%" class="text-end">Contact Person: </td>
+                    <td class="ml-2">{{ order.customer.contact_name|default:"-" }}</td>
+                    <td valign="top" style="width: 15%; padding-left:5px;" class="text-end">Contact No: </td>
+                    <td class="ml-2"> {{ order.customer.phone_1|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 13%" valign="top" rowspan="2" class="text-end">Address: </td>
+                    <td class="ml-2" rowspan="2">
+                        {{ order.shipping_address_line_1 }}, {{ order.shipping_address_line_2 }}, <br>
+                        {{ order.shipping_city }}, {% if order.shipping_state %} {{ order.shipping_state }},{% endif %} {% if order.shipping_zip_code %}{{ order.shipping_zip_code }}, {% endif %}<br>
+                        {{ order.shipping_country }}
+                    </td>
+                    <td valign="top" style="width: 15%; padding-left:5px;" ></td>
+                    <td class="ml-2">{{ order.customer.phone_2|default:"-" }}</td>
+                </tr>
+                <tr>
+                    <td valign="top" style="width: 15%; padding-left:5px;" class="text-end">Mobile No: </td>
+                    <td valign="top" class="ml-2"> {{ order.customer.mobile }}</td>
+                </tr>
+            </table>
+            {% endif %}
+
+            <div>
+                <pdf:nextpage />
+            </div>
+
+        </section>
+
+        <section>
+            <div class="my-5">
+                <div>
+                    <table class="my-2 text-start">
+                        <tr>
+                            <td style="width: 5%">TO</td>
+                            <td style="width: 1%">: </td>
+                            <td style="width: 20%"><b><h2>{{ order.customer.customer_name|upper }}</b></h2></td>
+                            <td style="width: 58%" class="text-center pr-4"><b><h2>{{ order.customer.area|upper }}</h2></b></td>
+                            <td style="width: 5%">NO</td>
+                            <td style="width: 1%">: </td>
+                            <td style="width: 10%"><b><h2>{{ order_bill.slip_no }}</h2></b></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 5%">ZONE</td>
+                            <td style="width: 1%">: </td>
+                            <td style="width: 20%"><b><h2>{{ order.customer.zone.zone_code }}</h2></b></td>
+                            <td style="width: 58%"></td>
+                            <td style="width: 5%">DATE</td>
+                            <td style="width: 1%">: </td>
+                            <td style="width: 10%"><b><h2>{{ order.created_at|date:"d-m-Y" }}</h2></b></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <hr/>
+
+                <div>
+                    <table class="text-start">
+                        <tr>
+                            <th class="text-center">Net Total </th>
+                            <th class="text-start" style="width: 74%"><h2>{{ order.grand_total }}</h2></th>
+                        </tr>
+                        <tr>
+                            <th class="text-end"></th>
+                            <th class="text-start" style="width: 74%"><h2>{{ amount_in_words }}</h2></th>
+                        </tr>
+                        <tr style="padding-top: 10px;">
+                            <th>D :-</th>
+                            <th>R :-</th>
+                        </tr>
+                    </table>
+                </div>
+
+                <div>
+                    <div class="my-2">
+                        <b><u>Note :- We do not hold any responsibillity for the damaged , plastic , glass or open goods</u></b>
+                    </div>
+                </div>
+
+                <table>
+                    <tr>
+                        <td style="width: 15%" class="text-end">Contact Person :</td>
+                        <td class="ml-2">{{ order.customer.contact_name|default:"-" }}</td>
+                        <td style="width: 15%; padding-left:5px;" class="text-end">Contact No :</td>
+                        <td class="ml-2">{{ order.customer.phone_1|default:"-" }}</td>
+                        <td>{{ order.customer.phone_2|default:"-" }}</td>
+                    </tr>
+                    <tr>
+                        <td valign="top" style="width: 15%" class="text-end">Address :</td>
+                        <td class="ml-2">
+                            {{ order.shipping_address_line_1 }}, {{ order.shipping_address_line_2 }}, <br>
+                            {{ order.shipping_city }}, {% if order.shipping_state %} {{ order.shipping_state }},{% endif %} {% if order.shipping_zip_code %}{{ order.shipping_zip_code }}, {% endif %}<br>
+                            {{ order.shipping_country }}
+                        </td>
+                        <td valign="top" style="width: 15%; padding-left:5px;" class="text-end">Mobile No :</td>
+                        <td valign="top" class="ml-2">{{ order.customer.mobile }}</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+            </div>
+        </section>
+
+        <script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+        <script src="{% static 'app-assets/vendors/js/switchery.min.js' %}"></script>
+
+        <script src="{% static 'app-assets/js/core/app-menu.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/core/app.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/notification-sidebar.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/customizer.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/scroll-top.min.js' %}"></script>
+
+        <script src="{% static 'app-assets/js/page-invoice.min.js' %}"></script>
+
+        <script src="{% static 'assets/js/scripts.js' %}"></script>
+
+    </body>
+
+</html>

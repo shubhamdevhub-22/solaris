@@ -1,0 +1,91 @@
+
+<form id="stock_form" novalidate method="post">
+    {% csrf_token %}
+    
+    <div class="row">
+    {% if request.user.is_superuser %}
+    <div class="col-md-12">
+        <label class="col-md-12 col-form-label" for="horizontal-form-2">{{form.company.label}} {% if form.company.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+        <div class="col-md-12">
+        {{form.company}}
+        {% if form.company.errors %}
+            {% for error in form.company.errors %}
+            <p style="color: red;">{{error}}</p>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <input type="text" name="company" value="{{ request.user.get_company_id }}" hidden />
+    {% endif %}
+
+    <div class="form-group col-md-12">
+        <label class="col-md-12 col-form-label" for="horizontal-form-2">{{form.product.label}} {% if form.product.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+        <div class="col-md-12">
+        <select name="product" class="form-control select2-list" {% if stock %} onchange="loadstockproductform(true)" {% endif %} id="id_modal_product">
+            <option value="">All</option>
+            
+            {% for product in products %}
+                <option value="{{ product.id }}" {% if selected_product == product.id %}selected{% endif %}>{{ product.name }}</option>
+            {% endfor %}
+                
+        </select>
+        {% if form.product.errors %}
+            {% for error in form.product.errors %}
+            <p style="color: red;">{{error}}</p>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+    
+    <div class="form-group col-md-12">
+        <label class="col-md-12 col-form-label" for="horizontal-form-2">{{form.warehouse.label}} {% if form.warehouse.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+        <div class="col-md-12">
+            <select name="warehouse" class="form-control select2-list" {% if stock %} onchange="loadstockproductform(true)" {% endif %} id="id_modal_warehouse">
+                <option value="">All</option>
+                
+                {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}" {% if selected_warehouse == warehouse.id %}selected{% endif %}>{{ warehouse.name }}</option>
+                {% endfor %}
+                    
+            </select>
+            {% if form.warehouse.errors %}
+                {% for error in form.warehouse.errors %}
+                <p style="color: red;">{{error}}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group col-md-12">
+        <label class="col-md-12 col-form-label" for="horizontal-form-2">{{form.stock.label}} {% if form.stock.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+        <div class="col-md-12">
+        <input type="number" name="stock" value="{% if stock %}{{stock}}{% else %}0{% endif %}" min="0" class="form-control" placeholder="Stock(Pieces)" id="id_stock">
+        {% if form.stock.errors %}
+            {% for error in form.stock.errors %}
+            <p style="color: red;">{{error}}</p>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+
+    {% comment %} <div class="form-group row">
+        <div class="col-md-3"></div>
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between">
+                <div class="d-flex">
+                    <div class="mr-3">
+                        <input type="checkbox" class="discount_type" name="primary" id="id_primary" {% if form.instance.type == form.instance.PRIMARY %}checked{% endif %}>
+                        <label class="col-form-label" for="id_primary">Primary {% if form.type.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    </div>
+                    <div class="ml-3">
+                        <input type="checkbox" class="discount_type" name="secondary" id="id_secondary" {% if form.instance.type == form.instance.SECONDARY %}checked{% endif %}>
+                        <label class="col-form-label" for="id_secondary">Secondary {% if form.type.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> {% endcomment %}
+</div>
+
+</form>

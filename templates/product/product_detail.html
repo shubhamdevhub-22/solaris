@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+
+
+{% load static %}
+{% block title %}Barcode{% endblock title %}
+{% block bodycontent %}
+
+<section>
+
+  <div class="row row-sm">
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-body h-100">
+          <div class="row row-sm ">
+            <div class="py-auto my-auto col-xl-5 col-lg-12 col-md-12 mt-4 mt-xl-0">
+              <div class="d-flex justify-content-center py-auto my-auto">
+                {% if product.product_image %}
+                <div class="tab-pane">
+                    <img src="{{ product.product_image.url }}" class="product-image" alt="image" height="400"/>
+                </div>
+                {% else %}
+                <div class="tab-pane">
+                  <img class="product-image" alt="image" src="{% static 'app-assets/img/images.png' %}"  height="400">
+                </div>    
+                {% endif %}
+              </div>
+            </div>
+            <div class="details col-xl-7 col-lg-12 col-md-12 mt-4 mt-xl-0">
+                <table class="table table-striped ">
+                  <thead>
+                    <th class="text-center" colspan="3">
+                      Product Details
+                    </th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Name : </label></th>
+                      <td class="text-wrap" class="">{{product.name}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Code : </label></th>
+                      <td class="text-wrap">{{product.code}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Brand : </label></th>
+                      <td class="text-wrap">{{product.brand}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Status : </label></th>
+                      <td class="text-wrap">{{product.status|title}}</td>
+                    </tr>
+                    {% if product.vehicle %}
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Vehicle : </label></th>
+                      <td class="text-wrap">{{product.vehicle.name}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if product.is_apply_ml_quantity %}
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>ML Quantity : </label></th>
+                      <td class="text-wrap">{{product.ml_quantity}}</td>
+                    </tr>
+                    {% endif %}
+                    {% if product.is_apply_weight %}
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width:50%" class="pl-5"><label>Weight : </label></th>
+                      <td class="text-wrap">{{product.weight}}</td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+
+                <table class="table table-striped">
+                  <thead>
+                    <th class="text-center" colspan="3">
+                      Pricing Details
+                    </th>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width: 50%" class="pl-5"><label>MRP : </label></th>
+                      <td id="id_mrp">{{product.mrp}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width: 50%" class="pl-5"><label>Wholesale Price : </label></th>
+                      <td id="id_wholesale_rate">{{product.wholesale_rate}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width: 50%" class="pl-5"><label>Retail Price : </label></th>
+                      <td id="id_retail_rate">{{product.retail_rate}}</td>
+                    </tr>
+                    <tr>
+                      <td style="width:10%"></td>
+                      <th style="width: 50%" class="pl-5"><label>Purchase Price : </label></th>
+                      <td id="id_purchase_rate">{{product.purchase_price}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-sm-row flex-column justify-content-end">
+    <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+
+
+{% comment %} <section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Barcode</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" >Product<span style="color: red;">*</span></label>
+                      <div class="col-md-9">
+                        
+                            <input type="text" name="product_name" id="product-name" class="form-control" value="{{product.name}}" readonly>
+                            <input type="text" name="product_id" id="product-id" class="form-control" value="{{product.id}}" hidden>
+                        
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" >{{form.product_type.label}}{% if form.product_type.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        <select class="form-control select2-list" id="product-type" name="product_type">
+                        <option value="piece">Piece</option>
+                            {% if product.box %}
+                            <option value="box">Box</option>
+                            {% endif %}
+                            {% if product.case %}
+                            <option value="case">Case</option>
+                            {% endif %}
+                        </select>
+                        {% if form.product_type.errors %}
+                            {% for error in form.product_type.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" >{{form.barcode_number.label}}{% if form.barcode_number.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.barcode_number}}
+                          {% if form.barcode_number.errors %}
+                              {% for error in form.barcode_number.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                  </div>
+                  </div>
+                <button type="button" class="btn btn-primary mr-2 submit-barcode-data"><i class="ft-check-square mr-1"></i>Save</button>
+                <a href="{% url 'product:list_product' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> {% endcomment %}
+
+  {% comment %} {% include 'product/list_barcode.html' %} {% endcomment %}
+
+  
+{% endblock %}
+
+{% block script %}
+
+<script>
+    $('.select2-list').select2({
+        width: "100%",
+      });
+</script>
+
+<script>
+    function initialize_datatable(){
+
+        var t = $('#table').DataTable({
+          
+          
+            columnDefs: [
+            {
+                orderable: false,
+                targets: [0,]
+            },
+            ],
+            order: [[0, 'desc']],
+
+            // Ajax for pagination
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{% url "product:product_barcode_list" %}',
+                type: 'get',
+                data: {'id':"{{product.id}}"}
+            },
+            columns: [
+              { data: 'id', name: 'id' },
+              
+              { data: 'unit', name: 'unit' },
+              { data: 'barcode_number', name: 'barcode_number' },
+              { data: 'barcode_code', name: 'barcode_code' },
+              { data: 'action', name: 'action' },
+              
+              
+            ],
+            rowCallback: function (nRow, aData, iDisplayIndex) {
+              var oSettings = this.fnSettings();
+              $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+              return nRow;
+          },
+            
+        });
+
+        }
+
+        initialize_datatable();
+
+        $(document).on('click', '.submit-customer-price', function (){
+          var id = $(this).data("id")
+          var url = $(this).data("url")
+
+          $.ajax({
+              type: "POST",
+              url: url,
+              data: {
+                  "id": id,
+                  "csrfmiddlewaretoken": '{{ csrf_token }}'
+              },
+              success: function (data) {
+                $('#table').DataTable().ajax.reload(null, false);
+                if (data["message"]){
+                  $.toast({
+                      text: data.message,
+                      position: 'bottom-right',
+                      stack: false,
+                      icon: 'success',                    
+                  })
+              }
+                  
+            }    
+          });
+        })
+</script>
+<script>
+    $(document).on('click', '.ajax-delete-btn', function (e) {
+      var id = $(this).data("id")
+      var name = $(this).data("title")
+      if (name == "None") {
+          name = ""
+      }
+      var url = $(this).data("url")
+      var delete_ele = $(this)
+
+      Swal.fire({
+          html: `Are you sure you want to delete <b>${name}</b> ?`,
+          icon: 'question',
+          showCloseButton: true,
+          showCancelButton: true,
+          confirmButtonColor: "#7442DB",
+      }).then((result) => {
+
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  data: {
+                      "id": id,
+                      "csrfmiddlewaretoken": '{{ csrf_token }}'
+                  },
+                  success: function (data) {
+                      $('#table').DataTable().ajax.reload(null, false);
+                      if (data["message"]) {
+                          $.toast({
+                              text: data.message,
+                              position: 'bottom-right',
+                              stack: false,
+                              icon: 'success',
+                          })
+                      }
+                  }
+              });
+          }
+      })
+    })
+</script>
+
+<script>
+  $(document).on('click', '.submit-barcode-data', function (){
+    //print("➡ barcode_number :", barcode_number)
+    var product_id = $("#product-id").val();
+    console.log(product_id);
+    var product_name = $("#product-name").val();
+    var product_type = $("#product-type").val();
+    var barcode_number = $("#id_barcode_number").val();
+
+      $.ajax({
+          type: "POST",
+          url: "{% url 'product:generate_barcode' %}",
+          data: {
+              "product_id": product_id,
+              "product_name": product_name,
+              "product_type": product_type,
+              "barcode_number": barcode_number,
+              "csrfmiddlewaretoken": '{{ csrf_token }}'
+          },
+          success: function (data) {
+            $('#id_barcode_number').val(null)
+            $('#table').DataTable().ajax.reload(null, false);
+            if (data["message"]){
+              $.toast({
+                  text: data.message,
+                  position: 'bottom-right',
+                  stack: false,
+                  icon: 'success',                    
+              })
+          }
+          if (data["error"]){
+            $.toast({
+                text: data.error,
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',                    
+            })
+        }
+              
+        }    
+      });
+    })
+</script>
+
+<script>
+  function ImageToPrint(source)
+    {
+        
+        return "<html><head><scri"+"pt>function step1(){\n" +
+                "setTimeout('step2()', 10);}\n" +
+                "function step2(){window.print();window.close()}\n" +
+                "</scri" + "pt></head><body onload='step1()'>\n" +
+                "<img src='/media/" + source + "' /></body></html>";
+    }
+    
+  $(document).on('click', '.ajax-image-btn', function (e) {
+    
+    var source = $(this).data("image")
+   
+        var Pagelink = "about:blank";
+        var pwa = window.open(Pagelink, "_new");
+        
+        pwa.document.open();
+        pwa.document.write(ImageToPrint(source));
+        pwa.document.close();
+    
+  })
+</script>
+
+<script>
+  $(document).ready(function(){
+    mrp = parseFloat($("#id_mrp").text())
+    wholesale = parseFloat($("#id_wholesale_rate").text())
+    retail = parseFloat($("#id_retail_rate").text())
+    purchase = parseFloat($("#id_purchase_rate").text())
+
+    $("#id_mrp").text(mrp.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}));
+    $("#id_wholesale_rate").text(wholesale.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}))
+    $("#id_retail_rate").text(retail.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}))
+    $("#id_purchase_rate").text(purchase.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}))
+    
+  })
+</script>
+
+{% endblock script %}

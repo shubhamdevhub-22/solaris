@@ -1,0 +1,4 @@
+<div>{% if order_bill %}{{order_bill.bill_id}}{% else %}{{order.order_id}}{% endif %}</div>
+{% if order.inform_admin_for_settlement and request.user.role in "company admin,super admin" %}
+<div class="badge bg-light-danger mt-2">Settlement Required</div>
+{% endif %}

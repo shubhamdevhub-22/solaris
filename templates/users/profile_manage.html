@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Profile{% endblock title %}
+
+{% block bodycontent %}
+
+<style>
+  .image-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .icon-overlay {
+    position: absolute;
+    bottom: -22px;
+    right: -22px;
+    color: wheat;
+    padding: 5px;
+  }
+
+  .material-icons {
+    color: #fff;
+    font-size: 20px;
+  }
+</style>
+
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">View Profile</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-10">
+                      <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.full_name.label}}{% if form.full_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {{form.full_name}}
+                                {% if form.full_name.errors %}
+                                  {% for error in form.full_name.errors %}
+                                    <p style="color: red;">{{error}}</p>
+                                  {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.email.label}}{% if form.email.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9" readonly>
+                                {{form.email}}
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.role.label}}{% if form.role.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                            <div class="col-md-9">
+                              {{form.role}}
+                              {% if form.role.errors %}
+                                  {% for error in form.role.errors %}
+                                    <p style="color: red;">{{error}}</p>
+                                  {% endfor %}
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.phone.label}}{% if form.phone.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                            <div class="col-md-9">
+                              {{form.phone}}
+                              {% if form.phone.errors %}
+                                  {% for error in form.phone.errors %}
+                                    <p style="color: red;">{{error}}</p>
+                                  {% endfor %}
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2 ">
+                    <div class="row ml-2">
+                        <div class="col-md-4 col-12">
+                          <div class="image-container">
+                            <img id="image-preview" src="{% if image %}{{image}}{% else %}{% static 'images/default-profile.png' %}{% endif %}" alt="" class="max-w-full mx-auto flex items-center justify-center text-[#434343]" style="border-radius: 50%; width:7rem; height:7rem; margin-right: 10px;">
+                          </div>
+                            <div class="icon-overlay">
+                              <label for="id_image" class="form-input" style="cursor: pointer; padding: 24px 11px; border: none;"><i class="fa-solid ft-edit fa-lg "></i></label>
+                            </div>
+                          </div>
+                            <input type="file" name="image" accept="image/*" class="form-input" placeholder="User Image" id="id_image" style="display:none;" value="">
+                        </div>
+                        <div class="col-md-4 col-12 ml-4">
+                          <!-- <label for="id_image" class="form-input" style="cursor: pointer; padding: 24px 11px; border: none;"><i class="fa-solid ft-edit fa-lg"></i></label> -->
+                          {% comment %} <label id="clear-btn" class="form-input ml-3 mt-5" style="cursor: pointer; padding: 0 12px; border: none;"> <i class="fa-solid ft-trash fa-lg" style="color:red;"></i></label> {% endcomment %}
+                        </div>
+                        <input type="checkbox" name="image-clear" id="image-clear" style="display:none;">
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Change</button>
+                  <a><button type="button" class="btn btn-secondary" onclick="history.back()"><i class="ft-x mr-1"></i>Cancel</button></a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock bodycontent %}
+
+{% block script %}
+<script>
+  if (document.getElementById('image-preview').getAttribute('src') == "/static/images/default-profile.png"){        
+      $("#clear-btn").hide() 
+  }else{
+      $("#clear-btn").show()
+  }
+  function readURL(input) {
+      if (input.files && input.files[0]) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+              document.getElementById("image-preview").src = e.target.result;
+          }
+          $("#clear-btn").show()
+          checkBox = document.getElementById('image-clear');
+          checkBox.checked = false;
+          reader.readAsDataURL(input.files[0]);
+      }
+      else {
+          $("#image").empty()
+      }
+  }
+  $("#id_image").on("change", function(){
+      readURL(this);
+  })
+  $("#clear-btn").on("click", function(){
+      $("#id_image").val("");
+      //console.log($("#id_image").val(""))
+      checkBox = document.getElementById('image-clear');
+      checkBox.checked = true;
+      document.getElementById("image-preview").src = "{% static 'images/default-profile.png' %}";
+      $("#clear-btn").hide()
+  })
+</script>
+<!-- <script>
+  $("#image-preview").on("click",function(){
+
+    $("#id_image").click();
+  });
+</script> -->
+{% endblock script %}

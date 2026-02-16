@@ -1,0 +1,118 @@
+#delete_btn:hover {
+    cursor: pointer;
+}
+
+.details-btn:hover {
+    cursor: pointer;
+}
+
+.col-1-5 {
+    flex: 0 0 12.5%;
+    max-width: 12.5%;
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-10-5 {
+    flex: 0 0 87.5%;
+    max-width: 87.5%;
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.row.match-height>.order-form{
+    width: 100%;
+}
+.hover-pointer:hover{
+    cursor: pointer;
+}
+
+.custom-control-input{
+    width: 1.5rem;
+    height: 1.75rem;
+}
+.custom-control-label span{
+    margin-left: 1rem;
+}
+.custom-control-label::after, .custom-control-label::before{
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.custom-checkbox input.custom-control-input~.custom-control-label:before{
+    width: 1.6rem;
+    height: 1.6rem;
+    top: 0;
+}
+
+.custom-checkbox .custom-control-input:checked~.custom-control-label:after{
+    background-size: 1rem;
+    top: 0rem;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.iti {
+    display: block !important;
+}
+
+.btn-pointer-events-none{
+    opacity: .65;
+}
+.btn-pointer-events-none:hover{
+    cursor: not-allowed;
+}
+
+.custom-file-label, .custom-file-label::after{
+    top:unset;
+}
+
+.product-row .added-product-quantity{
+    width: 100px;
+}
+
+#available_store_credits{
+    text-transform: capitalize;
+}
+
+.height-30{
+    height: 30px;
+}
+
+.select2-selection__rendered{
+    line-height: 35px !important;
+}
+
+.select2-selection__arrow{
+    top: 5px !important;
+}
+
+.text-end{
+    text-align: end !important;
+}
+
+.select2-container--default .select2-selection--single {
+    border: 1px solid #E0E0E0 !important;
+}
+
+.product-name{
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+}
+
+.select2-selection__clear {
+    float: left !important;
+    height: 35px !important;
+    margin-left: 5px !important;
+    margin-right: 5px !important;
+}
+
+.dropdown-css {
+    border: 2px solid;
+    padding: 5px;
+    border-color: #8dacf7;
+}

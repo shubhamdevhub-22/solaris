@@ -1,0 +1,61 @@
+{% if order_product %}
+<tr data-id="product_{{order_product.id}}" product-id={{order_product.id}} class="product-row">
+    <td data-title="product-id">{{order_product.id}}</td>
+    <td data-title="order">
+        <a href="{% url 'order:order_detail' order_product.order.id %}">{{order_product.order.order_id}}</a>
+    </td>
+    <td data-title="product-name">
+        {{order_product.product.name}}{% if order_product.product.code %} ({{order_product.product.code}}){% endif %}
+        <input type="hidden" name="product_{{order_product.id}}_name" value="{{order_product.product.id}}" />
+    </td>
+    <td data-title="vehicle">
+        {% if order_product.product.vehicle %}{{order_product.product.vehicle.name}}{% else %}-{% endif %}
+    </td>
+    <td data-title="unit-price">
+        <input type="number"  min="0" name="product_{{order_product.id}}_unitprice" id="id_product_{{order_product.id}}_unitprice" class="form-control" disabled value="{{ order_product.unit_price }}" />
+    </td>
+    <td data-title="quantity">
+        <input type="number"  min="0" name="product_{{order_product.id}}_quantity" class="form-control" id="id_product_{{order_product.id}}_quantity" disabled value="{{ order_product.quantity }}" />
+        <span>Available for replace: {{ order_product.get_available_replacement_stock }}</span>
+        <input type="hidden" name="available_replacement_quantity" value="{{ order_product.get_available_replacement_stock }}" id="id_product_{{order_product.id}}_available_replacement_quantity" />
+    </td>
+    <td data-title="replace-quantity">
+        <input type="number" name="product_{{order_product.id}}_replace_quantity" data-id="{{ order_product.id }}" class="form-control replace-quantity" id="id_product_{{order_product.id}}_replace_quantity" value="0" />
+    </td>
+    <td data-title="replace-total">
+        <input type="number" name="product_{{order_product.id}}_replace_amount" class="form-control replace-amount" id="id_product_{{order_product.id}}_replace_amount" value="0" />
+    </td>
+    <td data-title="remove-product"><span class="btn-product-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span></td>
+</tr>
+{% endif %}
+
+{% for replace_product in replace_products %}
+<tr data-id="product_{{replace_product.order_product.id}}" product-id={{replace_product.order_product.id}} class="product-row">
+    <td data-title="product-id">{{replace_product.order_product.id}}</td>
+    <td data-title="order">
+        <a href="{% url 'order:order_detail' replace_product.order_product.order.id %}">{{replace_product.order_product.order.order_id}}</a>
+    </td>
+    <td data-title="product-name">
+        {{replace_product.order_product.product.name}}{% if replace_product.order_product.product.code %} ({{replace_product.order_product.product.code}}){% endif %}
+        <input type="hidden" name="product_{{replace_product.order_product.id}}_name" value="{{replace_product.order_product.product.id}}" />
+    </td>
+    <td data-title="vehicle">
+        {% if replace_product.order_product.product.vehicle %}{{replace_product.order_product.product.vehicle.name}}{% else %}-{% endif %}
+    </td>
+    <td data-title="unit-price">
+        <input type="number"  min="0" name="product_{{replace_product.order_product.id}}_unitprice" id="id_product_{{replace_product.order_product.id}}_unitprice" class="form-control" disabled value="{{ replace_product.order_product.unit_price }}" />
+    </td>
+    <td data-title="quantity">
+        <input type="number"  min="0" name="product_{{replace_product.order_product.id}}_quantity" id="id_product_{{replace_product.order_product.id}}_quantity" class="form-control" disabled value="{{ replace_product.order_product.quantity }}" />
+        <span>Available for replace: {{ replace_product.get_available_replace_quantity }}</span>
+        <input type="hidden" name="available_replacement_quantity" value="{{ replace_product.get_available_replace_quantity }}" id="id_product_{{replace_product.order_product.id}}_available_replacement_quantity" />
+    </td>
+    <td data-title="replace-quantity">
+        <input type="number" name="product_{{replace_product.order_product.id}}_replace_quantity" data-id="{{ replace_product.order_product.id }}" class="form-control replace-quantity" id="id_product_{{replace_product.order_product.id}}_replace_quantity" value="{{ replace_product.replace_quantity }}" />
+    </td>
+    <td data-title="replace-total">
+        <input type="number" name="product_{{replace_product.order_product.id}}_replace_amount" class="form-control replace-amount" id="id_product_{{replace_product.order_product.id}}_replace_amount" value="{{ replace_product.get_replace_item_total }}" disabled />
+    </td>
+    <td data-title="remove-product"><span class="btn-product-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span></td>
+</tr>
+{% endfor %}

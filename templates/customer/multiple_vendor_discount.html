@@ -1,0 +1,130 @@
+
+{% load widget_tweaks %}
+{% load custom_template_tags %}
+{{ multipleVendorDiscounts.management_form }}
+{% load static %}
+
+<div class="row "style="padding:1.15rem 0rem;">
+
+    <div class="col-md-2">
+        <label class="label-control mt-2 font-weight-bold" for="id_additional_charges">Discounts :</label>
+    </div>
+    <div class="col-md-12">
+
+        <table class="table table-bordered inline-formset mt-3"
+            id="multiplediscount_set-table">
+
+            <tbody>
+                {% for form in multipleVendorDiscounts.forms %}
+                <tr data-id="{{ form.id.value }}" data-order="">
+                    <td>
+                        <div class="row" hidden>
+                            <div class="col-3 mb-1">
+                                <div class="controls">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="mt-1">
+                                            <label>{{form.customer.label}}{% if form.customer.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="help-block validate-email">
+                                                {{form.customer}}
+                                                {% for error in form.customer.errors %}
+                                                <span style="color: red;">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-3 mb-1">
+                                <div class="controls">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="mt-1">
+                                            <label>{{form.brand.label}}{% if form.brand.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="help-block validate-email">
+                                                {{form.brand}}
+                                                {% for error in form.brand.errors %}
+                                                <span style="color: red;">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-1">
+                                <div class="controls">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="mt-1">
+                                            <label>{{form.discount.label}}{% if form.discount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        </div>
+                                        <div class="col-10">
+                                            <div class="help-block validate-email">
+                                                {{form.discount}}
+                                                {% for error in form.discount.errors %}
+                                                <span style="color: red;">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-1">
+                                <div class="controls">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="mt-1">
+                                            <label>{{form.discount_percent.label}}{% if form.discount_percent.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        </div>
+                                        <div>
+                                            <div class="help-block validate-email">
+                                                {{form.discount_percent}}
+                                                {% for error in form.discount_percent.errors %}
+                                                <span style="color: red;">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-3 mb-1">
+                                <div class="controls">
+                                    <div class="d-flex justify-content-between">
+                                        <div class="mt-1 col-6">
+                                            <label>{{form.additional_discount.label}}{% if form.additional_discount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        </div>
+                                        <div>
+                                            <div class="help-block validate-email">
+                                                {{form.additional_discount}}
+                                                {% for error in form.additional_discount.errors %}
+                                                <span style="color: red;">{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <div>
+                    </td>
+                    <td>
+                        <label for="{{ form.DELETE.auto_id }}" class="btn btn-default btn-circle-inline inlineform-remove">
+                            <i class="ft-minus danger font-medium-3"></i>
+                            {{form.DELETE |add_attr:"class:d-none"}}
+                        </label>
+
+                        {% for hidden in form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="btn btn-default pull-right" type="button" id="add-discounts-inline"><i class="fa fa-plus"></i> Add more</button>
+
+    </div>
+</div>
+
+

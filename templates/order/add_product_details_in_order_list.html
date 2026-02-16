@@ -1,0 +1,225 @@
+{% load order_calculations %}
+
+{% if order_products %}
+
+{% for order_product in order_products %}
+
+{% comment %} <tr data-id="product_{{order_product.product.id}}" product-id={{order_product.product.id}} class="product-row"> 
+    <td data-title="product-id">{{forloop.counter}}</td>
+    <td data-title="product-code">
+        {% if order_product.product.code %}{{order_product.product.code}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{order_product.product.id}}__id" value="{{order_product.product.code}}" />
+    </td>
+    <td data-title="product-name">
+        {{order_product.product.name}}
+    </td>
+    <td data-title="vehicle">
+        {% if order_product.product.vehicle %}{{order_product.product.vehicle.name}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{order_product.product.id}}__id" value="{% if order_product.product.vehicle %}{{order_product.product.vehicle.name}}{% endif %}" />
+    </td>
+    <td data-title="unit-type">{% if order_product.unit_type %}{{order_product.unit_type}}{% else %}-{% endif %}<input type="hidden" name="product_{{order_product.product.id}}__unit_type" value="{{order_product.unit_type}}" /></td>
+    <td data-title="quantity">
+        <input type="number"  min="0" max="{{order_product.get_available_stock}}" name="product_{{order_product.product.id}}__quantity" class="form-control text-center added-product-quantity" value="{{order_product.quantity}}" />
+    </td>
+    <td data-title="total-pieces" class="d-none">
+        <span id="added_product_total_pieces" >{{order_product.get_total_pieces}}</span>
+        <input type="hidden" name="product_{{order_product.product.id}}__totalpieces" value="{{order_product.get_total_pieces}}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__unittypepieces" value="{{order_product.get_unit_type_pieces}}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__available_stock" value="{{order_product.get_available_stock}}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__product_name" value="{{order_product.product.name}}" />
+    </td>
+    <td data-title="unit-price">
+        <input type="number"  min="0" name="product_{{order_product.product.id}}__unitprice" class="form-control text-center" value="{{order_product.unit_price}}" />
+    </td>
+    <!-- <td data-title="gp">0.0</td> -->
+    
+    <td data-title="product-discount">
+        <input type="number"  min="0" step="0.05" name="product_{{order_product.product.id}}__product_discount1" class="form-control text-center" value="{{order_product.product_discount1}}" />
+    </td>
+    <td data-title="item-total">
+        {{order_product.get_item_total}}
+        <input type="hidden" name="product_{{order_product.product.id}}__itemtotal" value="order_product.get_item_total" />
+    </td>
+    <td data-title="product-discount2">
+        <input type="number"  min="0" step="0.05" name="product_{{order_product.product.id}}__product_discount2" class="form-control text-center" value="{{order_product.product_discount2}}" />
+    </td>
+    <td data-title="net-price">
+        <span class="added_product_net_price">{{order_product.get_net_price}}</span>
+        <input type="hidden" name="product_{{order_product.product.id}}__netprice" class="hidden-added-product-net-price" value="{{order_product.get_net_price}}" />
+    </td>
+    <td data-title="remove-product"><span class="btn-procuct-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span></td>
+</tr> {% endcomment %}
+
+<tr id="row_{{ order_product.product.id }}" data-id="product_{{order_product.product.id}}" product-id={{order_product.product.id}} class="product-row">
+    <td data-title="brand">{{order_product.product.brand.name}}</td>
+    <td data-title="product">
+        {{order_product.product.name}} {% if order_product.product.code %}({{order_product.product.code}}){% endif %}
+        <input type="hidden" name="product_{{order_product.product.id}}__id" value="{{order_product.product.code}}" />
+    </td>
+    <td data-title="vehicle">
+        {% if order_product.product.vehicle %}{{order_product.product.vehicle.name}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{order_product.product.id}}__id" value="{% if order_product.product.vehicle %}{{order_product.product.vehicle.name}}{% endif %}" />
+    </td>
+    <td data-title="quantity">
+        {{ order_product.quantity }} {% if order_product.free_quantity > 0 %}+ {{ order_product.free_quantity }}{% endif %}
+        <input type="hidden"  min="0" name="product_{{order_product.product.id}}__quantity" id="id_product_{{order_product.product.id}}__quantity" class="form-control text-center added-product-quantity" value="{{ order_product.quantity }}" />
+    </td>
+    <td data-title="unit-type">
+        {% if order_product.product.unit %}{{order_product.product.unit}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{order_product.product.id}}__unit" value="{{order_product.product.unit}}" />
+    </td>
+    {% comment %} <td data-title="total-pieces" class="d-none">
+        <span id="added_product_total_pieces" >{% calc_total_pieces  quantity unit_type_pieces%}</span>
+        <input type="hidden" name="product_{{order_product.product.id}}__totalpieces" value="{% calc_total_pieces  quantity unit_type_pieces %}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__unittypepieces" value="{{unit_type_pieces}}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__available_stock" value="{{max_quantity}}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__product_name" value="{{order_product.product.name}}" />
+    </td> {% endcomment %}
+    <td data-title="unit-price">
+        {{ order_product.unit_price }}
+        <input type="hidden" min="0" name="product_{{order_product.product.id}}__unitprice" class="form-control text-center" id="id_product_{{order_product.product.id}}__unitprice" value="{{order_product.unit_price}}" />
+        <input type="hidden" class="form-control" name="product_{{order_product.product.id}}__price_type" id="id_product_{{order_product.product.id}}__price_type" value="{{ order_product.price_type|lower }}" />
+        <input type="hidden" class="form-control" id="id_product_{{order_product.product.id}}__applied_product_price" value="{{ order_product.product.mrp }}"/>
+    </td>
+    <td data-title="item-total">
+        {% if order_product.special_rate != 0 %}
+            Special Rate (₹): {{ order_product.special_rate }} 
+        {% elif order_product.special_discount != 0 %}
+            Special Discount: {{ order_product.special_discount }} %
+        {% else %}
+            -
+        {% endif %}
+
+        <input type="hidden" class="form-control text-center mr-1" name="product_{{order_product.product.id}}__special_rate" id="id_product_{{order_product.product.id}}__special_rate" value="{{ order_product.special_rate }}" />
+        <input type="hidden" class="form-control text-center" name="product_{{order_product.product.id}}__special_discount" id="id_product_{{order_product.product.id}}__special_discount" value="{{ order_product.special_discount }}" />
+        <input type="hidden" class="form-control" name="product_{{order_product.product.id}}__special" value="{{ special }}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__free_quantity" id="id_product_{{order_product.product.id}}__free_quantity" value="{{ order_product.free_quantity }}" />
+        <input type="hidden" name="product_{{order_product.product.id}}__netprice" class="hidden-added-product-net-price" value="{{ order_product.get_net_price }}" />
+    </td>
+    
+    <td data-title="remove-product">
+        <span class="btn-product-edit hover-pointer" data-product-id="{{order_product.product.id}}"><i class="ft-edit font-medium-3 text-primary"></i></span>
+        <span class="btn-product-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span>
+    </td>
+</tr>
+
+{% endfor %}
+
+{% else %}
+<tr id="row_{{ product.id }}" data-id="product_{{product.id}}" product-id={{product.id}} class="product-row">
+    <td data-title="brand">{{product.brand.name}}</td>
+    <td data-title="product">
+        {{product.name}} {% if product.code %}({{product.code}}){% endif %}
+        <input type="hidden" name="product_{{product.id}}__id" value="{{product.code}}" />
+    </td>
+    <td data-title="vehicle">
+        {% if product.vehicle %}{{product.vehicle.name}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{product.id}}__id" value="{% if product.vehicle %}{{product.vehicle.name}}{% endif %}" />
+    </td>
+    <td data-title="quantity">
+        {{ total_quantity }} {% if free_quantity > 0 %}+ {{ free_quantity }}{% endif %}
+        <input type="hidden"  min="0" max="{{max_quantity}}" name="product_{{product.id}}__quantity" id="id_product_{{product.id}}__quantity" class="form-control text-center added-product-quantity" value="{{total_quantity}}" />
+    </td>
+    <td data-title="unit-type">
+        {% if product.unit %}{{product.unit}}{% else %}-{% endif %}
+        <input type="hidden" name="product_{{product.id}}__unit" value="{{product.unit}}" />
+    </td>
+    {% comment %} <td data-title="total-pieces" class="d-none">
+        <span id="added_product_total_pieces" >{% calc_total_pieces  quantity unit_type_pieces%}</span>
+        <input type="hidden" name="product_{{product.id}}__totalpieces" value="{% calc_total_pieces  quantity unit_type_pieces %}" />
+        <input type="hidden" name="product_{{product.id}}__unittypepieces" value="{{unit_type_pieces}}" />
+        <input type="hidden" name="product_{{product.id}}__available_stock" value="{{max_quantity}}" />
+        <input type="hidden" name="product_{{product.id}}__product_name" value="{{product.name}}" />
+    </td> {% endcomment %}
+    <td data-title="unit-price">
+        {{ unit_price }}
+        <input type="hidden" min="0" name="product_{{product.id}}__unitprice" class="form-control text-center" id="id_product_{{product.id}}__unitprice" value="{{unit_price}}" />
+        <input type="hidden" class="form-control" name="product_{{product.id}}__price_type" id="id_product_{{product.id}}__price_type" value="{{ price_type }}" />
+        <input type="hidden" class="form-control" id="id_product_{{product.id}}__applied_product_price" value="{{ applied_product_price }}" />
+    </td>
+    <td data-title="item-total">
+        {% if special_rate > 0 %}
+            Special Rate (₹): {{ special_rate }} 
+        {% elif special_discount > 0 %}
+            Special Discount: {{ special_discount }} %
+        {% else %}
+            -
+        {% endif %}
+        <input type="hidden" class="form-control text-center mr-1" name="product_{{product.id}}__special_rate" id="id_product_{{product.id}}__special_rate" value="{{ special_rate }}" />
+        <input type="hidden" class="form-control text-center" name="product_{{product.id}}__special_discount" id="id_product_{{product.id}}__special_discount" value="{{ special_discount }}" />
+        <input type="hidden" class="form-control" name="product_{{product.id}}__special" value="{{ special }}" />
+        <input type="hidden" name="product_{{product.id}}__free_quantity" id="id_product_{{product.id}}__free_quantity" value="{{ free_quantity }}" />
+        <input type="hidden" name="product_{{product.id}}__netprice" class="hidden-added-product-net-price" value="{{ net_amount }}" />
+    </td>
+    
+    <td data-title="remove-product">
+        <span class="btn-product-edit hover-pointer" data-product-id="{{product.id}}"><i class="ft-edit font-medium-3 text-primary"></i></span>
+        <span class="btn-product-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span>
+    </td>
+</tr>
+
+{% endif %}
+
+
+{% comment %} <tr data-id="product_{{product.id}}" product-id={{product.id}} class="product-row">
+    <td data-title="product-id">{{product.id}}</td>
+    <td data-title="product-name">
+        {{product.name}}
+        <input type="hidden" name="product_{{product.id}}__id" value="{{product.id}}" />
+        {% if exchange %}
+        <input type="hidden" name="product_{{product.id}}__orderlabel" value="exchange" />
+        <span class="badge badge-pill badge-info mb-1 mr-2">Exchange</span>
+        {% elif textable %}
+        <input type="hidden" name="product_{{product.id}}__orderlabel" value="textable" />
+        <span class="badge badge-pill badge-warning mb-1 mr-2">Textable</span>
+        {% elif free_item %}
+        <input type="hidden" name="product_{{product.id}}__orderlabel" value="free" />
+        <span class="badge badge-pill badge-success mb-1 mr-2">Free</span>
+        {% else %}
+        <input type="hidden" name="product_{{product.id}}__orderlabel" value="regular" />
+        {% endif %}
+    </td>
+    <td data-title="unit-type">{{unit_type}}<input type="hidden" name="product_{{product.id}}__unit_type" value="{{unit_type}}" /></td>
+    <td data-title="quantity">
+        <input type="number"  min="0" max="{{max_quantity}}" name="product_{{product.id}}__quantity" class="form-control text-center added-product-quantity" value="{{quantity}}" />
+    </td>
+    <td data-title="total-pieces">
+        <span id="added_product_total_pieces" >{% calc_total_pieces  quantity unit_type_pieces%}</span>
+        <input type="hidden" name="product_{{product.id}}__unittypepieces" value="{{unit_type_pieces}}" />
+    </td>
+    <td data-title="unit-price">
+        {% if exchange or free_item %}
+        <input type="number"  min="0" name="product_{{product.id}}__unitprice" class="form-control text-center" value="0.00" readonly/>
+        {% else %}
+        <input type="number"  min="0" name="product_{{product.id}}__unitprice" class="form-control text-center" value="{{base_price}}" />
+        {% endif %}
+    </td>
+    <td data-title="srp">{{product.srp}}</td>
+    <td data-title="gp">0.0</td>
+    <td data-title="item-total">
+        {% if exchange or free_item %}
+        <span id="added_product_item_total">0.00</span>
+        <input type="hidden" name="product_{{product.id}}__itemtotal" value="0.00" />
+        {% else %}
+        {% product_item_total quantity unit_type_pieces  base_price %}
+        <input type="hidden" name="product_{{product.id}}__itemtotal" value="{% product_item_total quantity unit_type_pieces  base_price %}" />
+        {% endif %}
+    </td>
+    <td data-title="product-discount">
+        {% if exchange or free_item %}
+        <input type="number"  min="0" name="product_{{product.id}}__productdiscount" class="form-control text-center" value="0.00" readonly />
+        {% else %}
+        <input type="number"  min="0" step="0.05" name="product_{{product.id}}__productdiscount" class="form-control text-center" value="0.00" />
+        {% endif %}
+    </td>
+    <td data-title="net-price">
+        {% if exchange or free_item %}
+        <span class="added_product_net_price">0.00</span>
+        <input type="hidden" name="product_{{product.id}}__netprice" class="hidden-added-product-net-price" value="0.00" />
+        {% else %}
+        <span class="added_product_net_price">{% product_item_total quantity unit_type_pieces  base_price %}</span>
+        <input type="hidden" name="product_{{product.id}}__netprice" class="hidden-added-product-net-price" value="{% product_item_total quantity unit_type_pieces  base_price %}" />
+        {% endif %}
+    </td>
+    <td data-title="remove-product"><span class="btn-procuct-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span></td>
+</tr> {% endcomment %}

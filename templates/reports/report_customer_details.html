@@ -1,0 +1,6 @@
+{% if request.user.role in "company admin,super admin" %}
+<a href="{% if customer_id %}{% url 'customer:customer_details' customer_id.id %}{% endif %}">{{ customer_id.customer_name }}</a> 
+{% else %}
+{{ customer_id.customer_name }}
+{% endif %}
+{% if customer_id.area %}({{ customer_id.area }}){% endif %}

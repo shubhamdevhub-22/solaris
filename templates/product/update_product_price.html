@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Update Product Price</h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <form action="" method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-1">{{form.name.label}}</label>
+                                        <div class="col-md-9">
+                                            {{form.name}}
+                                            {% if form.name.errors %}
+                                                {% for error in form.name.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %} <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-2">{{form.is_type_a_invoice.label}}</label>
+                                        <div class="col-md-9">
+                                            {{form.is_type_a_invoice}}
+                                            {% if form.is_type_a_invoice.errors %}
+                                                {% for error in form.is_type_a_invoice.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                            {% comment %} <div class="row">
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-1">{{form.stock.label}}</label>
+                                        <div class="col-md-9">
+                                            {{form.stock}}
+                                            {% if form.stock.errors %}
+                                                {% for error in form.stock.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div> {% endcomment %}
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-2">{{form.mrp.label}}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text">₹</span>
+                                                </div>
+                                            {{form.mrp}}
+                                            {% if form.mrp.errors %}
+                                                {% for error in form.mrp.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-1">{{form.wholesale_rate.label}}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text">₹</span>
+                                                </div>
+                                            {{form.wholesale_rate}}
+                                            {% if form.wholesale_rate.errors %}
+                                                {% for error in form.wholesale_rate.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-2">{{form.retail_rate.label}}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text">₹</span>
+                                                </div>
+                                            {{form.retail_rate}}
+                                            {% if form.retail_rate.errors %}
+                                                {% for error in form.retail_rate.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label"
+                                            for="horizontal-form-1">{{form.purchase_price.label}}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                  <span class="input-group-text">₹</span>
+                                                </div>
+                                            {{form.purchase_price}}
+                                            {% if form.purchase_price.errors %}
+                                                {% for error in form.purchase_price.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+                            <a href="{% url 'product:list_product_price' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

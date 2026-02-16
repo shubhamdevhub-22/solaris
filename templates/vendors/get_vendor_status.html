@@ -1,0 +1,7 @@
+{% if vendor.status == vendor.ACTIVE %}
+<center><span class="badge bg-light-success">{{vendor.status.title}}</span></center>
+
+{% elif vendor.status == vendor.INACTIVE %}
+<center><span class="badge bg-light-danger">{{vendor.status.title}}</span></center>
+
+{% endif %}

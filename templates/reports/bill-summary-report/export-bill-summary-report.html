@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Summary Report</title>
+    <style>
+        @page {
+            margin: 50px 15px;
+
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 20pt; right: 20pt; width: 980pt; top: 810pt; height: 20pt;
+            }
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: auto !important;
+            font-size: 10pt !important;
+        }
+
+        .text-end{
+            text-align: right !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 3rem !important;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <table style="width: 100%">
+            <tr style="width: 100%">
+                <td style="width:50%">
+                    {% if zone %}
+                    Zone: <b>{{ zone }}</b>
+                    {% endif %}
+                </td>
+                {% if start_date and end_date %}
+                <td style="width: 50%;" class="text-end">
+                    <b>{{ start_date|date:"d-m-Y" }}</b> to <b>{{ end_date|date:"d-m-Y" }}</b>
+                </td>
+                {% endif %}
+            </tr>
+        </table>
+    </div>
+
+    <div>
+        <table border="1" style="width: 100%">
+            {% comment %} <thead>
+                <th style="width: 70%; padding-left: 5px; padding-right: 0px;">CUSTOMER NAME / AREA</th>
+                <th style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></th>
+                <th style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></th>
+                <th style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></th>
+                <th style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></th>
+                <th style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></th>
+            </thead> {% endcomment %}
+            <tbody>
+                {% for order_bill in order_bills %}
+                <tr>
+                    <td valign="top" style="width: 75%; padding-top: 2px; padding-bottom: 10px; padding-left: 3px; padding-right: 5px;">
+                        <table>
+                            <tr>
+                                <td valign="top" style="width:55%">{{ order_bill.customer.customer_name }}</td>
+                                <td valign="top" style="width:25%">{{ order_bill.customer.area }}</td>
+                                <td valign="top" style="width:20%">{{ order_bill.remaining_amount }}</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></td>
+                    <td style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></td>
+                    <td style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></td>
+                    <td style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></td>
+                    <td style="padding-top: 20px; padding-bottom: 20px; padding-right: 60px; padding-left: 60px;"></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <th style="padding-top: 10px; padding-bottom: 10px;" colspan="7">No Bills Found</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <table  style="width: 100%">
+            <tr>
+                <td style="width: 50%;"></td>
+                <td colspan="4" style="padding-top: 10px; padding-bottom: 10px; padding-right: 10px;" class="text-end"><b>Total : </b></td>
+                <td style="padding-left: 5px;"><b>{{ total_amount }}</b></td>
+            </tr>
+        </table>
+    </div>
+
+    <table id="footer_content">
+        <tr>
+            <td>Date: {% now "d-m-Y h:i A" %}</td>
+            <td>page <pdf:pagenumber> of <pdf:pagecount></td>
+        </tr>
+    </table>
+</body>
+</html>

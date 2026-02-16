@@ -1,0 +1,38 @@
+
+<section id="basic-hidden-label-form-layouts">
+
+    <input type="hidden" name="company" value="{{user.get_company_id}}" id="id_company">
+
+    <div class="row">
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Product</label>
+            <div class="col-md-12">
+                <input type="text" class="form-control" name="product" id="id_product" value="{{ product.name }}" disabled />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Ordered stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number"  name="ordered_stock" id="id_ordered_stock" value="{{ ordered_stock }}" disabled>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Ready for dispatch stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number"  name="available_stock" id="id_available_stock" value="{{ stock }}" disabled>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Pending Stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number" name="remaining_stock" value="{{ remaining_stock }}" disabled />
+            </div>
+        </div>
+    </div>
+
+</section>

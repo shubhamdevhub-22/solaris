@@ -1,0 +1,90 @@
+{% comment %} <form action="{% if form.instance.pk %}{% url 'expanse_management:expanse_update' form.instance.pk %}{% else %}{% url 'expanse_management:expanse_create' %}{% endif %}" method="post" enctype="multipart/form-data" id="expanse-create-form" novalidate>
+<form id="expanse_form" novalidate method="post" hx-target="{% if form.instance.id %}#update_expanse_modal {% else %}#add_expanse_modal{% endif %}" hx-post="{% if form.instance.id %}{% url 'expanse_management:expanse_update' form.instance.pk %}{% else %}{% url 'expanse_management:expanse_create' %}{% endif %}">
+
+    {% csrf_token %}
+    <div class="row">
+
+        <div class="col-md-12 col-12">
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="horizontal-form-2">{{ form.expanse.label }}{% if form.expanse.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                <div class="col-md-12">
+                    {{ form.expanse }}
+                    {% if form.expanse.errors %}
+                        {% for error in form.expanse.errors %}
+                            <p style="color: red;">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-12">
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="horizontal-form-2">{{ form.date.label }}{% if form.date.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                <div class="col-md-12">
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        {% for error in form.date.errors %}
+                            <p style="color: red;">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-12" id="id-note">
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="horizontal-form-2">{{ form.note.label }}{% if form.note.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                <div class="col-md-12">
+                    {{ form.note }}
+                    {% if form.note.errors %}
+                        {% for error in form.note.errors %}
+                            <p style="color: red;">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</form> {% endcomment %}
+<form id="expanse-form" method="post" hx-post="{% url 'expanse_management:expanse_create' %}" hx-target="#add_expanse_modal" novalidate>
+  {% comment %} <form id="discount_form" novalidate method="post" hx-target="{% if form.instance.id %}#update_discount_modal {% else %}#add_discount_modal{% endif %}" 
+  hx-post="{% if form.instance.id %}{% url 'customer:discount_update' form.instance.id %}{% else %}{% url 'customer:discount_create' %}{% endif %}"> {% endcomment %}
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="id_category">Category:</label>
+      {{ form.category }}
+      {% if form.category.errors %}
+        {% for error in form.category.errors %}
+          <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label for="id_expanse">Expanse Amount:</label>
+      {{ form.expanse }}
+      {% if form.expanse.errors %}
+        {% for error in form.expanse.errors %}
+          <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label for="id_date">Date:</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        {% for error in form.date.errors %}
+          <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label for="id_note">Note:</label>
+      {{ form.note }}
+      {% if form.note.errors %}
+        {% for error in form.note.errors %}
+          <p style="color: red;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </form>

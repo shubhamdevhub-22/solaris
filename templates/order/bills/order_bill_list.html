@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sales Billing List{% endblock title %}
+{% block bodycontent %}
+<div class="company-list-filter px-2">
+    <div class="row border rounded py-2 mb-2 mx-n2">
+
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="order_customer">Customer</label>
+            <fieldset class="form-group">
+                <select id="order_customer" class="form-control">
+                <option value="">All</option>
+                {% for customer in customers %}
+                <option value="{{customer.id}}">{{customer.customer_name}}</option>
+                {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="users-list-company">Order Bill Status</label>
+            <fieldset class="form-group">
+                <select id="order_bill_status" class="form-control">
+                <option value="">All</option>
+                {% for order_status in order_statuses %}
+                <option value="{{order_status.0}}">{{order_status.1}}</option>
+                {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+
+        {% if request.user.is_superuser %}
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="order_list_company">Company</label>
+            <fieldset class="form-group">
+                <select id="order_list_company" class="form-control">
+                <option value="">All</option>
+                {% for company in companies %}
+                <option value="{{company.id}}">{{company.company_name|title}}</option>
+                {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<section id="file-export">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="d-flex flex-sm-row flex-column justify-content-between col-6">
+              <h4 class="card-title align-self-center">Sales Billing</h4>
+            </div>
+            <div class="d-flex flex-sm-row flex-column justify-content-end col-6">
+              <a href="{% url 'order:order_create' 'bill' %}" class="btn btn-primary ml-sm-1">Generate Bill</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-content ">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered file-export dataTable" id="table">
+                <thead>
+                  <th>Sr No.</th>
+                  <th>Order</th>
+                  <th>Company</th>
+                  <th>Customer</th>
+                  <th>Generated Date</th>
+                  <th>Due Date</th>
+                  <th>Bill Amount</th>
+                  <th>Paid Amount</th>
+                  <th>Due Amount</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-center">Actions</th>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="print-div" style="display: none;">
+
+</div>
+
+{% endblock bodycontent %}
+
+{% block script %}
+<script>
+  $('#order_bill_status, #order_list_company,#order_customer,#purchase_order_bill_number').select2({
+    width: "100%",
+  });
+
+  var role = false;
+  if ("{{request.user.is_superuser}}" == "True") {
+    role = true;
+  }
+
+  var i = 1;
+  function set_filters() {
+    var data = {}
+    data["order_bill_status"] = $("#order_bill_status").val()
+    data["order_list_company"] = $("#order_list_company").val()
+    data["order_customer"] = $("#order_customer").val()
+    return data
+  }
+
+  var order_false = [-1]
+  var to_center = "_all"
+  var invisible_columns = [2]
+  var filter_id = $("#order_bill_status, #order_list_company, #order_customer")
+  var url = '{% url "order:order_bill_list_ajax" %}';
+
+  var columns = [
+    { data: 'id', name: 'id' },
+    { data: 'id', name: 'id' },
+    { data: 'company', name: 'company' },
+    { data: 'customer', name: 'customer' },
+    { data: 'created_at', name: 'created_at' },
+    { data: 'due_date', name: 'due_date' },
+    { data: 'bill_amount', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'bill_amount' },
+    { data: 'paid_amount', name: 'paid_amount' },
+    { data: 'due_amount', name: 'due_amount' },
+    { data: 'status', name: 'status' },
+    { data: 'actions', name: 'actions' },
+  ]
+
+</script>
+<script src="{% static 'webapp/intailize_datatables.js' %}"></script>
+
+<script>
+  // print order
+
+  function HtmlToPrint(source) {
+
+    return "<html><head><scri" + "pt>function step1(){\n" +
+      "setTimeout('step2()', 10);}\n" +
+      "function step2(){window.print();window.close()}\n" +
+      "</scri" + "pt></head><body onload='step1()'>\n" +
+      source + "</body></html>";
+  }
+
+  $(document).on('click', '#table .order-print-btn', function () {
+    url = $(this).data("url")
+    window.open(url);
+  })
+</script>
+
+{% endblock script %}

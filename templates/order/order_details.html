@@ -1,0 +1,1126 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Order Detail{% endblock title %}
+{% block bodycontent %}
+
+<section id="extended">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+              <h4 class="card-title">Order Details</h4>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4">
+                      <label class="text-dark col-md-5"><b>Order ID:</b></label>
+                      <label class="col-md-6">{{object.order_id}}</label>
+                    </div>
+                    {% if request.user.role == "super admin" %}
+                    <div class="col-4">
+                        <label class="col-md-5"><b>Company:</b></label>
+                        <label class="col-md-6">{{object.company.company_name|default:"-"}}</label>
+                    </div>
+                    {% endif %}
+                    <div class="col-4">
+                      <label class="col-md-5"><b>Total Products:</b></label>
+                      <label class="col-md-6">{{order_products.count}}</label>
+                    </div>
+                    <div class="col-4">
+                        <label class="text-dark col-md-5"><b>Customer:</b></label>
+                        <label class="col-md-6">
+                          {% if request.user.role != request.user.SALES_REPRESENTATIVE %}
+                          <a href="{% url 'customer:customer_details' object.customer.id %}">{{object.customer.customer_name|default:"-"}}</a>
+                          {% else %}
+                          {{object.customer.customer_name|default:"-"}}
+                          {% endif %}
+                          {% if object.customer.is_locked %}<span class="text-danger font-weight-bold">(Locked)</span>{% endif %}
+                        </label>
+                    </div>
+                    <div class="col-4 mt-2">
+                        <label class="col-md-5"><b>Status:</b></label>
+                        <label class="col-md-6">
+                          <code {% if object.status not in 'cancelled,undelivered' %}class="text-success"{% else %}class="text-danger"{% endif %}>
+                            {{object.status|title|default:"-"}}
+                          </code>
+                          {% if object.status in "undelivered" %}
+                          {% if driver_route %}<div><small><b>Reason:</b> <b class="text-danger">{{ driver_route.remark|default:"-" }}</b></small></div>{% endif %}
+                          {% endif %}
+                        </label>
+                    </div>
+                    <div class="col-4 mt-2">
+                      <label class="text-dark col-md-5"><b>Customer Zone:</b></label>
+                      <label class="col-md-6">{{ order.customer.zone|default:"-" }}</label>
+                    </div>
+                    <div class="col-4 mt-2">
+                      <label class="text-dark col-md-5"><b>Customer Area:</b></label>
+                      <label class="col-md-6">{{ order.customer.area|default:"-" }}</label>
+                    </div>
+                    <div class="col-8 mt-3">
+                      <label class="text-dark col-md-3"><b>Customer Address:</b></label>
+                      <label class="mx-2 text-wrap col-md-8">
+                        {% if order.shipping_address_line_1 %}
+                        {{ order.shipping_address_line_1 }}, {{ order.shipping_address_line_2 }},
+                        {{ order.shipping_city }}, {{ order.shipping_state }} - {{ order.shipping_zip_code }},
+                        {{ order.shipping_country }}
+                        {% else %}
+                        -
+                        {% endif %}
+                      </label>
+                    </div>
+                    <div class="col-8 mt-2">
+                      <label class="text-dark col-md-3"><b>Internal Remark:</b></label>
+                      <label class="mx-2 col-md-8 text-wrap">{{object.internal_remarks|default:"-"}}</label>
+                    </div>
+                    {% comment %} <div class="col-4">
+                        <label class="text-dark col-md-5"><b>Payment Method:</b></label>
+                        <label class="col-md-6">{% if object.payment_method %}{{object.payment_method|title|default:"-"}}{% else %}-{% endif %}</label>
+                    </div>
+                    <div class="col-4">
+                        <label class="text-dark col-md-5"><b>Reference NO:</b></label>
+                        <label class="col-md-6">{{object.reference_number|default:"-"}}</label>
+                    </div> {% endcomment %}
+                    
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <small><b>Products</b></small>
+                </div>
+                <div class="card-content">
+                    <div class="card-body table-responsive">
+                      <table id="table_added_products" class="table text-center m-0">
+                        <thead>
+                          <tr>
+                                <th style="width: 8%;">SR NO.</th>
+                                <th style="width: 20%;">Brand</th>
+                                <th style="width: 20%;">Product Name</th>
+                                <th style="width: 8%;">Vehicle</th>
+                                <th style="width: 7%;">Quantity</th>
+                                <th style="width: 7%;">Unit</th>
+                                {% comment %} {% if object.status in 'new' %}
+                                <th style="width: 10%;">Ready For Dispatch Quantity</th>
+                                {% endif %} {% endcomment %}
+                                <th style="width: 10%;">Unit Price (₹)</th>
+                                <th style="width: 15%;">Offer (%)</th>
+                                <th style="width: 10%;">Item Total (₹)</th>
+                                {% if object.status not in 'draft,completed,dispatch' and request.user.role != request.user.SALES_REPRESENTATIVE %}
+                                <th>Actions</th>
+                                {% endif %}
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in order_products %}
+                            <tr class="">
+                                <td data-title="product-id">{{forloop.counter}}</td>
+                                <td data-title="product-id">{{product.product.brand.name}}</td>
+                                <td data-title="product-id">{{product.product.name}}</td>
+                                <td data-title="product-id">{% if product.product.vehicle %}{{product.product.vehicle.name}}{% else %}-{% endif %}</td>
+                                <td data-title="product-id">{{product.quantity}} {% if product.free_quantity %} + {{ product.free_quantity }}{% endif %}</td>
+                                <td data-title="product-id">{% if product.product.unit %}{{product.product.unit}}{% else %}-{% endif %}</td>
+                                {% comment %} {% if object.status in 'new' %}
+                                <td data-title="product-id">{{product.get_product_total_stock}}</td>
+                                {% endif %} {% endcomment %}
+                                <td data-title="product-id">{{product.unit_price}}</td>
+                                <td data-title="product-id">
+                                  {% if product.special_rate > 0 %}
+                                    Sp. Rate (₹): {{ product.special_rate }} 
+                                  {% elif product.special_discount > 0 %}
+                                    Sp. Disc.: {{ product.special_discount }} %
+                                  {% else %}
+                                    {% if product.product_discount1 == 0 and product.product_discount2 == 0 %}
+                                    -
+                                    {% else %}
+                                      {% if product.product_discount1 > 0 %}
+                                      <div>Pri. Disc.: {{ product.product_discount1 }}</div>
+                                      {% endif %}
+                                      {% if product.product_discount2 > 0 %}
+                                      <div>Sec. Disc.: {{ product.product_discount2 }}</div>
+                                      {% endif %}
+                                    {% endif %}
+                                  {% endif %}
+                                </td>
+                                <td data-title="product-id">{{product.get_item_total}}</td>
+                                {% if object.status not in 'draft,completed,dispatch' and request.user.role != request.user.SALES_REPRESENTATIVE %}
+                                <td>
+                                  <div class="d-flex justify-content-between">
+                                    <a href="javascript:void(0)" class="stock_details" data-ordered_stock="{{product.get_total_quantity}}" data-product_id="{{ product.product.id }}" title="Stock Details"><i class="ft-eye font-medium-3 mr-2"></i></a>
+                                    <a href="javascript:void(0)" class="transfer_stock" data-ordered_stock="{{product.get_total_quantity}}" data-product_id="{{ product.product.id }}" title="Transfer Stock"><i class="ft-file-text font-medium-3 mr-2"></i></a>
+                                  </div>
+                                </td>
+                                {% endif %}
+                                <td class="d-none">
+                                  <input type="hidden" class="pending_stock" id="id_product_{{ product.product.id }}_pending_stock" value="{{ product.get_pending_stock }}" />
+                                </td>
+                            </tr>
+                            {% comment %} <tr data-id="product_2" product-id="2" purchase-order-product="new" class="product-row">
+                                <td data-title="product-id">{{forloop.counter}}</td>
+                                <td data-title="product-name">Farrah Ortiz<input type="hidden" name="product_2__id" value="2"></td>
+                                <td data-title="unit-type-text">Piece<input type="hidden" name="product_2__unit_type" value="Piece"></td>
+                                <td data-title="quantity"><input type="number" min="1" max="10" name="product_2__quantity" class="form-control text-center" value="1"></td>
+                                <input type="hidden" min="0.00" step="0.01" data-default-value="1" name="product_2__totalpieces" class="form-control text-center" value="1">
+                                <td data-title="unit-price"><input type="number" min="0.00" step="0.01" name="product_2__unitprice" class="form-control text-center" value="12.0" readonly=""></td>
+                                <td data-title="total-price"><input type="number" min="0.00" step="0.01" name="product_2__totalprice" class="form-control text-center product-total-price" value="12.00" readonly=""></td>
+                            </tr> {% endcomment %}
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <small><b>Pricing Details</b></small>
+              </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <label class="col-md-6"><b>Item Total:</b></label>
+                            <label class="col-md-5">₹ {{object.item_total|default:"0"}}</label>
+                        </div>
+
+                        {% if object.is_bill_generated %}
+                        <div class="col-3">
+                          <label class="text-dark col-md-6"><b>Packing Charges:</b></label>
+                          <label class="col-md-5">₹ {{object.packing_charges|default:"0"}}</label>
+                        </div>
+                        <div class="col-3">
+                          <label class="text-dark col-md-6"><b>Shipping Charges:</b></label>
+                          <label class="col-md-5">₹ {{object.shipping_charges|default:"0"}}</label>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-3">
+                            <label class="text-dark col-md-6"><b>Paid Amount:</b></label>
+                            <label class="col-md-5">₹ {{object.get_paid_amount|default:"0"}}</label>
+                        </div>
+                        <div class="col-3">
+                            <label class="text-dark col-md-6"><b>Due Amount:</b></label>
+                            <label class="col-md-5">₹ {{object.get_due_amount|default:"0"}}</label>
+                        </div>
+
+                        <div class="col-3">
+                          <label class="text-dark col-md-6"><b>Grand Total:</b></label>
+                          <label class="col-md-5">₹ {{object.grand_total|default:"0"}}</label>
+                        </div>
+
+                      </div>
+
+                      {% if request.user.role not in "super admin,company admin" and is_replacement_settlement_available %}
+                      <div class="row mt-2">
+                        <div class="col-12 text-end">
+                          <input type="checkbox" data-url="{% url 'order:set_inform_admin_for_replacement' %}" name="inform_admin" id="id_inform_admin" class="mr-2" {% if object.inform_admin_for_settlement %} checked {% endif %} />
+                          <label for="id_inform_admin">Inform admin for settlement</label>
+                        </div>
+                      </div>
+                      {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+    {% if object.status in 'ready to ship' %}
+    <div class="row">
+      <div class="col-6">
+          <div class="card">
+              <div class="card-header">
+                  <small><b>Driver & Route Detail</b></small>
+              </div>
+              <div class="card-content">
+                  <div class="card-body table-responsive">
+                    <table id="table_added_products" class="table text-center m-0">
+                      <thead>
+                        <tr>
+                              <th style="width: 25%;">Driver Name</th>
+                              <th style="width: 22%;">Route Name</th>
+                              <th style="width: 30%;">Shipping Date</th>
+                              <th style="width: 40%;">Start Location</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for driver in driver_details|slice:"1" %}
+                          <tr class="">
+                              <td data-title="driver-id">{{driver.driver_route.driver}}</td>
+                              <td data-title="driver-id">{{driver.driver_route.name}}</td>
+                              <td data-title="driver-id">{{driver.driver_route.date}}</td>
+                              <td data-title="driver-id">{{driver.driver_route.start_location}}</td>
+                          </tr>
+                          {% comment %} <tr data-id="product_2" product-id="2" purchase-order-product="new" class="product-row">
+                              <td data-title="product-id">{{forloop.counter}}</td>
+                              <td data-title="product-name">Farrah Ortiz<input type="hidden" name="product_2__id" value="2"></td>
+                              <td data-title="unit-type-text">Piece<input type="hidden" name="product_2__unit_type" value="Piece"></td>
+                              <td data-title="quantity"><input type="number" min="1" max="10" name="product_2__quantity" class="form-control text-center" value="1"></td>
+                              <input type="hidden" min="0.00" step="0.01" data-default-value="1" name="product_2__totalpieces" class="form-control text-center" value="1">
+                              <td data-title="unit-price"><input type="number" min="0.00" step="0.01" name="product_2__unitprice" class="form-control text-center" value="12.0" readonly=""></td>
+                              <td data-title="total-price"><input type="number" min="0.00" step="0.01" name="product_2__totalprice" class="form-control text-center product-total-price" value="12.00" readonly=""></td>
+                          </tr> {% endcomment %}
+                          {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+          </div>
+      </div>
+  </div>
+{% endif %}
+
+    {% if object.status not in "cancel,draft" %}
+    <div class="row mt-2">
+        <div class="col-md-12 col-12">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+              <div>
+                {% if object.customer.is_locked and object.status not in 'completed' %}
+                <div class="text-start text-danger font-weight-bold">Order not able to update becuase the customer is locked</div>
+                {% endif %}
+              </div>
+              <div class="d-flex flex-sm-row flex-column justify-content-end">
+                {% comment %}
+                {% if object.status in 'packed,undelivered,ready for dispatch' %}
+                <button type="button" class="btn btn-primary ml-sm-1 assign_driver" data-value='{{object.id}}' id='id_assign_driver_btn' data-toggle="modal"                data-target="#xlarge">
+                    Assign Driver
+                </button>
+                {% endif %}
+                {% endcomment %}
+
+                {% comment %} {% if object.status in 'new,packing' %}
+                <a href="{% url 'order:order_packing' object.id %}"> <button type="button" name="packing-btn" value="packing" class="btn btn-info">Packing</button></a>
+                {% endif %} {% endcomment %}
+
+                {% if request.user.role != request.user.SALES_REPRESENTATIVE %}
+                  {% if is_replacement_settlement_available and request.user.role == request.user.COMPANY_ADMIN %}
+                  <button type="button" {% if not object.inform_admin_for_settlement %}disabled{% endif %} class="btn btn-primary" id="id_complete_settlement">Complete Settlement</button>
+                  {% endif %}
+
+                  {% if not order_bill %}
+                  <button type="button" name="submit" value="generate" class="btn btn-light" 
+                    data-url="{% url 'order:order_update' 'bill' object.id %}"
+                    id="id_generate_bill">Generate Bill</button>
+                  {% else %}
+                    {% if object.status in 'dispatch' %}
+                    <button type="button" name="submit" value="generate" class="btn btn-light" onclick=generateBill("{% url 'order:generate_bill_form' 'generate' %}")>
+                      Update Bill
+                    </button>
+                    {% endif %}
+                  <button value="print" data-id="{{object.id}}" data-url="{{ order_bill.bill_pdf.url }}" class="btn btn-warning ml-2 order-print-btn">Print Bill</button>
+                  {% endif %}
+                {% endif %}
+
+                {% if not order_bill %}
+                <button onclick=printBill("{% url 'order:generate_bill_form' 'print' %}") value="print" class="btn btn-dark ml-2">Print Order</button>
+                {% endif %}
+                
+                {% if request.user.role != request.user.SALES_REPRESENTATIVE %}
+                  {% if driver and object.status not in 'undelivered' %}
+                  <a href="{% url 'order:detail_assigned_order' driver.id %}?order={{ object.id }}" class="btn btn-info ml-2">View Route</a>
+                  {% endif %}
+
+                  {% if order_bill and object.status in 'new,undelivered' %}
+                  <button type="button" value="Dispatch" class="btn btn-info ml-2 assign_driver" {% if object.customer.is_locked or not is_order_ready_to_dispatch %}disabled{% endif %} data-value='{{object.id}}' id='id_assign_driver_btn'>Dispatch</button>
+                  {% endif %}
+                  
+                  {% if object.status in 'dispatch,new' and order_bill %}
+                  <button type="button" data-url="{% url 'order:set_order_completed' %}" data-popup-message="Are you you want to <b class='text-success'>Complete</b> the order ?" value="Completed" class="btn btn-success ml-2 completed-btn" {% if object.customer.is_locked %}disabled{% endif %}>Completed</button>
+                  {% endif %}
+                {% endif %}
+
+                {% comment %} {% if object.status == 'packed' %}
+                <button type="button" data-url="{% url 'order:set_order_shipped' %}" data-popup-message="Are you sure update order status To <b>Shipped</b>?" value="packing" class="btn btn-success ml-2 ready-to-ship-btn">Shipped</button>
+                <button type="button" data-url="{% url 'order:set_order_undelivered' %}" data-popup-message="Are you sure update order status To <b>Undelivered</b>?" value="packing" class="btn btn-warning ml-2 ready-to-ship-btn">Undelivered</button>
+                {% endif %} {% endcomment %}
+
+                {% comment %} {% if object.status not in 'ready to ship,packed' %}
+                <a href="{% url 'order:order_packing' object.id %}"> <button type="button" name="packing-btn" value="packing" class="btn btn-info">Packing</button></a>
+                {% endif %}
+
+                {% if object.status not in 'ready to ship,' %}
+                <button type="button" data-url="{% url 'order:set_order_ready_to_ship' %}" data-popup-message="Are you sure update order status To <b>Ready To Ship</b>?" value="packing" class="btn btn-success ml-2 ready-to-ship-btn">Ready to Ship</button>
+                {% endif %} {% endcomment %}
+
+                {% comment %} {% if object.status not in 'completed,dispatch' %}
+                <button type="button" data-url="{% url 'order:cancel_order' %}" data-popup-message="Are you sure you want to <b class='text-danger'>Cancel</b> the Order ?" value="cancel" class="btn btn-danger ml-2 cancel-order-btn" {% if object.customer.is_locked %}disabled{% endif %}>Cancel Order</button>
+                {% endif %} {% endcomment %}
+
+                <button type="button" value="go back" class="btn btn-secondary ml-2" onclick="history.back()">Back</button>
+              </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <div class="d-flex flex-sm-row flex-column justify-content-end">
+          <button type="button" value="go back" class="btn btn-secondary mr-1" onclick="history.back()">Back</button>
+        </div>
+    {% endif %}
+
+    <div class="modal fade" id="generateBillModal" role="dialog" aria-labelledby="" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="generateBillTitle">Generate Bill</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body" >
+                <form action="{% url 'order:generate_bill_form' 'generate' %}" target="_blank" method="post" id="generate_bill_form">
+                  {% csrf_token %}
+                  <input type="hidden" name="order" id="id_order" value="{{object.id}}" />
+                  <div id="generate_bill_modal">
+                    {% include 'order/bills/print_order_form.html' %}
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" id="generate_bill_btn" data-url="{% url 'order:generate_bill_form' 'generate' %}" class="btn btn-primary">Generate</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="printOrderModal" role="dialog" aria-labelledby="" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="generateBillTitle">Print Order</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body" >
+                <form action="{% url 'order:generate_bill_form' 'print' %}" target="_blank" method="post" id="print_order_form">
+                  {% csrf_token %}
+                  <input type="hidden" name="order" id="id_order" value="{{object.id}}" />
+                  <div id="print_order_modal">
+                    {% include 'order/bills/print_order_form.html' %}
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" id="print_btn" data-url="{% url 'order:generate_bill_form' 'print' %}" class="btn btn-primary">Print Order</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="transferStockModal" role="dialog" aria-labelledby="" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Transfer Stock</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body" >
+                <form action="" target="_blank" method="post" id="transfer_stock_form">
+                  {% csrf_token %}
+                  <input type="hidden" name="order" id="id_order" value="{{object.id}}" />
+                  <div id="transfer_stock_modal">
+                    
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" onclick="submitData()" class="btn btn-primary">Transfer</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="stockDetailModal" role="dialog" aria-labelledby="" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Stock Details</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body" >
+                <form action="" target="_blank" method="post" id="stock_detail_form">
+                  {% csrf_token %}
+                  <input type="hidden" name="order" id="id_order" value="{{object.id}}" />
+                  <div id="stock_detail_modal">
+                    
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="replacementModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="ProductVehicleLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title">Replcement Details</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body" >
+                <input type="hidden" name="order" id="id_order" value="{{object.id}}" />
+                <div id="replacement_detail_modal">
+                  {% include 'order/replacement_details.html' %}
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-order="{{ object.id }}" data-url='{% url "order:set_replacement_complete" %}' id="id_complete_replacement">Complete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="modal fade text-left show" id="xlarge" tabindex="-1" role="dialog" aria-labelledby="myModalLabel16" style="display: none; padding-right: 17px;" aria-modal="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-body" id="asssign-driver-model">
+              
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    
+</section>
+
+{% comment %} <button type="button" class="btn btn-primary ml-sm-1 assign_driver" data-value='' id='id_assign_driver_btn' data-toggle="modal" data-target="#xlarge">Assign driver</button> {% endcomment %}
+
+{% comment %} <div class="modal fade text-left show" id="xlarge" tabindex="-1" role="dialog" aria-labelledby="myModalLabel16" style="display: block; padding-right: 15px;" aria-modal="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" id="asssign-driver-model">
+    </div>
+</div> {% endcomment %}
+
+
+
+<!-- Button trigger modal -->
+{% comment %} <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+   Asign To Driver
+  </button> {% endcomment %}
+  
+  <!-- Modal -->
+  {% comment %} <div class="modal fade" id="xlarge" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="asssign-driver-model">
+          ...
+        </div>
+      </div>
+    </div>
+  </div> {% endcomment %}
+
+{% endblock bodycontent %}
+
+{% block script %}
+
+<script>
+  var replacement_url = "{% url 'order:replacement_product_list' %}"
+</script>
+
+<script src="{% static 'webapp/order/generate_bill.js' %}"></script>
+<script src="{% static 'webapp/order/replacement_table.js' %}"></script>
+
+<script>
+  $(document).on("click", ".ready-to-ship-btn, .ready-for-dispatch-btn, .cancel-order-btn, .completed-btn", function(){
+
+    {% if is_order_ready and object.status not in 'dispatch' %}
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Please add product stock in ready for dispatch !!!",
+      })
+      return;
+    {% endif %}
+
+    url = $(this).attr("data-url")
+    order_id = "{{object.id}}"
+    message = $(this).attr("data-popup-message")
+
+    Swal.fire({
+        html: message,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+        
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                type: "get",
+                dataType: "json",
+                data: {
+                    'order_id': order_id
+                },
+                success: function(data) {
+                    window.location.reload()
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                }
+            });
+        }
+    })
+  })
+
+  $(document).on("click", "#id_same_as_billing_address", function(){
+    var value = $(this).prop("checked");
+
+    if(value){
+      $("#id_shipping_address_line_1").val($("#id_billing_address_line_1").val());
+      $("#id_shipping_address_line_2").val($("#id_billing_address_line_2").val());
+      $("#id_shipping_suite_apartment").val($("#id_billing_suite_apartment").val());
+      $("#id_shipping_city").val($("#id_billing_city").val());
+      $("#id_shipping_state").val($("#id_billing_state").val());
+      $("#id_shipping_zip_code").val($("#id_billing_zip_code").val());
+    }
+    else {
+      $("#id_shipping_address_line_1").val("");
+      $("#id_shipping_address_line_2").val("");
+      $("#id_shipping_suite_apartment").val("");
+      $("#id_shipping_city").val("");
+      $("#id_shipping_state").val("");
+      $("#id_shipping_zip_code").val("");
+    }
+  })
+
+  $(document).on("click", "#id_generate_bill", function(){
+    var url = $(this).data("url");
+    location.href = url;
+  })
+
+  $(document).on("change", "#id_local_bill", function(){
+    $(document).find("#local_bill_fields").toggleClass("d-none");
+    if($(this).prop('checked') == true){
+        $(document).find("#id_local_bill_value").val(true);
+    }
+    else {
+        $(document).find("#id_local_bill_value").val(false);
+    }
+  });
+
+  function validateForm(){
+    const inputs = $(document).find("#id_shipping_address input, #id_billing_address input");
+    var has_error = false;
+    inputs.each(function(index) {
+      if($(this).val() == null || $(this).val() == ""){
+        const name = $(this).attr("name").replaceAll("_", " ");
+        if ($(this).siblings().length <= 0){
+          $(this).parent().append(`<span class='text-danger'>Please fill ${name}</span>`);
+        }
+        has_error = true;
+      } else {
+        $(this).siblings().remove();
+      }
+    })
+    return has_error;
+  }
+  
+  function generateBill(url) {
+
+    $.ajax({
+        url: url,
+        type: "get",
+        data: {
+            'packing_charge': "{{object.packing_charges|default:'0'}}",
+            'company_id': "{{object.company.id}}",
+            "customer_id": "{{object.customer.id}}",
+            "order_id": "{{object.id}}",
+        },
+        success: function(data) {
+            $("#generate_bill_modal").html(data.html);
+            $("#generateBillModal").modal("show");
+
+            var bill_date = document.querySelector("#generate_bill_modal #id_bill_date");
+
+            var now = new Date();
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            var today = now.getFullYear()+"-"+(month)+"-"+(day);
+
+            bill_date.value = today;
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+    });
+  }
+
+  function printBill(url) {
+
+    $.ajax({
+        url: url,
+        type: "get",
+        data: {
+            'packing_charge': "{{object.packing_charges|default:'0'}}",
+            'company_id': "{{object.company.id}}",
+            "customer_id": "{{object.customer.id}}",
+            "order_id": "{{object.id}}",
+        },
+        success: function(data) {
+            $("#print_order_modal").html(data.html);
+            var bill_date = document.querySelector("#print_order_modal #id_bill_date");
+
+            var now = new Date();
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            var today = now.getFullYear()+"-"+(month)+"-"+(day);
+
+            bill_date.value = today;
+            $("#printOrderModal").modal("show");
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+    });
+  }
+
+  function HtmlToPrint(source) {
+
+    return "<html><head><scri" + "pt>function step1(){\n" +
+      "setTimeout('step2()', 10);}\n" +
+      "function step2(){window.print();window.close()}\n" +
+      "</scri" + "pt></head><body onload='step1()'>\n" +
+      source + "</body></html>";
+  }
+
+  $(document).ready(function(){
+    replacement_initialize_datatable();
+
+    $(document).on("change", "#id_inform_admin", function(){
+      var value = this.checked;
+
+      $.ajax({
+        url: $(this).data("url"),
+        type: "get",
+        data: {
+          "order_id": "{{ object.id }}",
+          "inform_admin": value,
+        },
+        success: function(data) {
+          console.log(data);
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        }
+      });
+    })
+
+    $(document).on("input", "#generate_bill_modal #id_shipping_charges, #generate_bill_modal #id_packing_charges", function() {
+      const item_total = parseFloat($("#generate_bill_modal #id_order_total").val());
+
+      var shipping_charges = $("#generate_bill_modal #id_shipping_charges").val()
+      if(shipping_charges){shipping_charges = parseFloat(shipping_charges)}else { shipping_charges = 0}
+
+      var packing_charges = parseFloat($("#generate_bill_modal #id_packing_charges").val());
+      if(packing_charges){packing_charges = parseFloat(packing_charges)}else { packing_charges = 0}
+
+      var grand_total = item_total + shipping_charges + packing_charges;
+
+      adjustments = grand_total - Math.round(grand_total);
+      if (adjustments < 0) {
+          adjustments = -1 * (adjustments);
+      } else if (adjustments > 0) {
+          adjustments = 1 - adjustments;
+          grand_total = grand_total + 1;
+      }
+
+      grand_total = Math.round(grand_total);
+      $("#generate_bill_modal #id_grand_total").val(parseFloat(grand_total).toFixed(2));
+
+    });
+
+    $(document).on("click", "#print_btn", function(e){
+      $("#print_order_form").submit();
+      $("#printOrderModal").modal("hide");
+    });
+
+    $(document).on("click", "#generate_bill_btn", function(){
+      var formData = new FormData(document.getElementById("generate_bill_form"));
+      var url = $(this).data("url");
+
+      if(!valid_due_date) {
+        return false;
+      }
+
+      $.ajax({
+        url: url,
+        type: "post",
+        data: formData,
+        success: function(data) {
+          $("#generateBillModal").modal("hide");
+          
+          if(data.message){
+            window.open(data.bill_pdf_url);
+            location.reload();
+          }
+          else {
+            var source = data.html;
+            var Pagelink = "about:blank";
+            var pwa = window.open(Pagelink, "_new");
+    
+            pwa.document.open();
+            pwa.document.write(HtmlToPrint(source));
+            pwa.document.close();
+          }
+          
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+            console.log(thrownError);
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+    })
+
+    $(document).on("click", "#id_complete_settlement", function(){
+      $("#replacementModal").modal("show");
+    });
+
+    $(document).on("click", ".transfer_stock", function(){
+      var url = '{% url "order:transfer_stock" %}',
+      product_id =$(this).data('product_id');
+      order_product_stock = $(this).data('ordered_stock');
+    
+      $.ajax({
+        type: "GET",
+        url: url,
+        data: {
+          'product_id': product_id,
+          'order_product_stock': order_product_stock,
+        },
+        success: function (data){
+          $("#transfer_stock_modal").html(data.html);
+          $("#transferStockModal").modal("show");
+        }
+      });
+    });
+
+    $(document).on("click", ".stock_details", function(){
+      var url = '{% url "order:stock_details" %}',
+      product_id =$(this).data('product_id');
+      ordered_stock = $(this).data('ordered_stock');
+    
+      $.ajax({
+        type: "GET",
+        url: url,
+        data: {
+          'product_id': product_id,
+          'ordered_stock': ordered_stock,
+        },
+        success: function (data){
+          $("#stock_detail_modal").html(data.html);
+          $("#stockDetailModal").modal("show");
+        }
+      });
+    });
+
+    $(document).on('click', '.order-print-btn', function () {
+      var url = $(this).data("url");
+      window.open(url);
+    });
+  })
+</script>
+
+<script>
+
+    $(document).on("click", "#id_assign_driver_btn", function(){
+
+      {% if not customer_address %}
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Please add customer default address !!!",
+        })
+        return;
+      {% endif %}
+
+      {% if is_order_ready %}
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Please add product stock in ready for dispatch !!!",
+        })
+        return;
+      {% endif %}
+              
+      url = '{% url "order:assign_driver" %}',
+      this_val =$(this).attr('data-value')
+    
+      $.ajax({
+        type: "GET",
+        url: '{% url "order:assign_driver" %}',
+        data: {
+          'orders_id': this_val,
+        },
+        success: function (data){
+          $("#asssign-driver-model").html(data);
+          $("#xlarge").modal("show");
+          //console.log(data)
+          //model = document.getElementById('exampleModal')
+          //model.style.display = 'block';
+          
+        } 
+      });
+    });
+
+    $(document).on("click", "#id_complete_replacement", function(){
+      var order = $(this).data('order');
+      var url = $(this).data('url');
+    
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+          'order_id': order,
+          'csrfmiddlewaretoken': "{{ csrf_token }}",
+        },
+        success: function (data){
+          $("#replacementModal").modal("hide");
+          location.reload();
+        }
+      });
+    });
+
+</script>
+
+<script>
+    $( document ).ajaxComplete(function() {
+      $('.select2-list').select2({
+        width: "100%",
+    });
+    
+    
+    $(document).on("change", "#checkbox-select-route", function (){
+      if ($(this).is(':checked')) {
+        $(".routes-div").removeAttr("style").hide();
+        $("#location-date").removeAttr("style").show();
+        $("#route-name").removeAttr("style").show();
+        $(".routes-div").show();
+        $("#create-route").val(null)
+        $("#location-date").hide();
+        document.getElementById('bill-date').valueAsDate = new Date();
+    
+        $("#route-name").hide();
+        
+      }else{
+        $(".routes-div").hide();
+        $("#location-date").show();
+        $("#route-name").show();
+        $("#assign-routes").val(null).trigger('change');
+      }
+    })
+    });
+</script>
+
+<script>
+  $( document ).ajaxComplete(function() {
+    $("#assign-routes").on("change", function(){
+      $("#create_route").prop('disabled', false)
+      //console.log('parseInt($("#assign-routes").val():', parseInt($("#assign-routes").val()))
+      if($("#assign-routes").val() === ''){
+        $("#create_route").prop('disabled', true)
+      }else {
+        $("#create_route").prop('disabled', false)
+    }
+  
+    })
+    
+  })
+</script>
+
+<script>
+    var url = null
+    $(document).on("click","#plan_routes",function(e){
+      //console.log("lolll")
+      $(".driver-not-select").empty()
+      driver_id = $("#select-driver").val()
+      //console.log('driver_id:', driver_id)
+      assign_routes= $("#assign-routes").val()
+      //console.log('assign_routes:', assign_routes)
+      create_route=$("#create-route").val()
+      //console.log('create_route:', create_route)
+      start_location= $("#start-location").val()
+      //console.log('start_location:', start_location)
+      
+      //$("#checkbox-select-route")
+
+      if(driver_id === '' ){
+        e.preventDefault();  
+        $(".driver-not-select").empty().append("Select Driver")
+      }
+      if(assign_routes === ''){
+        e.preventDefault();  
+        $(".assign-routes-not-select").empty().append("Select Route or Create New")
+      } 
+      if(start_location === '' && assign_routes === '' ){
+        e.preventDefault();  
+        $(".start-location").empty().append("Select Warehouse")
+      } 
+      if(create_route === "" && assign_routes === ''){
+        e.preventDefault();  
+        $(".route-name").empty().append("Enter Valid Name")
+      } 
+      else {
+        var url ='{% url "order:plan_route_ajax" %}'
+      }
+      orders_id = $("#id_orders_id").val()
+      
+      //console.log('orders_id:', orders_id)
+      
+      
+      bill_date=$("#bill-date").val()
+      //console.log('bill_date:', bill_date)
+    
+    
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+          'orders_id': orders_id,
+          'driver_id': driver_id,
+          'assign_routes': assign_routes,
+          'create_route': create_route,
+          'start_location': start_location,
+          'bill_date': bill_date,
+          "csrfmiddlewaretoken": '{{ csrf_token }}',
+        },
+        success: function (data){
+          window.location = data.url
+        } 
+      });
+
+    })
+</script>
+
+<script>
+  function validOrderDispatch(){
+    var ready_to_dispatch_order = true;
+
+    $("#table_added_products tbody .pending_stock").each(function(index) {
+        var value = $(this).val();
+        if(value) {
+            value = parseInt(value);
+            if(value > 0) {
+                $("#id_assign_driver_btn").attr("disabled", "true");
+                ready_to_dispatch_order = false;
+            }
+        }
+    });
+    if(ready_to_dispatch_order){
+        $("#id_assign_driver_btn").removeAttr("disabled");
+    }
+  }
+
+  function validateTransferStockForm(){
+    const inputs = $(document).find("#transfer_stock_modal input:not(:disabled), #transfer_stock_modal select:not(:disabled)");
+    var has_error = false;
+
+    inputs.each(function(index) {
+        if(!$(this).is(":hidden")){
+            if($(this).val() == null || $(this).val() == "" || $(this).val() == "0"){
+                const name = $(this).attr("name").replaceAll("_", " ");
+                if (!$(this).hasClass("select2-list")){
+                    if ($(this).siblings().length <= 0){
+                        $(this).parent().append(`<span class='text-danger'>Please enter ${name}</span>`);
+                    }
+                }
+                else {
+                    if ($(this).siblings().length <= 1){
+                        $(this).parent().append(`<span class='text-danger'>Please select ${name}</span>`);
+                    }
+                }
+                has_error = true;
+            } else {
+                if (!$(this).hasClass("select2-list")){
+                    $(this).siblings().remove();
+                }
+                else {
+                    if ($(this).siblings().length >= 2){
+                        $(this).siblings(":last").remove();
+                    }
+                }
+            }
+        }
+    });
+
+    return has_error;
+  }
+
+  function submitData(){
+    var id_company = document.getElementById('id_company');
+    var id_from_warehouse = document.getElementById('id_from_warehouse');
+    var id_to_warehouse = document.getElementById('id_to_warehouse');
+    var id_product = document.getElementById('id_product');
+    var id_available_stock = document.getElementById('id_available_stock');
+    var id_transfer_stock = document.getElementById('id_transfer_stock');
+    var csrf = "{{ csrf_token }}";
+    var id_ordered_stock = document.getElementById('id_ordered_stock');
+
+    if(validateTransferStockForm()) {
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'product:transfer_stock_add' %}",
+        data: {
+            "company_id": id_company.value,
+            "from_warehouse_id": id_from_warehouse.value,
+            "to_warehouse_id": id_to_warehouse.value,
+            "product_id": id_product.value,
+            "available_stock_data": id_available_stock.value,
+            "transfer_stock_data": parseInt(id_transfer_stock.value),
+            "ordered_stock": id_ordered_stock.value,
+            "csrfmiddlewaretoken": csrf,
+        },
+        success: function (data) {
+            $("#transferStockModal").modal("hide");
+            $.toast({
+                text: "Stock Transfer Succesfully",
+                position: "bottom-right",
+                stack: false,
+                icon: "success",
+            });
+            $(`#id_product_${id_product.value}_pending_stock`).val(data.pending_stock);
+            validOrderDispatch();
+        }
+    });
+
+  }
+</script>
+{% endblock script %}

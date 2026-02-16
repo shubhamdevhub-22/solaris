@@ -1,0 +1,30 @@
+{% if credit_memo_products %}
+
+{% for credit_memo_product in credit_memo_products %}
+<tr data-id="product_{{credit_memo_product.product.id}}" product-id={{credit_memo_product.product.id}} purchase-order-product={{credit_memo_product.id}} class="product-row">
+    <td data-title="product-id">{{forloop.counter}}</td>
+    <td data-title="product-name">{{credit_memo_product.product.name}}<input type="hidden" name="product_{{credit_memo_product.product.id}}__id" value="{{credit_memo_product.product.id}}" /></td>
+    <td data-title="unit-type-text">{{credit_memo_product.unit_type}} ({{credit_memo_product.get_unit_type_pieces}} pcs)<input type="hidden" name="product_{{credit_memo_product.product.id}}__unit_type" value="{{credit_memo_product.unit_type}}" /></td>
+    <td data-title="quantity"><input id="return-quantity-{{credit_memo_product.product.id}}" data-product-id="{{credit_memo_product.product.id}}" type="number"  min="1" max="10" name="product_{{credit_memo_product.product.id}}__quantity" class="form-control text-center return-quantity" value="{{credit_memo_product.return_quantity}}" /><input type="hidden" name="product_{{credit_memo_product.product.id}}__quantity" value="{{credit_memo_product.return_quantity}}" /></td>
+    <td data-title="fresh-quantity"><input id="fresh-return-quantity-{{credit_memo_product.product.id}}" data-product-id="{{credit_memo_product.product.id}}" type="number" step="1"  min="0" name="product_{{credit_memo_product.product.id}}__fresh_quantity" class="form-control text-center fresh-quantity" value="{{credit_memo_product.fresh_return_quantity}}" /></td>
+    <td data-title="damage-quantity"><input id="damage-return-quantity-{{credit_memo_product.product.id}}" data-product-id="{{credit_memo_product.product.id}}" type="number" step="1" min="0" name="product_{{credit_memo_product.product.id}}__damage_quantity" class="form-control text-center damage-quantity" value="{{credit_memo_product.damage_return_quantity}}" /></td>
+    <input type="hidden"  min="0.00" step="0.01" data-default-value="{{credit_memo_product.get_unit_type_pieces}}" name="product_{{credit_memo_product.product.id}}__totalpieces" class="form-control text-center" value="{{credit_memo_product.get_total_pieces}}" />
+    <td data-title="unit-price"><input type="number"  min="0.00" step="0.01" name="product_{{credit_memo_product.product.id}}__unitprice" class="form-control text-center" value="{{credit_memo_product.unit_price}}" readonly /></td>
+    <td data-title="total-price"><input type="number"  min="0.00" step="0.01" name="product_{{credit_memo_product.product.id}}__totalprice" class="form-control text-center product-total-price" value="{{credit_memo_product.total_price}}" readonly /></td>
+    <td data-title="remove-product"><span class="btn-procuct-remove hover-pointer"><i class="ft-trash font-medium-3 danger btn-procuct-remove"></i></span></td>
+</tr>
+{% endfor %}
+{% else %}
+<tr data-id="product_{{product.id}}" product-id={{product.id}} purchase-order-product="new" class="product-row">
+    <td data-title="product-id"></td>
+    <td data-title="product-name">{{product.name}}<input type="hidden" name="product_{{product.id}}__id" value="{{product.id}}" /></td>
+    <td data-title="unit-type-text">{{unit_type_text}}<input type="hidden" name="product_{{product.id}}__unit_type" value="{{unit_type}}" /></td>
+    <td data-title="quantity"><input id="return-quantity-{{product.id}}" data-product-id="{{product.id}}" type="number" step="1" min="1" name="product_{{product.id}}__quantity" class="form-control text-center return-quantity" value="{{quantity}}" /></td>
+    <td data-title="fresh-quantity"><input id="fresh-return-quantity-{{product.id}}" data-product-id="{{product.id}}" type="number" step="1"  min="0" name="product_{{product.id}}__fresh_quantity" class="form-control text-center fresh-quantity" value="{{quantity}}" /></td>
+    <td data-title="damage-quantity"><input id="damage-return-quantity-{{product.id}}" data-product-id="{{product.id}}" type="number" step="1" min="0" name="product_{{product.id}}__damage_quantity" class="form-control text-center damage-quantity" value="0" /></td>
+    <input type="hidden"  min="0.00" step="0.01" data-default-value="{{unit_type_pieces}}" name="product_{{product.id}}__totalpieces" class="form-control text-center" value="{{total_pieces}}" />
+    <td data-title="unit-price"><input type="number"  min="0.00" step="0.01" name="product_{{product.id}}__unitprice" class="form-control text-center" value="{{unit_price}}" readonly /></td>
+    <td data-title="total-price"><input type="number"  min="0.00" step="0.01" name="product_{{product.id}}__totalprice" class="form-control text-center product-total-price" value="{{total_price}}" readonly /></td>
+    <td data-title="remove-product"><span class="btn-product-remove hover-pointer"><i class="ft-trash font-medium-3 danger btn-product-remove"></i></span></td>
+</tr>
+{% endif %}

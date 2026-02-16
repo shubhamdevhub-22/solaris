@@ -1,0 +1,24 @@
+<input type="text" value="{{customer_id}}" id="id_customer" hidden>
+
+<section>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered file-export" id="document_table">
+                <div class="mb-2">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <h4 class="card-title align-self-center">Documents List</h4>
+                        <a href="{% url 'customer:upload_document' customer_id %}" class="btn btn-primary ml-sm-1">Upload Document</a>
+                      </div>
+                </div>
+                <thead>
+                    <tr>
+                    <th>Sr no</th>
+                    <th>Document Name</th>
+                    <th>Document</th>
+                    <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+</section>

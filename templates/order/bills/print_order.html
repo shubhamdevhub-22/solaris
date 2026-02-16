@@ -1,0 +1,189 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html class="loading" lang="en">
+
+    <head>
+        <title>Order Bill#{{order.order_id}}</title>
+        <link rel="shortcut icon" type="image/x-icon" href="https://pixinvent.com/apex-angular-4-bootstrap-admin-template/app-assets/img/ico/favicon.ico">
+        <link rel="shortcut icon" type="image/png" href="{% static 'app-assets/img/ico/favicon-32.png' %}">
+        
+        <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,500,700,900%7CMontserrat:300,400,500,600,700,800,900" rel="stylesheet">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/feather/style.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/simple-line-icons/style.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/fonts/font-awesome/css/font-awesome.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/perfect-scrollbar.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/prism.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/switchery.min.css' %}">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/bootstrap-extended.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/colors.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/components.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/themes/layout-dark.min.css' %}">
+        <link rel="stylesheet" href="{% static 'app-assets/css/plugins/switchery.min.css' %}">
+
+        <link rel="stylesheet" href="{% static 'app-assets/css/pages/page-invoice.min.css' %}">
+
+        <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
+        <style>
+            .row {
+                margin-right: -0.75rem;
+                margin-left: -0.75rem;
+
+                display: -webkit-box; /* wkhtmltopdf uses this one */
+                display: flex;
+                -webkit-box-pack: center; /* wkhtmltopdf uses this one */
+                justify-content: center;
+            }
+
+            .row > div {
+                -webkit-box-flex: 1;
+                -webkit-flex: 1;
+                flex: 1;
+            }
+            
+            .row > div:last-child {
+                margin-right: 0;
+            }
+
+            .col-7 {
+                flex: 0 0 60%;
+                width: 60%;
+            }
+
+            .col-5 {
+                flex: 0 0 40%;
+                width: 40%;
+            }
+
+            .text-start {
+                text-align: left !important;
+            }
+            
+            .text-end {
+                text-align: right !important;
+            }
+
+            .text-center {
+                text-align: center !important;
+            }
+
+            .text-muted {
+                color: #838294 !important;
+            }
+
+            .w-100 {
+                width: 100% !important;
+            }
+
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                color: #031b4e;
+            }
+
+            .table th,
+            .table td {
+                padding: 0.75rem;
+                vertical-align: top;
+                border-top: 1px solid #dedcfb;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dedcfb;
+            }
+
+            .table tbody+tbody {
+                border-top: 2px solid #dedcfb;
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+                /* background-color: #5683ff2e; */
+            
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #5683ff2e;
+                /* background-color: #f0eeff; */
+            }
+
+            .font-capital {
+                text-transform: uppercase !important;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <section class="my-5">
+            <div class="row">
+                <div class="text-right">
+                    <span>DATE : <b>{{ order.created_at|date:"d M, Y" }}</b></span>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <span>Customer Name : <b class="font-capital">{{ order.customer.customer_name }}</b></span>
+            </div>
+            
+            {% if transport %}
+            <div class="row my-3">
+                <span>{{transport}}</span>
+            </div>
+            {% endif %}
+
+            <div class="table-responsive my-4">
+                <table class="table table-striped w-100">
+                    <thead class="text-start">
+                        <tr>
+                            <th>Item</th>
+                            <th>Vehicle</th>
+                            <th>Qty (Free count/Special Rate)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for order_product in order_products %}
+                        <tr>
+                            <td>{{ order_product.product.name }}</td>
+                            <td>{{ order_product.product.vehicle|default:"-" }}</td>
+                            <td>{{ order_product.quantity }} {% if order_product.free_quantity %} + {{ order_product.free_quantity }}{% endif %} {% if order_product.special_rate>0 %}({{order_product.special_rate}}){% endif %}</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6">
+                                <div class="text-end">Gross Total: </div>
+                            </td>
+                            <td>
+                                <b>{{ order.grand_total }}</b>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </section>
+
+        <script src="{% static 'app-assets/vendors/js/vendors.min.js' %}"></script>
+        <script src="{% static 'app-assets/vendors/js/switchery.min.js' %}"></script>
+
+        <script src="{% static 'app-assets/js/core/app-menu.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/core/app.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/notification-sidebar.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/customizer.min.js' %}"></script>
+        <script src="{% static 'app-assets/js/scroll-top.min.js' %}"></script>
+
+        <script src="{% static 'app-assets/js/page-invoice.min.js' %}"></script>
+
+        <script src="{% static 'assets/js/scripts.js' %}"></script>
+
+    </body>
+
+</html>

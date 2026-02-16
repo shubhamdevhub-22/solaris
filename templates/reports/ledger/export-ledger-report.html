@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ledger Report</title>
+    <style>
+        @page {
+            margin: 30px 30px 30px 30px;
+
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 10pt; right: 10pt; width: 1040pt; top: 810pt; height: 20pt;
+            }
+
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: auto !important;
+            font-size: 10pt !important;
+        }
+
+        .text-end{
+            text-align: right !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 3rem !important;
+        }
+
+        #main-table > table {
+            width: 90%;
+            border-collapse: separate; /* Don't collapse */
+            border-spacing: 0;
+        }
+
+        #main-table > table th {
+            /* Apply both top and bottom borders to the <th> */
+            border-top: 2px solid;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            font-size: 9pt !important;
+        }
+
+        #main-table > table td {
+            padding-top: 3px;
+        }
+
+        #main-table > table th:first-child
+        {
+            /* Apply a left border on the first <td> or <th> in a row */
+            border-left: 2px solid;
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <table style="width: 100%">
+            <tr style="width: 100%">
+                <td style="width:50%">
+                    {% if zone %}
+                    Zone: <b>{{ zone }}</b>
+                    {% endif %}
+                </td>
+                {% if start_date and end_date %}
+                <td style="width:50%" class="text-end">
+                    <b>{{ start_date|date:"d-m-Y" }}</b> to <b>{{ end_date|date:"d-m-Y" }}</b>
+                </td>
+                {% endif %}
+            </tr>
+        </table>
+    </div>
+
+    <div id="main-table">
+        {% for customer, bill_list in collection_list.items %}
+        <table style="width: 100%;">
+            <tbody>
+                <tr>
+                    <td colspan="3"></td>
+                </tr>
+                <tr>
+                    <td colspan="3"></td>
+                </tr>
+
+                <tr style="margin-bottom: 20px;">
+                    <td style="width: 30%" valign="top">
+                        <b>{{ customer.zone.zone_code|title|default:"-" }}</b><br>
+                        {{ customer.customer_name|title }} <br>
+                        {{ customer.contact_name|default:"-"|title }} <br>
+                        {{ customer.mobile }} <br>
+                        {{ customer.area }}
+                    </td>
+                    <td style="width: 60%;">
+                        <table>
+                            <tbody>
+                                {% for bill in bill_list.customer_bills %}
+                                    <tr>
+                                        <td style="width: 15%">{{ bill.slip_no|default:"-" }} </td>
+                                        <td style="width: 25%">{{ bill.bill_date|date:"d-m-Y" }}</td>
+                                        <td style="text-align: right; width: 30%;">{{ bill.bill_amount }}</td>
+                                        <td style="text-align: right; width: 30%;">{{ bill.paid_amount }}</td>
+                                    </tr>
+                                    {% if forloop.last %}
+                                    {% if bill_list.customer_bills|length == 1 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 2 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 3 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 4 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 5 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 6 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 7 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 8 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 9 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 10 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    {% elif bill_list.customer_bills|length == 11 %}
+                                    <tr><td colspan="4"></td></tr>
+                                    {% endif %}
+                                    {% endif %}
+                                {% empty %}
+                                    <tr>
+                                        <td style="width: 15%">-</td>
+                                        <td style="width: 25%">-</td>
+                                        <td style="text-align: right; width: 30%;">0</td>
+                                        <td style="text-align: right; width: 30%;">0</td>
+                                    </tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                    <tr><td colspan="4"></td></tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    {% if bill_list.before_start_date %}
+                                    <td colspan="2">up to {{ bill_list.before_start_date|date:"d-m-Y" }}</td>
+                                    <td style="text-align: right; border-bottom: 1px solid black;">{{ bill_list.before_start_date_bill_total }}</td>
+                                    <td style="text-align: right; border-bottom: 1px solid black;">{{ bill_list.before_start_date_payment_total }}</td>
+                                    {% else %}
+                                    <td colspan="4"></td>
+                                    {% endif %}
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </td>
+                    <td style="text-align: right; width: 30%"><b>{{ bill_list.total_pending_amount }}</b></td>
+                </tr>
+                <tr>
+                    <td style="width: 30%;"></td>
+                    <td class="text-end" style="width: 60%;">
+                        <table style="padding-top: 2px; text-align:right; width: 100%">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 15%"></td>
+                                    <td style="width: 25%;"></td>
+                                    <td style="text-align: right; width: 30%;"><b>{{ bill_list.total_bill_amount }}</b></td>
+                                    <td style="text-align: right; width: 30%;"><b>{{ bill_list.total_payment_amount }}</b></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td style="text-align: right; width: 30%"></td>
+                </tr>
+                {% comment %} <tr>
+                    <td colspan="3"></td>
+                </tr> {% endcomment %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+
+    <table id="footer_content">
+        <tr>
+            <td>Date: {% now "d-m-Y h:i A" %}</td>
+            <td>page <pdf:pagenumber> of <pdf:pagecount></td>
+        </tr>
+    </table>
+
+</body>
+</html>

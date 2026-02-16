@@ -1,0 +1,568 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}List Expanse{% endblock title %}
+
+{% block style %}
+<style>
+  .hidden{
+    display:none;
+  }
+  .budget-positive {
+    color: green;
+  }
+  .budget-negative {
+    color: red;
+  
+  .budget-zero {
+      color: black;
+    }
+  }
+
+</style>
+{% endblock style %}
+
+{% block bodycontent %}
+
+<section id="extended">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex flex-sm-row flex-column justify-content-between">
+            <h4 class="card-title ">Expanse</h4>
+            <button type="button" data-url="{% url 'expanse_management:expanse_create' %}" class="btn btn-primary ml-sm-1 add-expanse">Add</button>
+          </div>
+          <div class="company-list-filter px-2 mt-2">
+            <div class="row border rounded py-2 mb-2 mx-n2">
+              <div class="col-3">
+                <label for="budget-total">Budget:</label>
+                <span id="budget-total">0.00</span>
+              </div>
+          
+              <div class="col-3">
+                <label for="actual-total">Actual:</label>
+                <span id="actual-total">0.00</span>
+              </div>  
+              <div class="col-3">
+                <button class="btn btn-primary ml-sm-1 hidden add_budget" data-url="{% url 'expanse_management:get_month_budget' %}" id="add_budget">Add Budget</button>
+                <button class="btn btn-primary ml-sm-1 hidden" data-url="{% url 'expanse_management:get_month_budget' %}" id="update_budget">Update Budget</button>
+              </div>
+          
+              <div class="col-3 col-sm-6 col-lg-1 d-flex align-items-center">
+                <input type="month" id="month-selector" class="form-control" style="width:fit-content;">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-content">
+          <div class="card-body">
+            <div class="">
+              <input type="text" class="hidden" id="has_object" value="">
+            <table class="table table-striped table-bordered file-export dataTable" id="table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Budget</th>
+                  <th>Actual</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tfoot>
+                {% comment %} <tr>
+                    <th>Total:</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr> {% endcomment %}
+            </tfoot>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Budget Modals -->
+<div class="modal fade" id="budgetModal" tabindex="-1" role="dialog" aria-labelledby="budgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="budgetModalLabel">Manage Budget</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="budgetModalBody">
+          <!-- Budget form content will be loaded here -->
+           
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="save_budget" data-url="{% url 'expanse_management:save_budget' %}">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Add Expanse Create  Modals -->
+<div class="modal fade" id="expanseFormModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="ProductVehicleLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="expanseFormModalLabel">Add Expanse</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="add_expanse_modal">
+        <!-- Form content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" form="expanse-form" class="btn btn-primary add-expanse_">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{% comment %} <script>
+  var role = true;
+
+  function set_filters() {
+      var current_month = $("#month-selector").val();
+      console.log('current_month: ', current_month);
+      return { "current_month": current_month };
+  }
+  
+  function initialize_datatable() {
+      console.log("--datatable--")
+      $('#table').DataTable({
+          columnDefs: [
+              { orderable: false, targets: [0, -1, -2, -3] },
+              { targets: [1,2,3], visible: role } // Based on user role
+          ],
+          order: [],
+          processing: true,
+          serverSide: true,
+          ajax: {
+              url: '{% url "expanse_management:budget_list_ajax" %}',
+              type: 'GET',
+              data: function(d) {
+                  $.extend(d, set_filters()); // Extend DataTable's data with filters
+              },
+              error: function(xhr, error, thrown) {
+                  console.error("DataTable Error:", error, thrown);
+                  // Optionally handle the error, e.g., show an error message
+                  $('#table').DataTable().clear().draw();
+              }
+          },
+          columns: [
+              { data: 'category', name: 'category' },
+              { data: 'budget_amount', name: 'budget_amount' },
+              { data: 'actual_amount', name: 'actual_amount' },
+              { data: 'actions', name: 'actions' }
+          ],
+          drawCallback: function(settings) {
+              // Handle any additional logic if needed when drawing the table
+          },
+          footerCallback: function (row, data, start, end, display) {
+              var api = this.api();
+  
+              // Calculate the total for budget_amount
+              var totalBudget = api
+                  .column(1)
+                  .data()
+                  .reduce(function (a, b) {
+                      return parseFloat(a) + parseFloat(b);
+                  }, 0);
+  
+              // Calculate the total for actual_amount
+              var totalActual = api
+                  .column(2)
+                  .data()
+                  .reduce(function (a, b) {
+                      return parseFloat(a) + parseFloat(b);
+                  }, 0);
+  
+              // Determine the color based on the comparison
+              var color = 'black'; // Default color
+              if (totalActual > totalBudget) {
+                  color = 'red';
+              } else if (totalActual < totalBudget) {
+                  color = 'green';
+              }
+  
+              // Update the footer with the totals and apply the color
+              $(api.column(1).footer()).html(totalBudget.toFixed(2));
+              $(api.column(2).footer()).html(totalActual.toFixed(2)).css('color', color);
+          }
+      });
+  }
+  
+  $("#month-selector").on("change", function() {
+      $("#table").DataTable().destroy();
+      initialize_datatable();
+  });
+  
+  $(".users-list-clear").on("click", function() {
+      $('#month-selector').val(null).trigger('change');
+      $("#table").DataTable().destroy();
+      initialize_datatable();
+  });
+    
+  </script> {% endcomment %}
+
+  <script>
+    var role = true;
+  
+    function set_filters() {
+        var current_month = $("#month-selector").val();
+        console.log('current_month: ', current_month);
+        return { "current_month": current_month };
+    }
+    
+    function initialize_datatable() {
+        console.log("--datatable--")
+        $('#table').DataTable({
+            columnDefs: [
+                { orderable: false, targets: [0, -1, -2, -3] },
+                { targets: [1,2,3], visible: role } // Based on user role
+            ],
+            order: [],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{% url "expanse_management:budget_list_ajax" %}',
+                type: 'GET',
+                data: function(d) {
+                    $.extend(d, set_filters()); // Extend DataTable's data with filters
+                },
+                error: function(xhr, error, thrown) {
+                    console.error("DataTable Error:", error, thrown);
+                    // Optionally handle the error, e.g., show an error message
+                    $('#table').DataTable().clear().draw();
+                }
+            },
+            columns: [
+                { data: 'category', name: 'category' },
+                { data: 'budget_amount', name: 'budget_amount' },
+                { data: 'actual_amount', name: 'actual_amount' },
+                { data: 'actions', name: 'actions' }
+            ],
+            drawCallback: function(settings) {
+                // Handle any additional logic if needed when drawing the table
+            },
+            {% comment %} footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
+    
+                // Calculate the total for budget_amount
+                var totalBudget = api
+                    .column(1)
+                    .data()
+                    .reduce(function (a, b) {
+                        return parseFloat(a) + parseFloat(b);
+                    }, 0);
+    
+                // Calculate the total for actual_amount
+                var totalActual = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return parseFloat(a) + parseFloat(b);
+                    }, 0);
+    
+                // Determine the color based on the comparison
+                var color = 'black'; // Default color
+                if (totalActual > totalBudget) {
+                    color = 'red';
+                } else if (totalActual < totalBudget) {
+                    color = 'green';
+                }
+    
+                // Update the footer with the totals and apply the color
+                $(api.column(1).footer()).html(totalBudget.toFixed(2));
+                $(api.column(2).footer()).html(totalActual.toFixed(2)).css('color', color);
+                $(api.column(3).footer()).html('<i class="ft-eye font-medium-3 mr-2 text-primary"></i>');
+            } {% endcomment %}
+        });
+    }
+    
+    $("#month-selector").on("change", function() {
+        $("#table").DataTable().destroy();
+        initialize_datatable();
+    });
+    
+    $(".users-list-clear").on("click", function() {
+        $('#month-selector').val(null).trigger('change');
+        $("#table").DataTable().destroy();
+        initialize_datatable();
+    });
+      
+    </script>
+<script>
+  const monthSelector = $('#month-selector');
+  const budgetTotal = $('#budget-total');
+  const actualTotal = $('#actual-total');
+  const addBudgetButton = $('#add_budget');
+  const updateBudgetButton = $('#update_budget');
+  function fetchTotals(month) {
+    $.ajax({
+        url: "{% url 'expanse_management:get_monthly_totals' %}",
+        data: { month: month },
+        dataType: 'json',
+        success: function(data) {
+            console.log('data: ', data);
+
+            const totalBudget = Number(data.total_budget) || 0;
+            const totalExpanse = Number(data.total_expanse) || 0;
+            console.log('totalBudget: ' + totalBudget);
+            console.log('totalExpanse: ' + totalExpanse);
+
+            budgetTotal.text(totalBudget.toFixed(2));
+            actualTotal.text(totalExpanse.toFixed(2));
+
+            // Remove all color classes
+            actualTotal.removeClass('budget-positive budget-negative budget-zero');
+
+            // Add color class based on value
+            if (totalExpanse === 0) {
+                actualTotal.addClass('budget-zero');
+            } else if (totalExpanse < totalBudget) {
+                actualTotal.addClass('budget-positive');
+            } else {
+                actualTotal.addClass('budget-negative');
+            }
+
+            // Show or hide buttons based on whether budget exists
+            if (data.has_budget) {  // No need for "true" string comparison
+                updateBudgetButton.removeClass('hidden');
+                addBudgetButton.addClass('hidden');
+            } else {
+                addBudgetButton.removeClass('hidden');
+                updateBudgetButton.addClass('hidden');
+            }
+
+            // Reinitialize the DataTable
+            $("#table").DataTable().destroy();
+            initialize_datatable();
+        },
+        error: function() {
+            budgetTotal.text('0.00');
+            actualTotal.text('0.00');
+            actualTotal.removeClass('budget-positive budget-negative budget-zero'); // Remove any color classes
+            addBudgetButton.removeClass('hidden');
+            updateBudgetButton.addClass('hidden');
+            $("#table").DataTable().clear().draw();
+        }
+    });
+}
+
+// Set current month on page load and fetch totals
+const today = new Date();
+const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+monthSelector.val(currentMonth);
+fetchTotals(currentMonth);
+
+// Fetch totals on month change
+monthSelector.on('change', function() {
+    fetchTotals(this.value);
+});
+
+// Show the budget modal for Add/Update Budget
+function showBudgetModal(url, title) {
+    $('#budgetModal').modal('show');
+
+    $.ajax({
+        url: url,
+        type: 'GET',
+        data: { month: monthSelector.val() },
+        success: function(data) {
+            const categories = data.categories;
+            const budgets = data.budgets;
+            var has_budget = data.has_budget;
+            console.error('has_budget: '+ has_budget);
+            $("#has_object").val(has_budget)
+            let tableHtml = `
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Budget</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+            `;
+
+            for (const [category, budget] of Object.entries(budgets)) {
+                // Ensure the budget value is a number
+                const budgetValue = Number(budget) || 0;
+                tableHtml += `
+                    <tr>
+                      <td><span>${category}<span></td>
+                      <td><input type="text" class="form-control budget-input" value="${budgetValue.toFixed(2)}"></td>
+                    </tr>
+                `;
+            }
+
+            tableHtml += `
+                </tbody>
+                </table>
+            `;
+
+            $('#budgetModalLabel').text(title);
+            $('#budgetModalBody').html(tableHtml);
+            $('#budgetModal').modal('show');
+        }
+    });
+}
+  $(document).ready(function() {
+      
+
+      // Function to fetch and update totals
+      
+
+      $(document).on("click", ".add_budget", function() {
+          showBudgetModal($(this).data('url'), 'Add Budget');
+      });
+
+      $(document).on("click", "#update_budget", function() {
+          showBudgetModal($(this).data('url'), 'Update Budget');
+      });
+
+      // Save budget changes
+      $(document).on("click", "#save_budget", function() {
+          const month = monthSelector.val();
+          const budgets = {};
+          var has_budget = $("#has_object").val();
+          console.error('has_budget: '+ has_budget);
+          $('#budgetModalBody table tbody tr').each(function() {
+              const category = $(this).find('td:first').text();
+              const budget = $(this).find('.budget-input').val();
+              budgets[category] = parseFloat(budget) || 0;
+          });
+
+          $.ajax({
+              url: $(this).data('url'),  // Use the URL from the data-url attribute
+              type: 'POST',
+              data: {
+                  month: month,
+                  budgets: JSON.stringify(budgets),
+                  csrfmiddlewaretoken: '{{ csrf_token }}',  // Django CSRF token for security
+                  has_budget:has_budget
+              },
+              success: function() {
+                  $('#budgetModal').modal('hide');
+                  fetchTotals(month);  // Refresh totals after saving
+              }
+          });
+      });
+  });
+</script>
+<script>
+    
+    $(document).on('click', '.ajax-delete-btn' , function (e){
+    var id = $(this).data("id")
+    var name = $(this).data("title")
+    if(name == "None"){
+        name = ""
+    }
+    var url = $(this).data("url")
+    var delete_ele = $(this)
+
+
+    Swal.fire({
+        html: `Are you sure you want to delete <b>${name}</b> ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+        
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    "id": id,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    $('#table').DataTable().ajax.reload(null, false);
+                    if (data["message"]){
+                    $.toast({
+                        text: data.message,
+                        position: 'bottom-right',
+                        stack: false,
+                        icon: 'success',                    
+                    })
+                }
+                }    
+            });
+        }
+    })
+})
+
+</script>
+
+<script>
+  $(document).on('click', '.add-expanse', function (e) {
+    const url = $(this).data("url");
+    $("#add_expanse_modal").html("");
+
+    htmx.ajax('GET', url, {
+        target: '#add_expanse_modal',
+        swap: 'innerHTML'
+    }).then(() => {
+        $("#expanseFormModal").modal("show");
+        $.ajax({
+            url: "{% url 'expanse_management:get_categories' %}",
+            type: 'GET',
+            success: function(data) {
+                const select = $('#id_category');
+                select.empty();
+                $.each(data.categories, function(key, value) {
+                    select.append($('<option></option>').attr('value', key).text(value));
+                });
+            }
+        });
+    }).catch(err => {
+        console.error('Error fetching form:', err);
+    });
+});
+</script>
+
+<script>
+  document.addEventListener('htmx:afterRequest', function (evt) {
+    if (evt.detail.xhr.status === 201) {
+        // Reinitialize the modal and update its content
+    }
+})
+
+
+document.body.addEventListener("customerExpanseCreate", function(evt) {
+    $('#expanseFormModal').modal('hide');
+    $("#add_expanse_modal").html("");
+    $('#table').DataTable().destroy();
+    initialize_datatable();
+    
+    var currentMonth = $("#month-selector").val()
+    fetchTotals(currentMonth);
+    $.toast({
+        text: evt.detail.message,
+        position: 'bottom-right',
+        stack: false,
+        icon: evt.detail.level,
+    });  
+});
+</script>
+{% endblock script %}

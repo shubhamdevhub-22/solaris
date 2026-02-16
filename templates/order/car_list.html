@@ -1,0 +1,256 @@
+    {% extends 'base.html' %}
+
+    {% block title %}
+    List Car
+    {% endblock title %}
+
+
+    {% block bodycontent %}
+
+    <div class="users-list-filter px-2">
+        <div class="row border rounded py-2 mb-2 mx-n2">
+            <div class="col-12 col-sm-6 col-lg-3">
+            <label for="status-list-car">Status</label>
+            <fieldset class="form-group">
+            <select id="status-list-car" class="form-control">
+                <option value="">All</option>
+                    {% for data in status_choices %}
+                    <option value="{{data.0}}">{{data.1}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        
+        <div class="col-12 col-sm-6 col-lg-3">
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3">
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+        </div>
+        
+        <div class="col-12 col-sm-6 col-lg-1 mt-1 d-flex align-items-center">
+            <button type="reset" class="btn btn-primary btn-block car-list-clear glow mb-0">Clear</button>
+        </div>
+    </div>
+
+
+    <section id="file-export">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                    <h4 class="card-title align-self-center">Car List</h4>
+                    <a href="{% url 'order:car_create' %}" class="btn btn-primary ml-sm-1">Add</a>
+                </div>
+                </div>
+                <div class="card-content ">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered file-export" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sr no</th>
+                                        <th>Company Name</th>
+                                        <th>Car Nick Name</th>
+                                        <th>Year</th>
+                                        <th class="text-center">Status</th>
+                                        <th>Make</th>
+                                        <th>Model</th>
+                                        <th>VIN No</th>
+                                        <th>Licence Plate</th>
+                                        <th>Inspection Exp. Date</th>
+                                        <th>Start Milage</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+    {% endblock %}
+
+    {% block script %}
+
+        <script>
+            $('#status-list-car').select2({
+                width: "100%",
+            });
+        </script>
+        <script>
+            var role = true;
+            if ("{{request.user.role}}" == "company admin" || "{{request.user.role}}" == "sales representative"){
+                role = false;
+              }
+            {% comment %} if ("{{request.user.role}}" == "company admin"){
+            role = false;
+            } {% endcomment %}
+
+            function set_filters(){
+                var data = {}
+                data["status"] = $("#status-list-car").val()
+                return data
+            }
+
+            function initialize_datatable(){
+            $('#table').DataTable({
+                language: {
+                    searchPlaceholder: "Car Nick Name"
+                },
+                columnDefs: [{
+                    orderable: false,
+                    targets: -1
+                },
+                {
+                    targets: [1],
+                    visible: role // new variable true or false based on user role.
+                }
+                ],
+                order: [[0, 'desc']],
+
+                // Ajax for pagination
+                processing: true,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                serverSide: true,
+                ajax: {
+                    url: '{% url "order:car_list_ajax" %}',
+                    type: 'get',
+                    data: set_filters(),
+                },
+                columns: [
+                    // data: json key from prepare_results, name: model field name
+                    { data: 'id', name: 'id' },
+                    { data: 'company', name: 'company' },
+                    { data: 'car_nickname', name: 'car_nickname' },
+                    { data: 'year', name: 'year' },
+                    { data: 'status', name: 'status' },
+                    { data: 'make', name: 'make' },
+                    { data: 'model', name: 'model' },
+                    { data: 'vin_number', name: 'vin_number' },
+                    { data: 'licence_plate', name: 'licence_plate' },
+                    { data: 'inspect_exp_date', name: 'inspect_exp_date' },
+                    { data: 'start_mileage', name: 'start_mileage' },
+                    { data: 'actions', name: 'actions' }
+                ],
+                rowCallback: function (nRow, aData, iDisplayIndex) {
+                    var oSettings = this.fnSettings();
+                    $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                    return nRow;
+                },
+            });
+        }
+
+        initialize_datatable();
+
+        $("#status-list-car").on("change", function() {
+            $("#table").DataTable().destroy();
+            initialize_datatable()
+        });
+  
+
+
+    $("#status-list-car").on("change", function() {
+        $("#table").DataTable().destroy();
+        initialize_datatable()
+    });
+
+    //$(".car-list-clear").on("click",function(){
+    $(document).on('click', '.car-list-clear' , function (){
+        $("#status-list-car").val(null).trigger('change');
+        $("#table").DataTable().destroy();
+        initialize_datatable()
+    })
+
+
+    </script>
+    <script>
+      
+      $(document).on('click', '.ajax-delete-btn' , function (e){
+        var id = $(this).data("id")
+        var name = $(this).data("title")
+        if(name == "None"){
+            name = ""
+        }
+        var url = $(this).data("url")
+        var delete_ele = $(this)
+
+
+        Swal.fire({
+            html: `Are you sure you want to delete <b>${name}</b> ?`,
+            icon: 'question',
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonColor: "#7442DB",
+        }).then((result) => {
+            
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        "id": id,
+                        "csrfmiddlewaretoken": '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                      $('#table').DataTable().ajax.reload(null, false);
+                      if (data["message"]){
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',                    
+                        })
+                    }
+                  }    
+                });
+            }
+            var url = $(this).data("url")
+            var delete_ele = $(this)
+
+
+            Swal.fire({
+                html: `Are you sure you want to delete <b>${name}</b> ?`,
+                icon: 'question',
+                showCloseButton: true,
+                showCancelButton: true,
+                confirmButtonColor: "#7442DB",
+            }).then((result) => {
+                
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: {
+                            "id": id,
+                            "csrfmiddlewaretoken": '{{ csrf_token }}'
+                        },
+                        success: function (data) {
+                        $('#table').DataTable().ajax.reload(null, false);
+                        if (data["message"]){
+                            $.toast({
+                                text: data.message,
+                                position: 'bottom-right',
+                                stack: false,
+                                icon: 'success',                    
+                            })
+                        }
+                    }    
+                    });
+                }
+            })
+        })
+    })
+
+        </script>
+
+    {% endblock script %}

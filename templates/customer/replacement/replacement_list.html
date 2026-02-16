@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+List Replacement
+{% endblock title %}
+
+{% block bodycontent %}
+
+<div class="users-list-filter px-2">
+
+</div>
+
+<section id="file-export">
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title align-self-center">Replacement List</h4>
+                 <div>
+                  <a href="{% url 'customer:replacement_create' %}" class="btn btn-primary ml-sm-1 add-discount">Add</a>
+                </div>
+              </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                    <div class="table-responsive ">
+                        <table class="table table-striped table-bordered file-export" id="table">
+                              <thead>
+                                  <tr>
+                                    <th>Sr. no</th>
+                                    <th>Replace ID</th>
+                                    <th>Order</th>
+                                    <th>Customer</th>
+                                    <th>Created By</th>
+                                    <th>Return Type</th>
+                                    <th>Total Amount</th>
+                                    <th class="text-center" style="width: 13%;">Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+    var to_center = [0]
+    var order_false = [-1]
+    var invisible_columns = []
+
+    function initialize_datatable(){
+        $('#table').DataTable({
+            columnDefs: [{
+                targets: "_all",
+                className: "text-center",
+            },
+            {
+                orderable: false,
+                targets: order_false,
+            },],
+
+            // Ajax for pagination
+            processing: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+            },
+            serverSide: true,
+            ajax: {
+                url: '{% url "customer:replacement_list_ajax" %}',
+                type: 'get',
+                //data: set_filters(), // this line also in dropdown filter
+            },
+            columns: [
+                // data: json key from prepare_results, name: model field name
+                { data: 'id', name: 'id' },
+                { data: 'replace_id', name: 'replace_id' },
+                { data: 'order', name: 'order' },
+                { data: 'customer__customer_name', name: 'customer__customer_name' },
+                { data: 'created_by__full_name', name: 'created_by__full_name' },
+                { data: 'return_type', name: 'return_type' },
+                { data: 'total_amount', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'total_amount' },
+                { data: 'actions', name: 'actions' },
+            ],
+            rowCallback: function (nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+    }
+
+    initialize_datatable();
+
+</script>
+<script>
+    $(document).on('click', '.ajax-delete-btn' , function (e){
+    var id = $(this).data("id")
+    var name = $(this).data("title")
+    if(name == "None"){
+        name = ""
+    }
+    var url = $(this).data("url")
+    var delete_ele = $(this)
+
+
+    Swal.fire({
+        html: `Are you sure you want to delete <b>${name}</b> ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+      }).then((result) => {
+          
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  data: {
+                      "id": id,
+                      "csrfmiddlewaretoken": '{{ csrf_token }}'
+                  },
+                  success: function (data) {
+                  $('#table').DataTable().ajax.reload(null, false);
+                  if (data["message"]){
+                      $.toast({
+                          text: data.message,
+                          position: 'bottom-right',
+                          stack: false,
+                          icon: 'success',                    
+                      })
+                  }
+              }    
+              });
+          }
+      })
+    })
+</script>
+
+<script>
+
+  $(document).on('change', '.lock-switch', function(e){
+    const val = $(this).prop('checked');
+    const customer_id = $(this).data("id");
+
+    $.ajax({
+      url: "{% url 'customer:customer_billing_lock' %}",
+      type: "POST",
+      data: {
+        'csrfmiddlewaretoken': "{{ csrf_token }}",
+        'value': val,
+        'customer_id': customer_id,
+      },
+      success: function(data) {
+        $.toast({
+          text: data.message,
+          position: "bottom-right",
+          stack: false,
+          icon: data.level,
+        });
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+          //console.log(thrownError);
+      }
+    });
+  })
+
+  $(document).on("change", "#id_primary, #id_secondary", function(){
+
+    const primary = $(document).find("#id_primary");
+    const secondary = $(document).find("#id_secondary");
+    
+    if($(this).prop("checked")==true){
+      if($(this).attr("id")=="id_primary"){
+        secondary.prop('checked', false);
+      }
+      else{
+        primary.prop('checked', false);
+      }
+    }
+  })
+
+</script>
+
+{% endblock script %}

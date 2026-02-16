@@ -1,0 +1,30 @@
+<div class="row">
+<center>
+    <label data-id="{{obj.id}}" data-url="{{logs_url}}" title="Logs" data-toggle="modal" data-target="#default" class="danger p-0 mr-2 order-log-history-btn details-btn"><i class="ft-clock font-medium-3" style="color: #975AFF;"></i></label>
+    
+    {% if print_table_url %}
+    <label data-id="{{obj.id}}" data-url="{{print_table_url}}" title="Print" data-toggle="modal" data-target="#default" class="danger p-0 mr-2 order-print-btn  details-btn"><i class="ft-printer font-medium-3" style="color: #975AFF;"></i></label>
+    {% endif %}
+
+    {% if update_url %}    
+    <a href="{{update_url}}" title="Edit"><i class="ft-edit font-medium-3 mr-2"></i></a>
+    {% endif %}
+
+    <a href="{{detail_url}}" title="View"><i class="ft-eye font-medium-3 mr-2"></i></a>
+    
+    <!-- <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" name="customCheck" id="custom-check-2" value="{{obj.id}}">
+        <label class="custom-control-label" for="custom-check-2"><span>Assign Driver</span></label>
+      </div> -->
+    
+    {% if obj.status in 'packed' and user.role in "company admin,sales representative" %}
+    <input type="checkbox" name='order_checkbox' class="order_checkbox" value='{{obj.id}}' id="id_order_checkbox">
+    <label for="id__{{obj.id}}_order_checkbox"></label>
+    {% endif %}
+
+    {% if is_dispatch %}
+    <a href="javascript:void(0);" class="dispatch-btn" data-id="{{obj.id}}" data-url="{% url 'order:assign_driver' %}" title="Dispatch"><i class="ft-truck font-medium-3 mr-2"></i></a>
+    {% endif %}
+      
+</center>
+</div>

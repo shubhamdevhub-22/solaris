@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Bill Report</title>
+    <style>
+        @page {
+            margin: 25px 15px;
+
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 10pt; right: 10pt; width: 1050pt; top: 810pt; height: 20pt;
+            }
+        }
+
+        table, tr, td, th, tbody, thead, tfoot {
+            page-break-inside: auto !important;
+            font-size: 10pt;
+        }
+
+        .text-end{
+            text-align: right !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 3rem !important;
+        }
+
+        #main-table > table {
+            width: 90%;
+            text-align: center;
+            border-collapse: separate; /* Don't collapse */
+            border-spacing: 0;
+        }
+
+        #main-table > table th {
+            /* Apply both top and bottom borders to the <th> */
+            border-top: 2px solid;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+            padding-top: 3px;
+            padding-bottom: 3px;
+            font-size: 9pt !important;
+        }
+
+        #main-table > table td {
+            padding-top: 3px;
+        }
+
+        #main-table > table th:first-child
+        {
+            /* Apply a left border on the first <td> or <th> in a row */
+            border-left: 2px solid;
+        }
+
+        #main-table > table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #edecec;
+        }
+    </style>
+</head>
+<body>
+    <div class="mb-3">
+        <table style="width: 100%">
+            <tr>
+                <td style="width:50%">
+                    {% if zone %}
+                        Zone: <b>{{ zone }}</b>
+                    {% endif %}
+                </td>
+
+                <td style="width:50%" class="text-end">
+                    <b>BILL REPORT</b>
+                    {% if start_date %}
+                        ( {{ start_date|date:"d-m-Y" }} )
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="main-table">
+        <table>
+            <thead>
+                <th style="width:10%">SLIP NO.</th>
+                <th style="width:25%">CUSTOMER NAME & ADDRESS</th>
+                <th style="width:15%">SLIP DATE</th>
+                <th style="width:15%">AMOUNT</th>
+                <th style="width:15%">PAYMENT STATUS</th>
+                <th style="width:20%">UPDATE DATE</th>
+            </thead>
+            <tbody>
+                {% for order_bill in order_bills %}
+                <tr style="margin-bottom: 20px">
+                    <td valign="top">
+                        {{ order_bill.slip_no }}
+                    </td>
+                    <td valign="top">
+                        <div>{{order_bill.customer.customer_name}} <br>
+                        Zone: {{order_bill.customer.zone.zone_code}} &nbsp&nbsp {{order_bill.customer.area}}</div>
+                    </td>
+                    <td>
+                        {{ order_bill.created_at|date:"d-m-Y" }}
+                    </td>
+                    <td style="text-align: center;">
+                        <b>{{ order_bill.bill_amount }}</b>
+                    </td>
+                    <td style="text-align: center;">
+                        {% if order_bill.status == 'complete' %}
+                        <b>PAID</b>
+                        {% else %}
+                        <b>UNPAID</b>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        {% if order_bill.updated_at|date:"d-m-Y h:i A" != order_bill.created_at|date:"d-m-Y h:i A" %}
+                            {{ order_bill.updated_at|date:"d-m-Y h:i A" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if order_bills %}
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <div>Cash Total :</div>
+                        <div>Credit Total :</div>
+                    </td>
+                    <td>
+                        <div style="margin-right: 20px; text-align: center">
+                            <div><b>{{ paid_total }}</b></div>
+                            <div><b>{{ unpaid_total }}</b></div>
+                        </div>
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+
+    <table id="footer_content">
+        <tr>
+            <td>Date: {% now "d-m-Y h:i A" %}</td>
+            <td>page <pdf:pagenumber> of <pdf:pagecount></td>
+        </tr>
+    </table>
+</body>
+</html>

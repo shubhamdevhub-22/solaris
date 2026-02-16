@@ -1,0 +1,11 @@
+{% if company_customers %}
+    {% for company_customer in company_customers %}
+        <option value="{{company_customer.id}}">{{company_customer.customer_name}}</option>
+    {% endfor %}
+{% endif %}
+
+{% if company_products %}
+    {% for company_product in company_products %}
+        <option value="{{company_product.id}}">{{company_product.name}}</option>
+    {% endfor %}
+{% endif %}

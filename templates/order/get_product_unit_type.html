@@ -1,0 +1,9 @@
+{% if product %}
+    <option data-total-pieces="1" value="Piece" {% if barcode_product_type == 'Piece' %}selected="selected" {% endif %}>Piece</option>
+    {% if product.box %}
+    <option data-total-pieces="{{product.box_piece}}" value="Box" {% if barcode_product_type == 'Box' %}selected="selected" {% endif %}>Box ({{product.box_piece}} pcs)</option>
+    {% endif %}
+    {% if product.case %}
+    <option data-total-pieces="{{product.case_piece}}" value="Case" {% if barcode_product_type == 'Case' %}selected="selected" {% endif %}>Case ({{product.case_piece}} pcs)</option>
+    {% endif %}
+{% endif %}

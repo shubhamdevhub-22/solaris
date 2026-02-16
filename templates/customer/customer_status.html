@@ -1,0 +1,45 @@
+{% if status == 'active' %}
+<center><span class="badge bg-light-success">{{status.title}}</span></center>
+
+{% elif status == 'inactive' %}
+<center><span class="badge bg-light-danger">{{status.title}}</span></center>
+
+{% elif status == 'draft' %}
+<center><span class="badge bg-light-warning">{{status.title}}</span></center>
+
+{% elif status in 'saved' %}
+<center><span class="badge bg-light-dark">{{status.title}}</span></center>
+
+{% elif status == 'new' %}
+<center><span class="badge bg-light-primary">{{status.title}}</span></center>
+
+{% elif status == 'packed' %}
+<center><span class="badge bg-light-warning">{{status.title}}</span></center>
+
+{% elif status == 'ready to ship' %}
+<center><span class="badge bg-light-warning">{{status.title}}</span></center>
+
+{% elif status == 'shipped' %}
+<center><span class="badge bg-light-success">{{status.title}}</span></center>
+
+{% elif status in 'undelivered,cancel,close' %}
+<center><span class="badge bg-light-danger">{{status.title}}</span></center>
+
+{% elif status in 'completed,generate bill' %}
+<center><span class="badge bg-light-success">{{status.title}}</span></center>
+
+{% elif status == 'incomplete' %}
+<center><span class="badge bg-light-danger">{{status.title}}</span></center>
+
+{% elif status in 'ready for dispatch,dispatch' %}
+<center><span class="badge bg-light-info">{{status.title}}</span></center>
+
+{% endif %}
+
+{% if default %}
+<center><span class="badge bg-light-success">{{default}}</span></center>
+
+{% else %}
+<center><span class="badge bg-light-danger">{{default}}</span></center>
+
+{% endif %}

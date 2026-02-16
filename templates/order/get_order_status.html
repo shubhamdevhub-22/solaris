@@ -1,0 +1,21 @@
+{% if order.status == 'draft' %}
+<center><span class="badge bg-light-warning">{{order.status.title}}</span></center>
+
+{% elif order.status in 'saved,packed,shipped,packing,ready for dispatch,dispatch' %}
+<center><span class="badge bg-light-info">{{order.status.title}}</span></center>
+
+{% elif order.status in 'new,ready to ship' %}
+<center><span class="badge bg-light-primary">{{order.status.title}}</span></center>
+
+{% elif order.status in 'undelivered,cancel' %}
+<center><span class="badge bg-danger">{{order.status.title}}</span></center>
+
+{% elif order.status in 'close' %}
+<center><span class="badge bg-primary">{{order.status.title}}</span></center>
+
+{% elif order.status in 'active,completed' %}
+<center><span class="badge bg-light-success">{{order.status.title}}</span></center>
+
+{% elif order.status in 'inactive' %}
+<center><span class="badge bg-light-danger">{{order.status.title}}</span></center>
+{% endif %}

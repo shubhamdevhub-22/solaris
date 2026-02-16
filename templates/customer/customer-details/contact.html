@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if form.instance.id %}Update Contact {% else %}Add Contact {% endif %}{% endblock title %}
+{% block lazy_cdns %}
+{% comment %} <link rel="stylesheet" href="{% static 'cdns/intl-tel-input.css' %}" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" /> {% endcomment %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.7/css/intlTelInput.css" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock lazy_cdns %}
+{% block bodycontent %}
+<section id="horizontal-form-layout">
+  <div class="row match-height">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          {% if form.instance.id %}
+          <h4 class="card-title">Update Contact details</h4>
+          {% else %}
+          <h4 class="card-title">Add Contact details</h4> 
+          {% endif %}
+        </div>
+        <div class="card-content">
+          <div class="card-body">
+            <form action="" method="post" novalidate>
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-md-6 col-12" hidden>
+                  <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer_obj.label}}{% if form.customer_obj.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    <div class="col-md-9">
+                      {{form.customer_obj}}
+                        {% if form.customer_obj.errors %}
+                            {% for error in form.customer_obj.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.type.label}}{% if form.type.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    <div class="col-md-9">
+                      {{form.type}}
+                      {% if form.type.errors %}
+                        {% for error in form.type.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-3">{{form.contact_person.label}}{% if form.contact_person.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.contact_person}}
+                        {% if form.contact_person.errors %}
+                          {% for error in form.contact_person.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                
+                <div class="col-md-6 col-12">
+                  <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="horizontal-form-4">{{form.email.label}}{% if form.email.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    <div class="col-md-9">
+                      {{form.email}}
+                      {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-3">{{form.mobile_no.label}}{% if form.mobile_no.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.mobile_no}}
+                        {% if form.mobile_no.errors %}
+                          {% for error in form.mobile_no.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+              </div>
+              <div class="row">
+                
+                <div class="col-md-6 col-12">
+                  <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="horizontal-form-4">{{form.is_default.label}}{% if form.is_default.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                    <div class="col-md-9">
+                      {{form.is_default}}
+                      {% if form.is_default.errors %}
+                        {% for error in form.is_default.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% if form.instance.id %}
+              <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+              {% else %}
+              <button type="submit" class="btn btn-primary mr-2"><i class="ft-check-square mr-1"></i>Save</button>
+              {% endif %}
+              <a href="{% url 'customer:customer_details' customer_id  %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+  {% endblock %}
+  {% block script %}
+  <script>
+    $('.select2-list').select2({
+      width: "100%",
+    });
+  </script>
+  <script src="{% static 'cdns/intl-tel-input.js' %}"></script>
+  <script>
+    const input = document.querySelector("#id_mobile_no");
+    window.intlTelInput(input, {
+    
+    onlyCountries: ['in'],
+    separateDialCode: true,
+    nationalMode: false,
+  
+    // geoIpLookup: callback => {
+    //   fetch("https://ipapi.co/json")
+    //     .then(res => res.json())
+    //     .then(data => callback(data.country_code))
+    //     .catch(() => callback("us"));
+    // },
+    
+  })
+  
+  
+  
+  </script> 
+  {% endblock script %}

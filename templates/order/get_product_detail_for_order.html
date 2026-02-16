@@ -1,0 +1,15 @@
+{% load order_calculations %}
+<tr data-id="product_{{product.id}}" class="product-row">
+    <td data-title="product-id">{{product.id}}</td>
+    <td data-title="product-name">{{product.name}}</td>
+    <td data-title=="unit-type">{{unit_type}}</td>
+    <td data-title="quantity"><input type="number"  min="0" max="10" name="product_{{product.id}}__quantity" class="form-control text-center" value="{{quantity}}" /></td>
+    <td data-title="total-pieces">{{quantity}}</td>
+    <td data-title="unit-price"><input type="number"  min="0" name="product_{{product.id}}__unitprice" class="form-control text-center" value="{{product.retail_base_price}}" /></td>
+    <td data-title="srp">{{product.srp}}</td>
+    <td data-title="gp">0.0</td>
+    <td data-title="item-total">{% product_item_total quantity  product.retail_base_price %}</td>
+    <td data-title="product-discount"><input type="number"  min="0" name="product_{{product.id}}__productdiscount" class="form-control text-center" value="0.00" /></td>
+    <td data-title="net-price">{% product_item_total quantity  product.retail_base_price %}</td>
+    <td data-title="remove-product"><span class="btn-procuct-remove hover-pointer"><i class="ft-trash font-medium-3 danger"></i></span></td>
+</tr>

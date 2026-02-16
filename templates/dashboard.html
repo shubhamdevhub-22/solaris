@@ -1,0 +1,433 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% block bodycontent %}
+<!--Card-->
+<div class="row">
+  {% if request.user.role in "company admin,super admin" %}
+    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+      {% else %}
+    <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+      {% endif %}
+      <div class="card gradient-purple-love">
+        <div class="card-content">
+          <div class="card-body py-0">
+            <div class="media pb-1">
+              <div class="media-body white text-left">
+                <h3 class="font-large white mb-0">{{total_week_sales_orders|intcomma}}</h3>
+                <small>Weekly Sales Orders</small>
+              </div>
+              <div class="media-right white text-right">
+                <i class=" font-large-1"></i>
+              </div>
+            </div>
+          </div>
+          <div id="" class="height-30 WidgetlineChart WidgetlineChartshadow mb-2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if request.user.role in "company admin,super admin" %}
+    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+      <div class="card gradient-ibiza-sunset">
+        <div class="card-content">
+          <div class="card-body py-0">
+            <div class="media pb-1">
+              <div class="media-body white text-left">
+                <h3 class="font-large white mb-0">{{total_week_purchase_orders|intcomma}}</h3>
+                <small>Weekly Purchase Orders</small>
+              </div>
+              <div class="media-right white text-right">
+                <i class="font-large-1"></i>
+              </div>
+            </div>
+          </div>
+          <div id="" class="height-30 WidgetlineChart WidgetlineChartshadow mb-2">
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if request.user.role in "company admin,super admin" %}
+    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+      {% else %}
+    <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+      {% endif %}
+      <div class="card gradient-mint">
+        <div class="card-content">
+          <div class="card-body py-0">
+            <div class="media pb-1">
+              <div class="media-body white text-left">
+                <h3 class="font-large white mb-0" id="id_total_week_sales">₹ {{total_week_order_sales}}</h3>
+                <small>Weekly Sales</small>
+              </div>
+              <div class="media-right white text-right">
+                <i class=" font-large-1"></i>
+              </div>
+            </div>
+          </div>
+          <div id="" class="height-30 WidgetlineChart WidgetlineChartshadow mb-2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if request.user.role in "company admin,super admin" %}
+    <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+      {% else %}
+    <div class="col-xl-4 col-lg-6 col-md-6 col-12">
+      {% endif %}
+      <div class="card gradient-king-yna">
+        <div class="card-content">
+          <div class="card-body py-0">
+            <div class="media pb-1">
+              <div class="media-body white text-left">
+                <h3 class="font-large white mb-0" id="id_total_week_earning" value="{{unit_sold_count}}">{{unit_sold_count|default:"0"|intcomma}}</h3>
+              <small>Weekly Units Sold</small>
+              </div>
+              <div class="media-right white text-right">
+                <i class=" font-large-1"></i>
+              </div>
+            </div>
+          </div>
+          <div id="" class="height-30 WidgetlineChart WidgetlineChartshadow mb-2">
+          </div>
+        </div>
+      </div>
+    </div>
+    {% comment %} <div class="col-xl-3 col-lg-6 col-md-6 col-12">
+      <div class="card gradient-king-yna">
+        <div class="card-content">
+          <div class="card-body py-0">
+            <div class="media pb-1">
+              <div class="media-body white text-left">
+                <h3 class="font-large-1 white mb-0" id="id_total_week_earning" value="{{total_week_earning}}">₹ {{total_week_earning}}</h3>
+                <span>Weekly Earning</span>
+              </div>
+              <div class="media-right white text-right">
+                <i class=" font-large-1"></i>
+              </div>
+            </div>
+          </div>
+          <div id="" class="height-30 WidgetlineChart WidgetlineChartshadow mstatic_files/webapp/chart.jsb-2">
+          </div>
+        </div>
+      </div>
+    </div> {% endcomment %}
+  </div>
+
+<!--END-->
+
+{% if request.user.role in "company admin,super admin" %}
+<!--Statics-->
+<section id="basic-hidden-label-form-layouts">
+  <div class="row match-height mt-4">
+      <div class="col-xl-12 col-lg-12 col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Statistics</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <input type="hidden" id="id_last_1st_month" value="{{last_1st_month}}">
+              <input type="hidden" id="id_last_2nd_month" value="{{last_2nd_month}}">
+              <input type="hidden" id="id_last_3rd_month" value="{{last_3rd_month}}">
+              <input type="hidden" id="id_last_4th_month" value="{{last_4th_month}}">
+              <input type="hidden" id="id_last_5th_month" value="{{last_5th_month}}">
+              <input type="hidden" id="id_last_6th_month" value="{{last_6th_month}}">
+              <p class="font-medium-2 text-center my-2">Latest 6 Months Sales</p>
+              <div id="Stack-bar" class="height-300 Stackbarchart mb-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% comment %} <div class="col-xl-8 col-lg-12 col-12">
+        <div class="card shopping-cart">
+          <div class="card-header pb-2">
+            <h4 class="card-title mb-1">Recent Credit Memo</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table text-center m-0">
+                  <thead>
+                    <tr>
+                      <th>Customer Name</th>
+                      {% if request.user.role == 'company admin' %}
+                      {% else %}
+                      <th>Company</th>
+                      {% endif %}
+                      <th>Date</th>
+                      <th>Item</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% if last_5_credit_memo %}
+                    {% for credit_memo in last_5_credit_memo %}
+                    <tr>
+                    {% if not user.role == 'sales representative' %}
+                      <td><a href="{% url 'customer:customer_details' credit_memo.customer.id %}">{{credit_memo.customer|capfirst}}</a></td>
+                      {% else %}
+                      <td>{{credit_memo.customer|capfirst}}</td>
+                      {% endif %}
+
+                      {% if request.user.role == 'company admin' %}
+                      {% else %}
+                      <td>{{credit_memo.company|capfirst}}</td>
+                      {% endif %}
+                      <td>{{credit_memo.date}}</td>
+                      <td>{{credit_memo.item_count}}</td>
+                      <td>₹ {{credit_memo.item_total|intcomma}}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                      <td colspan="5">No data Found</td>
+                    </tr>
+                    {% endif %}
+                  </tbody>
+                  <!-- <tfoot>
+                    {% if last_5_credit_memo %}
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td colspan="2"><a href="{% url 'credit_memo:credit_memo_list' %}" class="btn btn-primary">Read more</a href=""></td>
+                    </tr>
+                    {% endif %}
+                  </tfoot> -->
+                </table>
+                <div class="d-flex justify-content-end mx-2 my-2">
+                  <!-- <a href="{% url 'credit_memo:credit_memo_list' %}"><span class="btn btn-primary"><u>Read more</u></span></a> -->
+                  
+                  {% if not user.role == 'sales representative' %}
+                  <a href="{% url 'credit_memo:credit_memo_list' %}"><button type="button" class="btn btn-primary">Read more</button></a>
+                  {% endif %}
+                    
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> {% endcomment %}
+  </div>
+</section>
+<!--END-->
+{% endif %}
+
+<!--List View Start-->
+<section id="basic-hidden-label-form-layouts">
+  <div class="row match-height mt-4">
+  <div class="col-xl-6 col-lg-12 col-12 ">
+    <div class="card shopping-cart">
+      <div class="card-header pb-2">
+        <h4 class="card-title mb-1">Recent Order List</h4>
+      </div>
+      <div class="card-content">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table text-center m-0">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  {% if request.user.role == 'company admin' %}
+                  {% else %}
+                  <th>Company</th>
+                  {% endif %}
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if last_5_orders %}
+                {% for order in last_5_orders %}
+                <tr>
+                  <td><a href="{% url 'customer:customer_details' order.customer.id %}">{{order.customer|capfirst}}</a></td>
+                  {% comment %} <td>{{order.customer|capfirst}}</td> {% endcomment %}
+                  {% if request.user.role == 'company admin' %}
+                  {% else %}
+                  <td>{{order.company|capfirst}}</td>
+                  {% endif %}
+                  <td>{{order.order_date}}</td>
+                  <td>₹ {{order.grand_total|intcomma}}</td>
+                  <td><span class="badge badge-pill 
+                  {% if order.status in 'new,ready to ship' %}
+                    bg-light-primary
+                  {% elif order.status == 'draft' %}
+                    bg-light-warning
+                  {% elif order.status in 'saved,packed,shipped,packing' %}
+                    bg-light-info
+                  {% elif order.status in 'undelivered,cancel' %}
+                    bg-light-danger
+                  {% endif %}
+                      cursor-pointer">{{order.status.title}}</span></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td colspan="5">No data Found</td>
+                </tr>
+                {% endif %}
+              </tbody>
+              <!-- <tfoot>
+                {% if last_5_orders %}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  {% if request.user.role == 'company admin' %}
+                  {% else %}
+                  <td></td>
+                  {% endif %}
+                  <td colspan="2"><a href="{% url 'order:order_list' %}" class="btn btn-primary">Read more</a href=""></td>
+                </tr>
+                {% endif %}
+              </tfoot> -->
+            </table>
+            <div class="d-flex justify-content-end mx-2 my-2">
+              {% comment %} <!-- <a href="{% url 'credit_memo:credit_memo_list' %}"><span class="btn btn-primary"><u>Read more</u></span></a> --> {% endcomment %}
+              
+              {% if not user.role == 'sales representative' %}
+              <a href="{% url 'order:order_list' %}"><button type="button" class="btn btn-primary">Read more</button></a>
+              {% endif %}
+                
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-xl-6 col-lg-12 col-12">
+    <div class="card shopping-cart">
+      <div class="card-header pb-2">
+        <h4 class="card-title mb-1">Recent Customer Collection List</h4>
+      </div>
+      <div class="card-content">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table text-center m-0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  {% if request.user.role == 'company admin' %}
+                  {% else %}
+                  <th>Company</th>
+                  {% endif %}
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if last_5_customers_payment %}
+                {% for customer in last_5_customers_payment %}
+                <tr>
+                  {% comment %} {% ifchanged customer.customer_name %} {% endcomment %}
+                  {% if not user.role == 'sales representative' %}
+                  <td><a href="{% url 'customer:customer_details' customer.id %}">{{customer.customer_name|capfirst}}</a></td>
+                  {% else %}
+                  <td>{{customer.customer_name|capfirst}}</td>
+                  {% endif %}
+
+                  {% if request.user.role == 'company admin' %}
+                  {% else %}
+                  <td>{{customer.customer_name.company|capfirst}}</td>
+                  {% endif %}
+                  <td>{{customer.entry_date}}</td>
+                  <td>₹ {{customer.receive_amount|intcomma}}</td>
+                  <td><span class="badge badge-pill bg-light-success cursor-pointer">completed</span></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td colspan="5">No data Found</td>
+                </tr>
+                {% endif %}
+              </tbody>
+              <!-- <tfoot>
+                {% if last_5_customers_payment %}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td colspan="2"><a href="{% url 'customer:payment_list' %}" class="btn btn-primary">Read more</a href=""></td>
+                </tr>
+                {% endif %}
+              </tfoot> -->
+            </table>
+            <div class="d-flex justify-content-end mx-2 my-2">
+              {% comment %} <!-- <a href="{% url 'credit_memo:credit_memo_list' %}"><span class="btn btn-primary"><u>Read more</u></span></a> --> {% endcomment %}
+              
+              {% if not user.role == 'sales representative' %}
+              <a href="{% url 'customer:payment_list' %}"><button type="button" class="btn btn-primary">Read more</button></a>
+              {% endif %}
+                
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!--END-->
+{% endblock bodycontent %}
+
+{% block script %}
+
+<script>
+  var currentdate = new Date(); 
+  var datetime = (currentdate.getMonth())
+  month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"];
+  
+  last_1st_month = document.getElementById("id_last_1st_month").value
+  last_2nd_month = document.getElementById("id_last_2nd_month").value
+  last_3rd_month = document.getElementById("id_last_3rd_month").value
+  last_4th_month = document.getElementById("id_last_4th_month").value
+  last_5th_month = document.getElementById("id_last_5th_month").value
+  last_6th_month = document.getElementById("id_last_6th_month").value
+  
+  var label=[month[datetime-6], month[datetime-5] , month[datetime-4] , month[datetime-3], month[datetime-2], month[datetime-1]]
+  var series_1 = [last_6th_month, last_5th_month, last_4th_month, last_3rd_month, last_2nd_month, last_1st_month]
+  s1=[last_6th_month, last_5th_month, last_4th_month, last_3rd_month, last_2nd_month, last_1st_month]
+  s1.sort()
+
+  big_count = parseInt(s1[s1.length-1])+1
+  //var series_2 = [0,0,0,0,0,0]
+  var series_2 = [big_count-parseInt(last_6th_month), big_count-parseInt(last_5th_month), big_count-last_4th_month, big_count-last_3rd_month, big_count-last_2nd_month, big_count-parseInt(last_1st_month)]
+</script>
+
+<script src="{% static 'webapp/chart.js' %}"></script>
+<script>
+
+      let rupee = new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+      });
+      
+      {% comment %} total_week_earning = document.getElementById("id_total_week_earning").innerHTML
+      week_earning = total_week_earning.split("₹")[1]
+      parseInt(week_earning)
+      $("#id_total_week_earning").html(rupee.format(week_earning)) {% endcomment %}
+
+      total_week_sales = document.getElementById("id_total_week_sales").innerHTML
+      week_sales = total_week_sales.split("₹")[1]
+      parseInt(week_sales)
+      $("#id_total_week_sales").html(rupee.format(week_sales))
+
+      // customer_payment_amount = document.getElementById("id_customer_payment_amount").innerHTML
+      // payment_amount = customer_payment_amount.split("$")[1]
+      // parseInt(payment_amount)
+      // $("#id_customer_payment_amount").html(USDollar.format(payment_amount))
+
+</script>
+{% endblock script %}

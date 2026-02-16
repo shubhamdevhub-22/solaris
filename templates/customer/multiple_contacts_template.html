@@ -1,0 +1,88 @@
+{% load widget_tweaks %}
+{% load custom_template_tags %}
+{% load static %}
+
+<tr data-id="None" data-order="">
+    <td>
+        <div class="row">
+            <div class="col-6 mb-1">
+                <div class="controls">
+                    <div class="row">
+                        <div class="col-2 mt-1">
+                            <label for="{{ multiplecontacts.empty_form.is_default.auto_id }}">{{multiplecontacts.empty_form.is_default.label}}</label>
+                        </div>
+                        <div class="col-10 help-block validate-email ">
+                            {{multiplecontacts.empty_form.is_default}}
+                            {% for error in multipleinlines.empty_form.is_default.errors %}
+                            <span style="color: red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-1">
+                <div class="controls">
+                    <div class="row">
+                        <div class="col-2 mt-1 ">
+                            <label>{{multiplecontacts.empty_form.contact_person.label}}{% if multipleVendorDiscounts.empty_form.contact_person.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        </div>
+                        <div class="col-10">
+                            <div class="help-block validate-email">
+                                {{multiplecontacts.empty_form.contact_person}}
+                                {% for error in multipleinlines.empty_form.contact_person.errors %}
+                                <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 mb-1">
+                <div class="controls">
+                    <div class="row">
+                        <div class="col-2 mt-1 ">
+                            <label>{{multiplecontacts.empty_form.email.label}}{% if multipleVendorDiscounts.empty_form.email.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        </div>
+                        <div class="col-10">
+                            <div class="help-block validate-email">
+                                {{multiplecontacts.empty_form.email}}
+                                {% for error in multipleinlines.empty_form.email.errors %}
+                                <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 mb-1">
+                <div class="controls">
+                    <div class="row">
+                        <div class="col-2 mt-1 ">
+                            <label>{{multiplecontacts.empty_form.mobile_no.label}}{% if multipleVendorDiscounts.empty_form.mobile_no.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        </div>
+                        <div class="col-10">
+                            <div class="help-block validate-email">
+                                {{multiplecontacts.empty_form.mobile_no}}
+                                {% for error in multipleinlines.empty_form.mobile_no.errors %}
+                                <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </td>
+    <td>
+        <label for="{{ multiplecontacts.empty_form.DELETE.auto_id }}" class="btn btn-default btn-circle-inline inlineform-remove">
+            <i class="ft-minus danger font-medium-3"></i>
+            {{ multiplecontacts.empty_form.DELETE|add_attr:"class:d-none" }}
+        </label>
+
+        {% for hidden in multiplecontacts.empty_form.hidden_fields %}
+        {{ hidden }}
+        {% endfor %}
+    </td>
+</tr>

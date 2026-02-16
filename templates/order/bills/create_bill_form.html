@@ -1,0 +1,617 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} 
+    {% if form.instance.id %}
+        Update Bill
+    {% else %}
+        Create Bill 
+    {% endif %}
+{% endblock title %}
+
+{% block style %}
+    <style>
+        .select2-results__options {
+            max-height: 352px !important;
+        }
+    </style>
+{% endblock style %}
+
+{% block bodycontent %}
+<section id="horizontal-form-layout">
+    
+    <div class="content-header">
+        {% if form.instance.is_bill_generated %}
+        Update Bill
+        {% else %}
+        Create Bill
+        {% endif %}
+    </div>
+
+    <div class="row match-height">
+        <form action="" method="post" class="order-form" enctype="multipart/form-data" id="order_form" novalidate>
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-lg-12 col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    {% if request.user.is_superuser %}
+                                        {% if form.company %}
+                                            <div class="form-group col-md-6">
+                                                <label>Brand{% if form.company.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                                {{form.company}}
+                                                {% if form.company.errors %}
+                                                {% for error in form.company.errors %}
+                                                <p style="color: red;">{{error}}</p>
+                                                {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <input type="text" name="company" id="id_company" value="{{request.user.get_company_id}}" hidden>
+                                    {% endif %}
+
+                                    <div class="form-group col-md-6">
+                                        <label>{{form.customer.label}}{% if form.customer.field.required %} {% if form.instance.customer.is_locked %}<span class="text-danger font-weight-bold">(Locked)</span>{% endif %} <span style="color: red;">*</span>{% endif %}</label>
+                                        {{ form.customer }}
+                                        {% if form.customer.errors %}
+                                            {% for error in form.customer.errors %}
+                                            <p style="color: red;">{{error}}</p>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group col-md-6">
+                                        <label>Customer details</label>
+                                        <textarea name="customer_details" disabled class="form-control" id="id_customer_details" cols="30" rows="3">{{ shipping_address }}</textarea>
+                                    </div>
+
+                                    {% comment %} <div class="form-group col-md-3">
+                                        <label>Area</label>
+                                        <input type="text" name="area" class="form-control" id="id_area" readonly>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label for="customer_sales_representative">Sales Rep</label>
+                                        <input type="text" class="form-control square" id="customer_sales_representative" name="customer-sales-representative" disabled>
+                                    </div> {% endcomment %}
+
+
+                                    <div class="mb-2 col-lg-12">
+                                        <small><b>Product</b></small>
+                                    </div>
+                                    
+                                    {% comment %} <div class="form-group col-md-3">
+                                        <label>Brand</label>
+                                        <select name="brand" id="id_brand">
+                                            <option value="0">------</option>
+                                        </select>
+                                    </div> {% endcomment %}
+
+                                    {% comment %} <div class="form-group col-md-6">
+                                        <label>Product code</label>
+                                        <input type="text" name="barcode" placeholder="Search by product code" class="form-control" id="id_barcode" data-url = "{% url 'order:ajax_get_product_for_order_by_barcode' %}">
+                                    </div> {% endcomment %}
+
+                                    <div class="form-group col-md-12">
+                                        <label>{{form2.product.label}}{% if form2.product.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        {{form2.product}}
+                                        {% if form2.product.errors %}
+                                        {% for error in form2.product.errors %}
+                                            <p style="color: red;">{{error}}</p>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+
+                                    <input type="text" name="unit_total_pieces" class="form-control" id="id_total_pieces" hidden value="1" />
+                                </div>
+                                <div class="row g-3 d-none" id="id_product_extra_fields">
+                                    <div class="col-md-3">
+                                        <label>Brand</label>
+                                        <div class="input-group">
+                                            <input type="text" id="id_product_brand" disabled name="brand" class="form-control" value="">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Code</label>
+                                        <div class="input-group">
+                                            <input type="text" id="id_product_code" disabled name="code" class="form-control" value="">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Select Price</label>
+                                        <select name="price_choice" id="id_price_choice" data-url="{% url 'product:get_product_price' %}" class="form-control">
+                                            <option value="mrp">MRP</option>
+                                            <option value="wholesale">Wholesale</option>
+                                            <option value="retail">Retail</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Unit Price</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₹</span>
+                                            </div>
+                                            <input type="number" disabled name="mrp" class="form-control" id="id_mrp" value="0.00">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-3">
+                                        <div class="d-flex justify-content-between">
+                                            <label>{{form2.quantity.label}}{% if form2.quantity.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                            <div class="mr-2"><small class="mr-1">Available Stock: </small><span id="id_available_stock">0</span></div>
+                                        </div>
+                                        <input type="number" name="quantity" min="0" max="0" value="0" class="form-control" placeholder="Quantity" required id="id_quantity" />
+                                        {% if form2.quantity.errors %}
+                                        {% for error in form2.quantity.errors %}
+                                            <p style="color: red;">{{error}}</p>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group col-md-3">
+                                        <label>Unit</label>
+                                        <input type="text" name="unit" class="form-control" id="id_unit" disabled />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Previous Price</label>
+                                        <input type="text" name="previous_price" class="form-control" id="id_previous_price" value="0" disabled />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label>Free quantity</label>
+                                        <input type="text" name="free_quantity" class="form-control" id="id_free_quantity" value="0" />
+                                    </div>
+                                    
+                                    <div class="form-group col-md-3">
+                                        <label>Special Rate</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text">₹</span>
+                                            </div>
+                                            <input type="number" name="special_rate" class="form-control discounts" id="id_special_rate" value="0.00" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-3">
+                                        <label>Special Discount</label>
+                                        <div class="input-group">
+                                            <input type="number" name="special_discount" class="form-control discounts" id="id_special_discount" value="0.00" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="label-control">Primary Discount</label>
+                                        <div class="input-group">
+                                            <input type="number" name="brand_primary_discount" class="form-control discounts" id="id_brand_primary_discount" value="0.00" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        <span id="id_discount_applied" class="text-success font-weight-bold"></span>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="label-control">Secondary Discount</label>
+                                        <div class="input-group">
+                                            <input type="number" name="brand_secondary_discount" class="form-control discounts" id="id_brand_secondary_discount" value="0.00" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12 my-auto">
+                                        <div class="d-flex flex-sm-row flex-column justify-content-end">
+                                            <span type="button" class="btn btn-primary btn-pointer-events-none" data-url="{% url 'order:ajax_add_product_details_in_order_list' %}" id="btn_add_product">Add</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row g-3" id="id_product_add_button">
+                                    <div class="col-md-12 my-auto">
+                                        <div class="d-flex flex-sm-row flex-column justify-content-end">
+                                            <span type="button" class="btn btn-primary btn-pointer-events-none" data-url="{% url 'order:ajax_add_product_details_in_order_list' %}" id="btn_add_product">Add</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <small><b>Products</b></small>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body table-responsive">
+                              <table id="table_added_products" class="table text-center m-0">
+                                <thead>
+                                    <tr>
+                                        <th>Brand</th>
+                                        <th>Product</th>
+                                        <th>Vehicle</th>
+                                        <th style="width: 10%">Qty</th>
+                                        <th>Unit</th>
+                                        <th style="width: 13%">Unit Price (₹)</th>
+                                        <th style="width: 15%">Offer (%)</th>
+                                        <th>Total Price (₹)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="no-product-row">
+                                       <td colspan="12"><p>No products added</p></td>
+                                    </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-12">
+                    <div class="card">
+                        <div class="card-header"></div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="{{form.internal_remarks.auto_id}}">{{form.internal_remarks.label}}{% if form.internal_remarks.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                    {{form.internal_remarks}}
+                                    {% if form.internal_remarks.errors %}
+                                        {% for error in form.internal_remarks.errors %}
+                                        <p style="color: red;">{{error}}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                {% if form.instance.id %}
+                                <div class="form-group">
+                                    <label for="order_id">Order No</label>
+                                    <input type="text" class="form-control square" id="order_id" name="order-number" value="{{form.instance.order_id}}" disabled>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="form-group">
+                                    <label for="{{form.order_date.auto_id}}">{{form.order_date.label}}{% if form.order_date.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                    {{form.order_date}}
+                                    {% if form.order_date.errors %}
+                                        {% for error in form.order_date.errors %}
+                                        <p style="color: red;">{{error}}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                
+                                {% if form.instance.id %}
+                                <div class="form-group form-row">
+                                    <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.status.label}}{% if form.status.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                    {{form.status}}
+                                    {% if form.status.errors %}
+                                        {% for error in form.status.errors %}
+                                            <p style="color: red;">{{error}}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% comment %} <textarea id="customer_billing_address" rows="4" class="form-control square" name="customer-billing-address" disabled></textarea> {% endcomment %}
+                                </div>
+                                
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-12">
+                    <div class="card">
+                        <div class="card-header"></div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <div class="form-bordered">
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.item_total.auto_id}}">{{form.item_total.label}}{% if form.item_total.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                {{form.item_total}}
+                                                {% if form.item_total.errors %}
+                                                    {% for error in form.item_total.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.paid_amount.auto_id}}">{{form.paid_amount.label}}{% if form.paid_amount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                {{form.paid_amount}}
+                                                {% if form.paid_amount.errors %}
+                                                    {% for error in form.paid_amount.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="grand_total" step="any" class="form-control" placeholder="Grand Total" id="id_grand_total" />
+                                    <input type="hidden" name="submit" value="generate" />
+                                    <input type="hidden" name="payment_choice" id="payment_choice" value="credit" />
+
+                                    {% comment %} <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.overall_discount.auto_id}}">{{form.overall_discount.label}}{% if form.overall_discount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        <div class="col-md-9">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        {{form.overall_discount}}
+                                                        {% if form.overall_discount.errors %}
+                                                        {% for error in form.overall_discount.errors %}
+                                                        <p style="color: red;">{{error}}</p>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text">₹</span>
+                                                        </div>
+                                                        <input type="number" id="id_overall_discount_amount" class="form-control" value="0.00" />
+                                                    </div>
+                                                </div>    
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
+                                    {% comment %} <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="id_credit_memo">Credit Memo</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                <input type="number" id="id_credit_memo" class="form-control" value="0.00" readonly/>
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
+                                    {% comment %} <div class="form-group row"> {% endcomment %}
+                                        {% comment %} <label class="col-md-3 label-control" for="{{form.use_credits.auto_id}}">{{form.use_credits.label}}{% if form.use_credits.field.required %}<span style="color: red;">*</span>{% endif %}
+                                        <br><small><span class="text-success"id="available_store_credits"></span></small>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                {{form.use_credits}}
+                                                {% if form.use_credits.errors %}
+                                                    {% for error in form.use_credits.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                <input type="hidden" id="id_available_store_credit" name="id_available_store_credit" value="0">
+                                                <input type="hidden" id="id_remaining_store_credit" name="id_remaining_store_credit" value="0">
+                                            </div>
+                                        </div> {% endcomment %}
+                                        {% comment %} <label class="col-md-3 label-control" for="id_store_credit">Store Credit</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                <input type="number" id="id_store_credit" name="id_store_credit" class="form-control" value="0.00" readonly/>
+                                                <input type="hidden" id="id_remaining_store_credit" name="id_remaining_store_credit" value="">
+                                            </div>
+                                        </div> {% endcomment %}
+                                    {% comment %} </div> {% endcomment %}
+
+                                    {% comment %} <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.shipping_charges.auto_id}}">{{form.shipping_charges.label}}{% if form.shipping_charges.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                {{form.shipping_charges}}
+                                                {% if form.shipping_charges.errors %}
+                                                    {% for error in form.shipping_charges.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.packing_charges.auto_id}}">{{form.packing_charges.label}}{% if form.packing_charges.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">₹</span>
+                                                </div>
+                                                {{form.packing_charges}}
+                                                {% if form.packing_charges.errors %}
+                                                    {% for error in form.packing_charges.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div> {% endcomment %}
+                                    
+                                    {% if not form.instance.id %}
+                                    <input type="hidden" name="created_by" id="id_created_by" value ="{{user.id}}">
+                                    {% endif %}
+
+                                    {% comment %} <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.payment_method.auto_id}}">{{form.payment_method.label}}{% if form.payment_method.field.required %}<span style="color: red;">*</span>{% endif %}</label>                                      
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                {{form.payment_method}}
+                                                {% if form.payment_method.errors %}
+                                                    {% for error in form.payment_method.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row">
+                                        <label class="col-md-3 label-control" for="{{form.reference_number.auto_id}}">{{form.reference_number.label}}{% if form.reference_number.field.required %}<span style="color: red;">*</span>{% endif %}</label>                                      
+                                        <div class="col-md-9">
+                                            <div class="input-group">
+                                                {{form.reference_number}}
+                                                {% if form.reference_number.errors %}
+                                                    {% for error in form.reference_number.errors %}
+                                                    <p style="color: red;">{{error}}</p>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>{% endcomment %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-12">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <div>
+                            {% if form.instance.customer.is_locked %}
+                            <div class="text-start text-danger font-weight-bold">Order not able to update becuase the customer is locked</div>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex flex-sm-row flex-column justify-content-end">
+                            <input type="hidden" name="product_id_list" id="product_id_list" value="" />
+                            
+                            {% if 'bill/' in request.path %}
+                            <button type="button" class="btn btn-primary mr-2" onclick=generateBill("{% url 'order:generate_bill_form' 'generate' %}") id="id_generate_bill">
+                                {% if form.instance.is_bill_generated %}
+                                Update Bill
+                                {% else %}
+                                Generate Bill
+                                {% endif %}
+                            </button>
+                            {% endif %}
+
+                            <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()"><i class="ft-x mr-1"></i>Cancel</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</section>
+
+<div class="modal fade" id="updateProductModal" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="update_product_modal">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-url="{% url 'order:ajax_add_product_details_in_order_list' %}" id="btn_update_product">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="generateBillModal" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Generate Bill</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="generate_bill_modal">
+                {% include 'order/bills/generate_bill_form.html' %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="generate_bill_btn" class="btn btn-primary">Generate</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block script %}
+    <script>
+        var get_customers_products_url = "{% url 'order:get_customers_products_ajax' %}";
+        var update_order_product_url = "{% url 'order:update_order_product' %}";
+        var brand_search_url = "{% url 'order:brand_search' %}";
+        var customer_search_url = "{% url 'customer:customer_search' %}";
+        var product_search_url = "{% url 'product:product_search' %}";
+        var is_bill_create = true;
+
+        var submit_url = '{% url "order:order_create" "bill" %}';
+
+        {% if form.instance.id %}
+        submit_url = '{% url "order:order_update" "bill" form.instance.id %}';
+        {% endif %}
+
+    </script>
+
+    {% if request.user.role == 'company admin' or request.user.role == 'sales representative'  %}
+        <script>
+        var company_admin_company_id = $("#order_form #id_company").val();
+        </script>
+    {% else %}
+        <script>
+        var company_admin_company_id = null;
+        </script>
+    {% endif %}
+
+    {% if form.instance.id %}
+        <script>
+            var update_form = true;
+            var order_id = '{{form.instance.id}}'
+            var update_order_url = "{% url 'order:ajax_get_update_order_product_details' %}";
+        </script>
+    {% else %}
+        <script>
+            var update_form = false;
+        </script>
+    {% endif %}
+    
+    <script src="{% static 'webapp/order/order_bill.js' %}"></script>
+    <script src="{% static 'webapp/order/order.js' %}"></script>
+    <script src="{% static 'webapp/order/generate_bill.js' %}"></script>
+{% endblock script %}
+  

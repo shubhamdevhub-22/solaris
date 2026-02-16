@@ -1,0 +1,104 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="myModalLabel1">Payment Details</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+    
+        <span aria-hidden="true" id="xbutton"><i style="display:block" class="ft-x font-medium-2 text-bold-700" id="cross-btn"></i></span>
+      
+    </button>
+</div>
+<div class="modal-body">
+    <section id="test_red">
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered file-export" id="customer-log-table">
+                {% comment %} <div class="mb-2">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <h4 class="card-title align-self-center">Customer Logs</h4>
+                    </div>
+                </div> {% endcomment %}
+                <thead>
+                    <tr>
+                    <th style="width: 10%">Sr no</th>
+                    <th style="width: 20%">Bill Date</th>
+                    <th style="width: 20%">Bill Amount</th>
+                    <th style="width: 20%">Payment Date</th>
+                    <th style="width: 20%">Payment Mode</th>
+                    <th style="width: 20%">Paid Amount</th>
+                    <th style="width: 20%">Remark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in object_list %}
+                    <tr>    
+                        <td>{{forloop.counter}}</td>
+                        <td>{{data.customer_bill.order.order_date}}</td>
+                        <td>{{data.customer_bill.bill_amount}}</td>
+                        <td>{{data.customer_payment.receive_date}}</td>
+                        <td>{{data.customer_payment.payment_mode}}</td>
+                        <td>{{data.customer_payment.get_amount.0}}</td>
+                        <td>{{data.customer_payment.remark|default:"-----"}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% comment %} <script>
+    var customer_id = "{{customer_id}}"
+    $('#customer-log-table').DataTable({
+        columnDefs: [{
+            orderable: false,
+            targets: -1,
+        },],
+        bInfo:false,
+        bLengthChange:false,
+        searching:false,
+        
+        // Ajax for pagination
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{% url "customer:customer_log_ajax_datatable" %}',
+            type: 'get',
+            data: {
+                "customer_id": customer_id,
+            }, // this line also in dropdown filter
+        },
+        columns: [
+            // data: json key from prepare_results, name: model field name
+            { data: 'id', name: 'id' },
+            { data: 'action_by', name: 'action_by' },
+            { data: 'remark', name: 'remark' },
+        ],
+        rowCallback: function (nRow, aData, iDisplayIndex) {
+            var oSettings = this.fnSettings();
+            $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+            return nRow;
+        },
+        
+        
+    });
+    // val = document.getElementById("cross-btn")
+    //     console.log('val: ', val);
+    //     val.style.display = "block"
+    //     console.log('val: ', val);
+    
+    
+   
+    
+</script>
+<!-- 
+<script>
+    $( document ).ready(function() {
+    console.log( "ready!" );
+    val = document.getElementById("cross-btn")
+        console.log('val: ', val);
+        val.style.display = "none"
+        console.log('val: ', val);
+    });
+    // $("#id_customer_log").on('click', function(){
+       
+
+
+    // })
+</script> --> {% endcomment %}

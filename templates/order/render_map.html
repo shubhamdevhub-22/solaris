@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Optimize Routes{% endblock title %}
+{% block bodycontent %}
+
+<div class="card">
+    <div class="card-content">
+        <div class="card-body">
+            <!-- Map container -->
+            <div id="map" style="height: 800px; width: 100%;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{GOOGLE_MAP_API_KEY}}&callback=initMap" async defer></script>
+<script>
+  let map;
+  let startPoint = "{{ start_point }}";
+  let orderLocations = {{ order_locations|safe }};
+  let customerOrderMap = {{ customer_order_map|safe }};
+
+  function initMap() {
+      // Initialize the map
+      map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: { lat: parseFloat(startPoint.split(',')[0]), lng: parseFloat(startPoint.split(',')[1]) }
+      });
+
+      // Add a marker for the start point
+      new google.maps.Marker({
+          position: { lat: parseFloat(startPoint.split(',')[0]), lng: parseFloat(startPoint.split(',')[1]) },
+          map: map,
+          title: 'Start Point (Warehouse)'
+      });
+
+      // Initialize DirectionsService and DirectionsRenderer
+      const directionsService = new google.maps.DirectionsService();
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(map);
+
+      // Group orders by location
+      const locationOrderMap = {};
+
+      orderLocations.forEach((location, index) => {
+          const [lat, lng] = location.split(',');
+          const latLng = `${lat},${lng}`;
+          
+          if (!locationOrderMap[latLng]) {
+              locationOrderMap[latLng] = [];
+          }
+
+          // Store order data for each location
+          locationOrderMap[latLng].push(index + 1); // Use index+1 for stop number placeholder
+      });
+
+      // Array to store waypoints for routing
+      const waypoints = [];
+      const markers = []; // Array to keep track of markers
+
+      console.log('locationOrderMap:', locationOrderMap);
+
+      // Prepare waypoints and markers
+      Object.keys(locationOrderMap).forEach((latLng) => {
+          const [lat, lng] = latLng.split(',');
+
+          // Add waypoints for routing
+          waypoints.push({
+              location: new google.maps.LatLng(parseFloat(lat), parseFloat(lng)),
+              stopover: true
+          });
+
+          // Add markers for orders at the same location
+          locationOrderMap[latLng].forEach((stopNumber, index) => {
+              const orderId = Object.keys(customerOrderMap).find(key => key === latLng);
+              const orderData = customerOrderMap[orderId] || {};
+              const title = orderData.order_ids ? `Order IDs: ${orderData.order_ids} - Stop ${stopNumber}` : `Stop ${stopNumber}`;
+
+              console.log(`Adding marker at ${lat}, ${lng} with title: ${title}`);
+
+              markers.push(new google.maps.Marker({
+                  position: { lat: parseFloat(lat), lng: parseFloat(lng) },
+                  map: map,
+                  title: title // Marker title includes order IDs and stop number
+              }));
+          });
+      });
+
+      // Sort waypoints by stop numbers
+      waypoints.sort((a, b) => {
+          const aIndex = locationOrderMap[`${a.location.lat()},${a.location.lng()}`].sort()[0];
+          const bIndex = locationOrderMap[`${b.location.lat()},${b.location.lng()}`].sort()[0];
+          return aIndex - bIndex;
+      });
+
+      // Draw route from start point to the last order location
+      const request = {
+          origin: { lat: parseFloat(startPoint.split(',')[0]), lng: parseFloat(startPoint.split(',')[1]) },
+          destination: { lat: parseFloat(orderLocations[orderLocations.length - 1].split(',')[0]), lng: parseFloat(orderLocations[orderLocations.length - 1].split(',')[1]) },
+          waypoints: waypoints,
+          travelMode: 'DRIVING',
+          optimizeWaypoints: true // Optional: optimize the route order
+      };
+
+      console.log('Directions request:', request);
+
+      directionsService.route(request, function(result, status) {
+          if (status === 'OK') {
+              directionsRenderer.setDirections(result);
+              console.log('Directions result:', result);
+          } else {
+              console.error('Directions request failed due to ' + status);
+              alert('Directions request failed due to ' + status);
+          }
+      });
+  }
+</script>
+
+{% endblock %}

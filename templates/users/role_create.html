@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Add User{% endblock title %}
+{% block lazy_cdns %}
+{% comment %} <link rel="stylesheet" href="{% static 'cdns/intl-tel-input.css' %}" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" /> {% endcomment %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.7/css/intlTelInput.css" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock lazy_cdns %}
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Add User</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="post" enctype="multipart/form-data" id="user-create-form" novalidate>
+                {% csrf_token %}
+                {% comment %} {{form.as_p}} {% endcomment %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.name.label}}{% if form.name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.name}}
+                        {% if form.name.errors %}
+                            {% for error in form.name.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.permissions.label}}{% if form.permissions.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {{form.permissions}}
+                        {% if form.permissions.errors %}
+                            {% for error in form.permissions.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                <button type="submit" class="btn btn-primary mr-2 user_create_form_submit"><i class="ft-check-square mr-1"></i>Save</button>
+                <a href="{% url 'users:user_list' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+
+{% block script %}
+{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+
+<script>
+  var input = document.querySelector("#id_phone");
+  console.log('input:', input)
+  window.intlTelInput(input, {
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js",
+  });
+  iti = intlTelInput(input)
+
+  $("#id_phone").on("click", function(){
+      $("#id_country_code").val(iti["s"]["dialCode"])
+  })
+
+  $("#submit_button").submit(function(){
+      $("#id_country_code").val(iti["s"]["dialCode"])
+  })
+
+  $("#div_id_phone").addClass("d-none");
+  $("#div_id_country_code").addClass("d-none");
+  $("#id_phone").addClass("country_code")
+</script>
+
+<script>
+  $(document).ready(function(){
+
+  $(document).on("input", "#id_phone", function(e) {
+      this.value = this.value.replace(/[^+\d]/g,'');
+   });
+   $("#id_phone").on('paste',function(e) {
+
+          if(gBrowser=='IE') {
+              var clipboardData, pastedData;
+               clipboardData = e.clipboardData || window.clipboardData;
+                pastedData = clipboardData.getData('Text');
+
+          }
+          else if((gBrowser=='Firefox')|| (gBrowser=='Chrome')){
+                var pastedData = (e.originalEvent || e).clipboardData.getData('text/plain');
+                  window.document.execCommand('insertText', false, pastedData)
+          }
+      if(Math.floor(pastedData) == pastedData && $.isNumeric(pastedData)){
+         $(this).val($(this).val().replace(/[^\d]/g,''));
+        }
+        else{
+         return false;
+        }
+   });
+
+  });
+
+
+</script> {% endcomment %}
+
+
+<script src="{% static 'cdns/intl-tel-input.js' %}"></script>
+{% comment %} <script>
+  $("#id_phone").intlTelInput({
+    utilsScript: '{% static "cdns/intl-tel-input.js" %}',
+    autoPlaceholder: true,
+    separateDialCode: true,
+    nationalMode: false,
+    initialCountry: 'auto'
+
+    });
+    
+ console.log('input:', input)
+ flag = $(".iti__selected-dial-code").html()
+ flg=document.querySelector(".iti__selected-dial-code").innerHTML;
+ console.log('flg:', flg)
+ console.log('flag:', flag)
+
+
+  
+  
+</script>  {% endcomment %}
+
+<!-- <script>
+  const phoneInputField = document.querySelector("#id_phone");
+  const phoneInput = window.intlTelInput(phoneInputField, {
+    onlyCountries: ['ug'],
+    utilsScript:
+      "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+  });
+  const info = document.querySelector(".alert-info");
+
+  function process(event) {
+  event.preventDefault();
+
+  const phoneNumber = phoneInput.getNumber();
+
+  info.style.display = "";
+  info.innerHTML = `Phone number in E.164 format: <strong>${phoneNumber}</strong>`;
+  }
+</script> -->
+
+<script>
+  const input = document.querySelector("#id_phone");
+  window.intlTelInput(input, {
+  
+  onlyCountries: ['in'],
+  separateDialCode: true,
+  nationalMode: false,
+
+  // geoIpLookup: callback => {
+  //   fetch("https://ipapi.co/json")
+  //     .then(res => res.json())
+  //     .then(data => callback(data.country_code))
+  //     .catch(() => callback("us"));
+  // },
+  
+})
+
+
+
+</script> 
+
+<script>
+//  $(document).on("change", "#id_phone", function() {
+//     var new_val = iti["selectedCountryData"]["dialCode"] + $(id_phone).val()
+//     $("#id_phone").val(new_val)
+//   } 
+// )
+  var select = document.getElementById('id_role');
+  if ($("#id_role").val() == "super admin" || $("#id_role").val() == "admin") {
+      $("#id-company").hide();
+  }
+  if ("{{request.user.role}}" == "company admin") {
+      $("#id-company").hide();
+  }
+  $("#id_role").on('change', function(){
+      var role_value = $(this).val();
+      if ("{{request.user.role}}" == "super admin" || "{{request.user.role}}" == "admin")
+      {   
+          var role_value = $(this).val();
+          if(role_value=="admin" || role_value=="super admin"){
+              $("#id-company").hide();
+              $("#id_company").val('');
+          }
+          else{
+              
+              $("#id-company").show();
+          }
+      }
+  });
+
+  /*$("#user-create-form").on('submit', function() {
+    var new_val = iti["selectedCountryData"]["dialCode"] + $(id_phone).val()
+    $("#id_phone").val(new_val)
+    //$("#table_added_products .product-row").trigger("focusout");
+
+    return true;
+});*/
+
+// $(document).ready(function () {
+//   alert("hajkfhuash")
+  
+//   // var country_code = $(document).text()
+//   // console.log('country_code:', country_code)
+// });
+
+// $(document).("click","user_create_form_submit")
+// $(document).on("click", ".user_create_form_submit", function(e) {
+//   e.preventDefault
+//   var country_code = $(".iti__selected-dial-code").html()
+//   console.log('country_code:', country_code)
+// })
+
+// $( document ).ajaxComplete(function() {
+//   alert("hajkfhuash")
+  
+//   // var country_code = $(document).text()
+//   // console.log('country_code:', country_code)
+// });
+
+// const countryData = iti.getSelectedCountryData();
+// console.log('countryData:', countryData)
+
+</script>
+
+
+
+
+
+
+{% endblock script %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Vendor Payment
+{% endblock title %}
+{% block bodycontent %}
+<section id="horizontal-form-layout">
+    <div class="content-header">Vendor Payment</div>
+        <div class="row match-height">
+            <form action=""
+                    method="post"
+                    class="w-100"
+                    id="form_purchase_order"
+                    enctype="multipart/form-data"
+                    novalidate
+                    >
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <small><b>Payment Details</b></small>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-body">
+                                    {% if user.role == "super admin" %}
+                                    <div class="row">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">Company</label>
+                                                <div class="col-md-9">
+                                                    <fieldset class="form-group">
+                                                        <select id="id_company" class="select2-data-array form-control select2-list" onchange="loadVendor()">
+                                                            <option value="" selected>---------</option>
+                                                            {% for company in company_list %}
+                                                            <option value="{{company.id}}">{{company.company_name}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </fieldset>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.vendor.label }}
+                                                    {% if form.vendor.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    {% comment %} {{form.vendor}} {% endcomment %}
+                                                    <select name="vendor" class="select2-data-array form-control select2-list" placeholder="Prefered Vendor" required = "" id="id_vendor" onchange = loadVendortablelist()>
+                                                        <option value="" selected>---------</option>
+                                                        </select>
+                                                    {% if form.vendor.errors %}
+                                                        {% for error in form.vendor.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        {% endif %}
+                                        {% if user.role == "company admin" or user.role == "sales representative" %}
+                                        <input type="hidden" name="company" value="{{user.get_company_id}}" id="id_company">
+                                        <div class="row">
+                                            <div class="col-md-6 col-12">
+                                                <div class="form-group row">
+                                                    <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                        {{ form.vendor.label }}
+                                                        {% if form.vendor.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                    </label>
+                                                    <div class="col-md-9">
+                                                        {{form.vendor}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                        
+                                    <div class="row">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">Due Amount</label>
+                                                <div class="col-md-9">
+                                                    <input type="number" class="form-control"  name="due-amount" value="0" id="id_due_amount" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.payment_date.label }}
+                                                    {% if form.payment_date.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    <div class="input-group">
+                                                        {{ form.payment_date }}
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text">
+                                                                <span class="ft-calendar font-medium-2"></span>
+                                                            </span>
+                                                        </div>
+                                                        {% if form.payment_date.errors %}
+                                                            {% for error in form.payment_date.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.payment_mode.label }}
+                                                    {% if form.payment_mode.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    {{ form.payment_mode }}
+                                                    {% if form.payment_mode.errors %}
+                                                        {% for error in form.payment_mode.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.reference_number.label }}
+                                                    {% if form.reference_number.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    {{ form.reference_number }}
+                                                    {% if form.reference_number.errors %}
+                                                        {% for error in form.reference_number.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.payment_amount.label }}
+                                                    {% if form.payment_amount.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    {{ form.payment_amount }}
+                                                    {% if form.payment_amount.errors %}
+                                                        {% for error in form.payment_amount.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-12">
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-form-label" for="horizontal-form-1">
+                                                    {{ form.remark.label }}
+                                                    {% if form.remark.field.required %}<span style="color: red;">*</span>{% endif %}
+                                                </label>
+                                                <div class="col-md-9">
+                                                    {{ form.remark }}
+                                                    {% if form.remark.errors %}
+                                                        {% for error in form.remark.errors %}<p style="color: red;">{{ error }}</p>{% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <section id="extended">
+                </section>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}
+{% block script %}
+
+<script>
+   function loadVendor(){
+    var company_id = document.getElementById('id_company');
+    var id_vendor = document.getElementById('id_vendor');
+    id_vendor.innerHTML = '';
+    $.ajax({
+      type: "GET",
+      url: "{% url 'vendors:load_vendor_ajax' %}",
+      data: {
+          "company_id": company_id.value,
+      },
+      success: function (data) {
+       // $("#id_vendor").empty().append("<option value=''>---------</option>");
+        $("#id_vendor").empty()
+        $("#id_due_amount").val(0);
+        
+
+        var list = data;
+            list.vendor_list.forEach(element => {
+                var option = document.createElement("option");
+                option.value = element.id;
+                option.text = element.first_name;
+                id_vendor.options.add(option);
+            });
+        loadVendortablelist();
+        $("#id_payment_amount").val(0);
+      }
+    }); 
+  }
+</script>
+
+<script>
+    var url = "{% url 'vendors:load_vendor_table_list_ajax' %}"
+    var object = '{{object_list}}'
+</script>
+
+<script src="{% static 'webapp/vendors/vendor_payment.js' %}"></script>
+
+<script src="{% static 'webapp/custom.js' %}"></script>
+
+
+
+
+{% endblock script %}

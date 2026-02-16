@@ -1,0 +1,356 @@
+a{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transfer-Stock Product{% endblock title %} 
+{% block style %}
+<style>
+    .table-responsive {
+        display: inline-table;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block bodycontent %}
+<section id="basic-hidden-label-form-layouts">
+    <div class="d-flex flex-sm-row flex-column justify-content-between">
+        <h4 class="card-title align-self-center">Transfer Stock</h4>
+    </div>
+    {% comment %} <h4 class="card-title">Manage Stock</h4> {% endcomment %}
+    <hr>
+    <div class="row match-height">
+        <!-- Basic Form starts -->
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body" id="id_transfer_stock_form">
+
+                        {% if user.role == "super admin" %}
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">Company</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_company" class="select2-data-array form-control select2-list"
+                                        onchange="loadWareHouse()">
+                                        <option value="">-----</option>
+                                        {% for company in company_list %}
+                                        <option value="{{company.id}}">{{company.company_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">From Warehouse</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_from_warehouse" class="select2-data-array form-control select2-list"
+                                        onchange="loadproduct()">
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">Product</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_product" class="select2-data-array form-control select2-list"
+                                        onchange="loadstock()">
+                                        <option value="">-----</option>
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">To Warehouse</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_to_warehouse" class="select2-data-array form-control select2-list">
+                                        <option value="">-----</option>
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if user.role == "company admin" or user.role == "sales representative" %}
+                        <input type="hidden" name="company" value="{{user.get_company_id}}" id="id_company">
+                        
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">From Warehouse</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_from_warehouse" class="select2-data-array form-control select2-list"
+                                        onchange="loadproduct()">
+                                        <option value="">-----</option>
+                                        {% for warehouse in warehouse_list_for_cadmin %}
+                                            <option value="{{ warehouse.id }}" {% if warehouse.name == "WAREHOUSE 2" %}selected{% endif %}>{{ warehouse.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">Product</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_product" class="select2-data-array form-control select2-list"
+                                        onchange="loadstock()">
+                                        <option value="">-----</option>
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-3 col-form-label" for="horizontal-form-2">To Warehouse</label>
+                            <div class="col-md-9">
+                                <fieldset class="form-group">
+                                    <select id="id_to_warehouse" class="select2-data-array form-control select2-list">
+                                        <option value="">-----</option>
+                                        {% for warehouse in warehouse_list_for_cadmin %}
+                                            <option value="{{ warehouse.id }}" {% if warehouse.name == "WAREHOUSE 1" %}selected{% endif %}>{{ warehouse.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </fieldset>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="container mb-5 pb-3" id="table-body">
+                            <div class="form-group row mt-2">
+                                <div class="col-3">
+                                    <label>Available Stock</label>
+                                </div>
+                                <div class="col-9">
+                                    <input class="form-control" type="number" id="id_available_stock" value="0" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label>Transfer Stock</label>
+                                </div>
+                                <div class="col-9">
+                                    <input class="form-control" type="number" id="id_transfer_stock" value="0" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-end">
+                            <div class="btn btn-primary mt-auto mr-2">
+                                <a onclick="submitData()"><i class="ft-edit mr-2"></i> Save</a>
+                            </div>
+                            <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()"><i class="ft-x mr-1"></i>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        
+{% endblock %}
+{% block script %}
+<script src="{% static 'webapp/custom.js' %}"></script>
+
+<script>
+
+    function loadWareHouse(){
+            var id_company = document.getElementById('id_company');
+            /*var id_from_warehouse = document.getElementById('id_warehouse');
+            var id_product= document.getElementById('id_product');*/
+            id_from_warehouse.innerHTML = '';
+            id_to_warehouse.innerHTML = '';
+            id_product.innerHTML = '';
+            $.ajax({
+                type: "GET",
+                url: "{% url 'product:load_warehouse' %}",
+                data: {
+                    "id_company": id_company.value,
+                },
+                success: function (data) {
+                    $("#id_from_warehouse").empty().append("<option value=''>-----</option>");
+                    $("#id_to_warehouse").empty().append("<option value=''>-----</option>");
+                    var list = data;
+                    list.warehouse_list.forEach(element => {
+                            var option = document.createElement("option");
+                            option.value = element.id;
+                            option.text = element.name;
+                            id_from_warehouse.options.add(option);
+                    });
+                    list.warehouse_list.forEach(element => {
+                        var option = document.createElement("option");
+                        option.value = element.id;
+                        option.text = element.name;
+                        id_to_warehouse.options.add(option);
+                    });
+                }
+            })  
+        
+        
+    }
+
+    function loadproduct(){
+        var id_company = document.getElementById('id_company');
+        var id_from_warehouse = document.getElementById('id_from_warehouse');
+        id_product.innerHTML = '';
+        $.ajax({
+            type: "GET",
+            url: "{% url 'product:load_product' %}",
+            data: {
+                "id_company": id_company.value,
+                "id_warehouse": id_from_warehouse.value,
+            },
+            success: function (data) {
+
+                $("#id_to_warehouse").empty().append("<option value=''>-----</option>");
+                from_warehouse = document.getElementById("id_from_warehouse")
+
+                var list = data;
+                list.warehouse_list.forEach(element => {
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.name;
+                    id_to_warehouse.options.add(option);
+                });
+            }
+        })  
+    }
+
+    function loadstock(){
+        id_from_warehouse = document.getElementById('id_from_warehouse');
+        id_product = document.getElementById('id_product');
+        $.ajax({
+            type: "GET",
+            url: "{% url 'product:load_available_stock' %}",
+            data: {
+                "id_warehouse": id_from_warehouse.value,
+                "id_product": id_product.value,
+            },
+            success: function (data) {
+                var list = data;
+                list.available_stock.forEach(element => {
+                    $("#id_available_stock").val(element.stock)
+                });
+            }
+        })  
+    }
+</script>
+
+<script>
+    var product_search_url = "{% url 'product:product_search' %}";
+
+    function productFormat(product) {
+        if (!product.id) return product.text;
+    
+        var $product = $(
+            '<div class="dropdown-css">'+
+                '<div class="d-flex justify-content-between">'+
+                    '<div class="">'+ product.text +'</div>'+
+                    '<div class="">' + product.vehicle + '</div>' +
+                '</div>'+
+                '<div class="d-flex justify-content-between">'+
+                    '<div class="">'+ product.brand +'</div>'+
+                    '<div class="">' + product.code + '</div>' +
+                '</div>'+
+            '</div>');
+        return $product;
+    }
+
+    $(document).ready(function(){
+        $("#id_product").select2({
+            width: "100%",
+            templateResult: productFormat,
+            ajax: {
+                url: product_search_url,
+                data: function (params) {
+                    var query = {
+                        search: params.term,
+                        type: 'public',
+                    }
+                    query["company"] = $("#id_company").val();
+                    return query;
+                },
+                processResults: function (data) {
+                    return {
+                      results: data.items
+                    };
+                },
+            }
+        });
+    })
+
+    function validateForm(){
+        const inputs = $(document).find("#id_transfer_stock_form select");
+        var has_error = false;
+
+        inputs.each(function(index) {
+          if($(this).val() == null || $(this).val() == ""){
+            if ($(this).parent().children().length <= 2){
+              $(this).parent().append(`<span class='text-danger'>Please select this field</span>`);
+            }
+            has_error = true;
+          } else {
+            if ($(this).parent().children().length > 2){
+                $(this).parent().children().last().remove();
+            }
+          }
+        })
+        return has_error;
+    }
+
+    function submitData(){
+        if(validateForm()){
+            return;
+        }
+
+        var id_company = document.getElementById('id_company');
+        var id_from_warehouse = document.getElementById('id_from_warehouse');
+        var id_to_warehouse = document.getElementById('id_to_warehouse');
+        var id_product = document.getElementById('id_product');
+        var id_available_stock = document.getElementById('id_available_stock');
+        var id_transfer_stock = document.getElementById('id_transfer_stock');
+
+        if(parseInt(id_transfer_stock.value) <= 0) {
+            $.toast({
+                text: "Please enter tranfer stock !!!",
+                position: 'bottom-right',
+                stack: false,
+                icon: 'error',
+            });
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "{% url 'product:transfer_stock_add' %}",
+            data: {
+                "company_id": id_company.value,
+                "from_warehouse_id": id_from_warehouse.value,
+                "to_warehouse_id": id_to_warehouse.value,
+                "product_id": id_product.value,
+                "available_stock_data": id_available_stock.value,
+                "transfer_stock_data": parseInt(id_transfer_stock.value),
+                "csrfmiddlewaretoken": "{{ csrf_token }}",
+            },
+            success: function (data) {
+                $.toast({
+                    text: "Stock Transfer Succesfully.",
+                    position: "bottom-right",
+                    stack: false,
+                    icon: "success",
+                  });
+                $("#id_transfer_stock").val(0);
+                $("#id_available_stock").val(data.current_stock);
+          }
+        })
+    }
+</script>
+{% endblock script %}        

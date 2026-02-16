@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Assigned Driver
+{% endblock title %}
+
+
+{% block bodycontent %}
+
+{% comment %} <div class="users-list-filter px-2">
+  <div class="row border rounded py-2 mb-2 mx-n2">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <label for="status-list-car">Status</label>
+      <fieldset class="form-group">
+        <select id="status-list-car" class="form-control">
+          <option value="">All</option>
+          {% for data in status_choices %}
+          <option value="{{data.0}}">{{data.1}}</option>
+          {% endfor %}
+        </select>
+      </fieldset>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+    </div>
+    <div class="col-12 col-sm-6 col-lg-2">
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-1 mt-1 d-flex align-items-center">
+      <button type="reset" class="btn btn-primary btn-block car-list-clear glow mb-0">Clear</button>
+    </div>
+  </div> {% endcomment %}
+
+  <div class="modal fade text-left show" id="xlarge" tabindex="-1" role="dialog" aria-labelledby="myModalLabel16"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content" id="mark-as-complete-modal">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<section id="file-export">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex flex-sm-row flex-column justify-content-between">
+            <h4 class="card-title align-self-center">Assigned Order Route Details</h4>
+            <div>
+              <a class="btn btn-info" target="_blank" href="{% url 'order:print_dispatch_routes' assigned_route %}" id="#id_print_dispatch_routes">Print Dispatch Routes</a>
+              {% if assigned_route_obj.status == 'pending' %}
+              <span class="btn btn-danger ml-sm-1 assign_driver" id='id_mark_as_cancel' data-url="" data-popup-message="Are you sure want To <b>Cancel This Route</b>?" data-toggle="modal">Mark as Cancel</span>
+              <span class="btn btn-primary ml-sm-1 assign_driver" data-value='' id='id_mark_as_complete'
+                data-toggle="modal" data-target="#xlarge">Mark as Complete</span>
+              {% endif %}
+            </div>
+            
+          </div>
+          <hr>
+          <div class="row mt-2">
+            <div class="col-lg-2 text-dark">
+                <b>
+                    <p>Driver Name: </p>
+                </b>
+                <b>
+                    <p>Route Name:</p>
+                </b>
+                <b>
+                  <p>Ship Date:</p>
+                </b>
+                <b>
+                  <p>Map:</p>
+                </b>
+            </div>
+            <div class="col-lg-8">
+                <p> {{assigned_route_obj.driver.full_name}} </p> 
+                <p> {{assigned_route_obj.name}} </p>
+                <p> {{assigned_route_obj.date}}</p>
+                <p> <a href="{% url 'order:detail_assigned_order_location' assigned_route %}",  title="Edit"><i class="icon-pointer font-medium-3 mr-2"></i></a> </p>
+            </div>
+              <div>
+                  <span style="cursor: pointer;" id="fetch-route-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="35" height="35" viewBox="0 0 256 256" xml:space="preserve">
+
+                      <defs>
+                      </defs>
+                      <g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+                        <path d="M 22.226 25.91 c 11.153 0 20.226 9.073 20.226 20.226 c 0 4.776 -1.707 9.417 -4.805 13.069 L 22.226 77.367 L 6.805 59.205 C 3.707 55.553 2 50.912 2 46.136 C 2 34.983 11.073 25.91 22.226 25.91 M 22.226 56.511 c 6.143 0 11.141 -4.998 11.141 -11.141 c 0 -6.143 -4.998 -11.141 -11.141 -11.141 s -11.141 4.998 -11.141 11.141 C 11.085 51.514 16.083 56.511 22.226 56.511 M 22.226 23.91 C 9.951 23.91 0 33.861 0 46.136 c 0 5.48 1.992 10.488 5.28 14.363 l 16.946 19.958 l 16.946 -19.958 c 3.288 -3.875 5.28 -8.883 5.28 -14.363 C 44.452 33.861 34.501 23.91 22.226 23.91 L 22.226 23.91 z M 22.226 54.511 c -5.048 0 -9.141 -4.092 -9.141 -9.141 c 0 -5.048 4.092 -9.141 9.141 -9.141 c 5.048 0 9.141 4.092 9.141 9.141 C 31.366 50.419 27.274 54.511 22.226 54.511 L 22.226 54.511 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 72.845 11.543 C 81.201 11.543 88 18.341 88 26.698 c 0 3.578 -1.279 7.056 -3.6 9.792 L 72.845 50.099 L 61.29 36.49 c -2.322 -2.737 -3.601 -6.214 -3.601 -9.792 C 57.69 18.341 64.488 11.543 72.845 11.543 M 72.845 35.163 c 4.993 0 9.055 -4.062 9.055 -9.055 c 0 -4.993 -4.062 -9.055 -9.055 -9.055 s -9.055 4.062 -9.055 9.055 C 63.79 31.101 67.852 35.163 72.845 35.163 M 72.845 9.543 c -9.474 0 -17.155 7.681 -17.155 17.155 c 0 4.23 1.538 8.095 4.076 11.086 l 13.079 15.405 l 13.079 -15.405 C 88.462 34.793 90 30.928 90 26.698 C 90 17.223 82.319 9.543 72.845 9.543 L 72.845 9.543 z M 72.845 33.163 c -3.896 0 -7.055 -3.159 -7.055 -7.055 c 0 -3.896 3.159 -7.055 7.055 -7.055 s 7.055 3.159 7.055 7.055 C 79.9 30.004 76.741 33.163 72.845 33.163 L 72.845 33.163 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                        <path d="M 77.127 81.457 h -0.373 v -2 h 0.373 c 1.239 0 2.432 -0.371 3.446 -1.072 l 1.137 1.645 C 80.36 80.964 78.775 81.457 77.127 81.457 z M 72.11 81.457 h -4.645 v -2 h 4.645 V 81.457 z M 62.822 81.457 h -4.645 v -2 h 4.645 V 81.457 z M 53.534 81.457 H 48.89 v -2 h 4.645 V 81.457 z M 44.246 81.457 h -4.644 v -2 h 4.644 V 81.457 z M 34.958 81.457 h -4.644 v -2 h 4.644 V 81.457 z M 84.813 75.85 l -1.904 -0.609 c 0.19 -0.596 0.287 -1.218 0.287 -1.852 c 0 -0.708 -0.121 -1.403 -0.36 -2.064 l 1.881 -0.68 c 0.318 0.88 0.479 1.804 0.479 2.744 C 85.195 74.229 85.066 75.058 84.813 75.85 z M 80.386 68.269 c -0.972 -0.62 -2.099 -0.948 -3.259 -0.948 h -0.634 v -2 h 0.634 c 1.542 0 3.041 0.437 4.335 1.263 L 80.386 68.269 z M 71.849 67.32 h -4.644 v -2 h 4.644 V 67.32 z M 62.561 67.32 h -4.408 c -0.092 0 -0.183 -0.001 -0.272 -0.005 l 0.074 -1.998 l 0.198 0.003 h 4.408 V 67.32 z M 53.016 65.474 c -1.37 -1.132 -2.34 -2.705 -2.732 -4.43 l 1.951 -0.443 c 0.294 1.296 1.024 2.479 2.055 3.332 L 53.016 65.474 z M 52.642 56.707 l -1.814 -0.84 c 0.744 -1.607 2.02 -2.945 3.59 -3.768 l 0.928 1.771 C 54.162 54.49 53.202 55.497 52.642 56.707 z M 64.038 53.184 h -4.645 v -2 h 4.645 V 53.184 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+                      </g>
+                      </svg>
+                  </span>
+                  <!-- Status message container -->
+                  <div class="sync-status mt-2" id="sync-status">
+                    {% if assigned_route_obj.synchronized_route %}
+                    <span class="text-success">The route is synchronized.</span>
+                    {% else %}
+                    <span class="text-danger">The route is not synchronized.</span>
+                    {% endif %}
+                </div>
+              </div>
+          </div>
+      </div>
+        <div class="card-content ">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered file-export" id="table">
+                <thead>
+                  <tr>
+                    <th>Sr no</th>
+                    <th>Customer Name</th>
+                    <th>Order ID</th>
+                    <th>Bill Date</th>
+                    <th>Order Shipping</th>
+                    <th>Stops</th>
+                    <th>Payment Method</th>
+                    {% if assigned_route_obj.status == 'completed' %}
+                      <th>Status</th>
+                      <th>Remark</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                  {% for object in object_list %}
+                  <tr data-id="{{object.order.id}}">
+                    <td> {{forloop.counter}} </td>
+                    <td><a href="{% url 'customer:customer_details' object.order.customer.id %}"> {{object.order.customer.customer_name}} </a></td>
+                    <td><a href="{% url 'order:order_detail' object.order.id %}"> {{object.order.order_id}} </a></td>
+                    <td> {{object.order.order_date}} </td>
+                    <td>  
+                      {% if object.order.shipping_address_line_1 and object.order.shipping_address_line_2 and object.order.shipping_city and object.order.shipping_state %}
+                      {{object.order.shipping_address_line_1}},<br>{{object.order.shipping_address_line_2}},<br>{{object.order.shipping_city}},{{object.order.shipping_state}},<br>{{object.order.shipping_country}}-{{object.order.shipping_zip_code}}
+                      {% else %}
+                      -----
+                      {% endif %}
+                    </td>
+                    <td> {{object.stop}} </td>
+                    <td>{{object.order.payment_method}}</td>
+                    {% if assigned_route_obj.status == 'completed' %}
+                    <td>
+                      <center><span {% if object.order.status == 'completed' %} class="badge bg-light-success" {% else %} class="badge bg-light-danger" {% endif %}>{{object.order.status|capfirst}}</span></center>
+                    </td>
+                    <td> 
+                    {% if object.remark %}
+                    {{object.remark|capfirst}}
+                    {% else %}
+                    -------
+                    {% endif %}
+                    </td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+
+{% block script %}
+<!-- <script>
+  $(document).ready(function () {
+
+    $("#ckbCheckAll").click(function () {
+      order_id_list = []
+
+      $(".checkbox").prop('checked', $(this).prop('checked'));
+      if ($("#ckbCheckAll").is(':checked')) {
+        $(".checkbox").each(function () {
+          console.log('$( this ):', $(this).val())
+          order_id_list.push(parseInt($(this).val()))
+        });
+        console.log('order_id_list:', order_id_list)
+      }
+
+    });
+
+    $(".checkbox").change(function () {
+      if (!$(this).prop("checked")) {
+        $("#ckbCheckAll").prop("checked", false);
+        order_id = $(this).val();
+        console.log('order_id:', order_id)
+        id_index = order_id_list.indexOf(parseInt(order_id));
+        console.log('id_index:', id_index)
+        if (id_index > -1) {
+          order_id_list.splice(id_index, 1);
+        }
+        console.log('order_id_list:', order_id_list)
+
+
+      }
+    });
+  });
+</script> -->
+<script>
+
+  $(document).on('click', '#id_mark_as_complete', function (e) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const order = urlParams.get('order');
+    if(order){
+      url = "{% url 'order:detail_assigned_order_complete' assigned_route %}?order="+order;
+    } else {
+      url = "{% url 'order:detail_assigned_order_complete' assigned_route %}";
+    }
+    htmx.ajax('GET',
+      url,
+      {
+        target: '#mark-as-complete-modal',
+        swap: 'innerHTML',
+      }).then(() => {
+        $("#xlarge").show()
+      });  
+  });
+
+</script>
+
+<script>
+  $(document).on("click", "#id_mark_as_cancel", function(){
+    url =  "{% url 'order:detail_assigned_order_cancel' assigned_route %}"
+    message = $(this).attr("data-popup-message")
+
+    Swal.fire({
+        html: message,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+    }).then((result) => {
+        
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url,
+                type: "get",
+                dataType: "json",
+                /*data: {
+                    
+                },*/
+                success: function(data) {
+                    console.log("data",data)
+                    //window.location = data.url
+                    window.location.reload()
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                }
+            });
+        }
+    })
+})
+
+</script>
+
+
+<script>
+  $(document).ready(function() {
+    function updateTable(data) {
+        const tbody = $('#table-body');
+        tbody.empty();
+
+        data.forEach((order, index) => {
+            console.log('order: ', order);
+            let orderRow = `<tr data-id="${order.order.id}">
+                                <td>${index + 1}</td>
+                                <td><a href="${order.customer_url}">${order.customer_name}</a></td>
+                                <td><a href="${order.order_url}">${order.order.order_id}</a></td>
+                                <td>${order.order.order_date}</td>
+                                <td>${order.order.shipping_address}</td>
+                                <td>${order.stop}</td>
+                                <td>${order.order.payment_method}</td>`;
+            
+            {% if assigned_route_obj.status == 'completed' %}
+            orderRow += `<td>
+                            <center><span class="${order.order.status_class}">${order.order.status}</span></center>
+                         </td>
+                         <td>${order.order.remark}</td>`;
+            {% endif %}
+            
+            orderRow += `</tr>`;
+            
+            tbody.append(orderRow);
+        });
+    }
+
+    $('#fetch-route-btn').click(function() {
+        var assignedRouteObjId = "{{ assigned_route_obj.pk }}";
+        $.ajax({
+            url: '{% url "order:fetch_shortest_route" %}',
+            type: 'POST',
+            data: {
+                'assigned_route_obj': assignedRouteObjId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    const orders = response.best_route;
+                    updateTable(orders);
+                    $('#sync-status').html('<span class="text-success">The route is synchronized.</span>');
+                    $.toast({
+                      text: response.message,
+                      position: 'bottom-right',
+                      stack: false,
+                      icon: 'success',                    
+                  })
+                } else {
+                    console.log('Error fetching the best route: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                console.log('An error occurred while fetching the best route');
+            }
+        });
+    });
+});
+</script>
+
+
+{% endblock script %}

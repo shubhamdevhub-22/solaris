@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daily Bill Report{% endblock title %}
+
+{% block style %}
+<style>
+.buttons-html5 {
+    display:none;
+ }
+</style>
+{% endblock style %}
+
+{% block bodycontent %}
+
+<div class="users-list-filter px-2">
+    <div class="row border rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="report-list-customer">Zone</label>
+            <fieldset class="form-group">
+                <select id="id_zone" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for zone in zone_list %}
+                    <option value="{{zone.id}}">{{zone.zone_code}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="id_start_date">Date</label>
+            <div class="" id="report-due-from-date">
+                <input type="date" name="due_from_date" class="form-control" placeholder="From Date"  id="id_start_date">
+            </div>
+        </div>
+        {% comment %} <div class="col-12 col-sm-6 col-lg-2">
+            <label for="end_date">To Date</label>
+            <div class="" id="report-due-to-date">
+                <input type="date" name="end_date" class="form-control" placeholder="To Date"  id="id_end_date">
+            </div>
+        </div> {% endcomment %}
+        <div class="col-12 col-sm-6 col-lg-8">
+            <div class="d-flex justify-content-end">
+                <button type="reset" class="btn btn-primary report-list-clear mt-2">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section id="file-export">
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title align-self-center">Daily Bill Report</h4>
+                <div>
+                    <button class="btn btn-primary export-report" data-url="{% url 'reports:export_daily_bill_report' %}" title="Export PDF">Export Report</button>
+                </div>
+              </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                      <div class="table-responsive">
+                          <table class="table table-striped table-bordered file-export" id="bill-table">
+                              <thead>
+                                  <tr>
+                                    {% comment %} <th>Sr no</th> {% endcomment %}
+                                    <th>Slip No</th>
+                                    <th>Customer Name & Address</th>
+                                    <th>Slip Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment Status</th>
+                                    <th>Update Date</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>                        
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'app-assets/js/net_plug-ins_2.1.2_api_sum().js' %}"></script>
+    <script>
+        let startDateElement = document.getElementById("id_start_date")
+        {% comment %} let endDateElement = document.getElementById("id_end_date") {% endcomment %}
+
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1).padStart(2, '0');
+        var day = String(today.getDate()).padStart(2, '0');
+        var dateString = `${year}-${month}-${day}`;
+
+        startDateElement.value = dateString
+        {% comment %} endDateElement.value = dateString {% endcomment %}
+
+        $('.select2-list').select2({
+            width: "100%",
+        });
+
+        function set_filters(){
+            var data = {}
+            data["zone"] = $("#id_zone").val()
+            data["from_date"] = document.getElementById("id_start_date").value
+            {% comment %} data["to_date"] = document.getElementById("id_end_date").value {% endcomment %}
+            return data;
+        }
+
+        function initialize_datatable(){
+            function statusDesign(status){
+                if(status.toString().toLowerCase() == "paid"){
+                    return "<span class='badge bg-light-success'>PAID</span>";
+                }
+                else {
+                    return "<span class='badge bg-light-danger'>UNPAID</span>";
+                }
+            }
+
+            $('#bill-table').DataTable({
+                columnDefs: [{
+                        orderable: false,
+                        targets: []
+                    },
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                processing: true,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                serverSide: true,
+                ajax: {
+                    url: '{% url "reports:daily_bill_report_ajax" %}',
+                    type: 'get',
+                    data: set_filters(),
+                },
+                columns: [
+                    {% comment %} { data: 'id', name: 'id' }, {% endcomment %}
+                    { data: 'slip_no', name: 'slip_no' },
+                    { data: 'customer', name: 'customer' },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'bill_amount', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'bill_amount' },
+                    { data: 'payment_status', render: function ( status ) {return statusDesign(status) }, name: 'payment_status' },
+                    { data: 'updated_at', name: 'updated_at' },                    
+                ],
+                {% comment %} rowCallback: function (nRow, aData, iDisplayIndex) {
+                    var oSettings = this.fnSettings();
+                    $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                    return nRow;
+                }, {% endcomment %}
+                footerCallback: function ( row, data, start, end, display ) {
+                    var api = this.api(), data;
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '')*1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+
+                    var monTotal = api
+                        .column( 3 )
+                        .data()
+                        .reduce( function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0 );
+                    
+                    $( api.column( 0 ).footer() ).html('Total Bill Amount');
+                    $( api.column( 3 ).footer() ).html(monTotal.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}));
+                },
+            });
+        }
+
+        initialize_datatable();
+
+        $(document).on("change", ".select2-list", function(){
+            $("#bill-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("input", "#id_start_date", function(){
+            $("#bill-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("click",".report-list-clear",function(){
+            document.getElementById("id_start_date").value = ""
+            document.getElementById("id_end_date").value = ""
+            $("#bill-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("click", ".export-report" , function() {
+            var url = $(this).data("url");
+            var zone = $("#id_zone").val();
+            var start_date = $("#id_start_date").val();
+            {% comment %} var end_date = $("#id_end_date").val(); {% endcomment %}
+    
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {
+                    "zone": zone,
+                    "start_date": start_date,
+                    {% comment %} "end_date": end_date, {% endcomment %}
+                },
+                success: function (data) {
+                    var file = new Blob([data], {type: 'application/pdf'});
+                    var fileURL = URL.createObjectURL(file);
+                    window.open(fileURL);
+                }
+            });
+        });
+    </script>
+    
+{% endblock script %}

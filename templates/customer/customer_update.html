@@ -1,0 +1,745 @@
+{% extends 'base.html' %}
+{% load static i18n %}
+
+{% load crispy_forms_tags %}
+{% load custom_template_tags %}
+
+{% block title %}
+Update Customer
+{% endblock title %}
+{% block lazy_cdns %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.7/css/intlTelInput.css" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock lazy_cdns %}
+
+{% block bodycontent %}
+
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Update Customer</h4>
+            
+          </div>
+            <div class="card-body">
+              <form action="" method="post" id="customer-form" enctype="multipart/form-data" novalidate>
+                {{form.non_field_errors.as_text}}
+                {% csrf_token %}
+                <div class="row">
+                  {% if user.role == 'super admin' %}
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">Company<span style="color: red;">*</span></label>
+                          <div class="col-md-9">
+                            {{form.company}}
+                            {% comment %} <select name="company" class="select2-data-array form-control customer-type" placeholder="Company" id="id_company">
+                              <option value="" selected>---------</option>
+                              {% for company in companies %}
+                              <option vlaue="{{company.id}}">{{company}}</option>
+                              {% endfor %}
+                            </select> {% endcomment %}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {% else %}
+                      <input type="hidden" id="id_company" name="company" value="{{user.get_company_id}}">
+                    {% endif %}
+                  </div>
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer_name.label}}{% if form.customer_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.customer_name}}
+                              {% if form.customer_name.errors %}
+                              {% for error in form.customer_name.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer_type.label}}{% if form.customer_type.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.customer_type}}
+                              {% if form.customer_type.errors %}
+                              {% for error in form.customer_type.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  {% if not user.role == 'sales representative' %}
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.sales_rep.label}}{% if form.sales_rep.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {% if user.role == 'company admin'%}
+                            {{form.sales_rep}}
+                            {% else %}
+                            <select name="sales_rep" class="select2-data-array form-control select2-list" placeholder="Sales Rep" id="id_sales_rep">
+                              <option value="" selected>---------</option>
+                            </select>
+                            {% endif %}
+                              {% if form.sales_rep.errors %}
+                              {% for error in form.sales_rep.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                    {% else %}
+                    <input type="hidden" id="id_sales_rep" name="sales_rep" value="{{user.id}}">
+                    {% endif %}
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.status.label}}{% if form.status.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.status}}
+                              {% if form.status.errors %}
+                              {% for error in form.status.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                {% comment %} <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.tax_id.label}}{% if form.tax_id.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.tax_id}}
+                              {% if form.tax_id.errors %}
+                              {% for error in form.tax_id.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.terms.label}}{% if form.terms.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.terms}}
+                              {% if form.terms.errors %}
+                              {% for error in form.terms.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                {% comment %} <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.store_open_time.label}}{% if form.store_open_time.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.store_open_time}}
+                            <input type="time" name="store_open_time" class="form-control" placeholder="Store Open Time" required id="id_store_open_time">
+                              {% if form.store_open_time.errors %}
+                              {% for error in form.store_open_time.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.store_close_time.label}}{% if form.store_close_time.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.store_close_time}}
+
+                              {% if form.store_close_time.errors %}
+                              {% for error in form.store_close_time.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+                {% comment %} <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.dba_name.label}}{% if form.dba_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.dba_name}}
+                              {% if form.dba_name.errors %}
+                              {% for error in form.dba_name.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                </div> {% endcomment %}
+            <div class="row">
+              {% comment %} <div class="col-md-6 col-12">
+                  <div class="form-group row">
+                    <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.price_level.label}}{% if form.price_level.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {% if user.role == 'company admin' or user.role == 'sales representative' %}
+                          {{form.price_level}}
+                          {% else %}
+                          <select name="price_level" class="select2-data-array form-control select2-list" placeholder="Price Level" required = "" id="id_price_level">
+                            <option value="" selected>-----</option>
+                          </select>
+                          {% endif %}
+                            {% if form.price_level.errors %}
+                            {% for error in form.price_level.errors %}
+                            <span style="color: red;">{{error}}</span>
+                            {% endfor %}
+                          {% endif %}
+                    </div>
+                  </div>
+                </div> {% endcomment %}
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.zone.label}}{% if form.zone.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.zone}}
+                          {% if form.zone.errors %}
+                          {% for error in form.zone.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.area.label}}{% if form.area.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.area}}
+                          {% if form.area.errors %}
+                          {% for error in form.area.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              {% comment %} <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.transport.label}}{% if form.transport.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.transport}}
+                          {% if form.transport.errors %}
+                          {% for error in form.transport.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div> {% endcomment %}
+            </div>
+            {% comment %} <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.cst.label}}{% if form.cst.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.cst}}
+                          {% if form.cst.errors %}
+                          {% for error in form.cst.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.gst.label}}{% if form.gst.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.gst}}
+                          {% if form.gst.errors %}
+                          {% for error in form.gst.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div> {% endcomment %}
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.mobile.label}}{% if form.mobile.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.mobile}}
+                          {% if form.mobile.errors %}
+                          {% for error in form.mobile.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% comment %} <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.past_due_amount.label}}{% if form.past_due_amount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.past_due_amount}}
+                          {% if form.past_due_amount.errors %}
+                          {% for error in form.past_due_amount.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div> {% endcomment %}
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.phone_1.label}}{% if form.phone_1.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.phone_1}}
+                          {% if form.phone_1.errors %}
+                          {% for error in form.phone_1.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.contact_name.label}}{% if form.contact_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.contact_name}}
+                          {% if form.contact_name.errors %}
+                          {% for error in form.contact_name.errors %}
+                            <span style="color: red;">{{error}}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.phone_2.label}}{% if form.phone_2.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.phone_2}}
+                          {% if form.phone_2.errors %}
+                          {% for error in form.phone_2.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.transport.label}}{% if form.transport.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.transport}}
+                          {% if form.transport.errors %}
+                          {% for error in form.transport.errors %}
+                            <span style="color: red;">{{error}}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.remark.label}}{% if form.remark.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.remark}}
+                          {% if form.remark.errors %}
+                          {% for error in form.remark.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {% comment %} <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.fax.label}}{% if form.fax.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.fax}}
+                          {% if form.fax.errors %}
+                          {% for error in form.fax.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div> {% endcomment %}
+            <div class="row">
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.email.label}}{% if form.email.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.email}}
+                          {% if form.email.errors %}
+                          {% for error in form.email.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.code.label}}{% if form.code.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.code}}
+                        {% if form.code.errors %}
+                          {% for error in form.code.errors %}
+                            <p style="color: red;">{{error}}</p>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 col-12">
+                <div class="form-group row">
+                  <label class="col-md-3 col-form-label" for="horizontal-form-1">Lock Status<span style="color: red;">*</span></label>
+                    <div class="col-md-9">
+                    <select name="is_locked" class="form-control select2-list" placeholder="Lock Status" id="id_is_locked">
+                      <option value="unlock">Unlock</option>
+                      <option value="lock" {% if form.instance.is_locked %}selected{% endif %}>Lock</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row "><label class="col-md-3 col-form-label mt-2 mb-3 font-weight-bold">Billing Details :</label></div>
+                <div class="row">
+                  {{ form.billing_address }}
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_address_line_1.label}}{% if form.billing_address_line_1.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_address_line_1}}
+                              {% if form.billing_address_line_1.errors %}
+                              {% for error in form.billing_address_line_1.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_address_line_2.label}}{% if form.billing_address_line_2.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_address_line_2}}
+                              {% if form.billing_address_line_2.errors %}
+                              {% for error in form.billing_address_line_2.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_suite_apartment.label}}{% if form.billing_suite_apartment.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_suite_apartment}}
+                              {% if form.billing_suite_apartment.errors %}
+                              {% for error in form.billing_suite_apartment.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_city.label}}{% if form.billing_city.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_city}}
+                              {% if form.billing_city.errors %}
+                              {% for error in form.billing_city.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_state.label}}{% if form.billing_state.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_state}}
+                              {% if form.billing_state.errors %}
+                              {% for error in form.billing_state.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_country.label}}{% if form.billing_country.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                            {{form.billing_country}}
+                            {% if form.billing_country.errors %}
+                            {% for error in form.billing_country.errors %}
+                              <span style="color: red;">{{error}}</span>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_zip_code.label}}{% if form.billing_zip_code.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.billing_zip_code}}
+                              {% if form.billing_zip_code.errors %}
+                              {% for error in form.billing_zip_code.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row d-flex justify-content-between">
+                    <label class="col-md-3 col-form-label mt-2 mb-3 font-weight-bold">Shipping Details :</label>
+                    <div class="mx-3 my-auto">
+                      <input type="checkbox" class="mx-1" name="same_as_billing_address" id="id_same_as_billing_address" /> <label for="id_same_as_billing_address">Same as billing address</label>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    {{ form.shipping_address }}
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_address_line_1.label}}{% if form.shipping_address_line_1.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_address_line_1}}
+                              {% if form.shipping_address_line_1.errors %}
+                              {% for error in form.shipping_address_line_1.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_address_line_2.label}}{% if form.shipping_address_line_2.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_address_line_2}}
+                              {% if form.shipping_address_line_2.errors %}
+                              {% for error in form.shipping_address_line_2.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_suite_apartment.label}}{% if form.shipping_suite_apartment.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_suite_apartment}}
+                              {% if form.shipping_suite_apartment.errors %}
+                              {% for error in form.shipping_suite_apartment.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_city.label}}{% if form.shipping_city.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_city}}
+                              {% if form.shipping_city.errors %}
+                              {% for error in form.shipping_city.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_state.label}}{% if form.shipping_state.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_state}}
+                              {% if form.shipping_state.errors %}
+                              {% for error in form.shipping_state.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_country.label}}{% if form.shipping_country.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                            {{form.shipping_country}}
+                            {% if form.shipping_country.errors %}
+                            {% for error in form.shipping_country.errors %}
+                              <span style="color: red;">{{error}}</span>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.shipping_zip_code.label}}{% if form.shipping_zip_code.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                              {{form.shipping_zip_code}}
+                              {% if form.shipping_zip_code.errors %}
+                              {% for error in form.shipping_zip_code.errors %}
+                                <span style="color: red;">{{error}}</span>
+                              {% endfor %}
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div id="discount-table">
+                    {{ discount_table }}
+                  </div>
+
+                  {% comment %} {% include 'customer/multiple_contact_form.html' %}
+                  {% include 'customer/multiple_vendor_discount.html' %} {% endcomment %}
+                  
+                  <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+                    <a href="{% url 'customer:customer_list' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  {% endblock %}
+
+  {% block script %} 
+  
+  {{ block.super }}
+{% comment %} 
+  <script src="{% static 'js/inlines.js' %}"></script>
+ 
+  <script type="text/html" id="multiplecontact_set-template">
+    {% include 'customer/multiple_contacts_template.html' %}
+  </script>
+
+  <script type="text/html" id="multiplediscount_set-template">
+    {% include 'customer/multiple_discounts_template.html' %}
+  </script>
+
+  <script>
+  utils.inlineFormSLMEmailAdd("multiplecontact_set", "customer");
+  utils.inlineFormRemove();
+
+  utils.inlineFormSLMDiscountAdd("multiplediscount_set", "customer_discounts");
+  //discounts.inlineFormRemove();
+  </script> {% endcomment %}
+
+<script>
+    const brand_search_url = "{% url 'order:brand_search' %}";
+    const discount_search_url = "{% url 'customer:discount_search' %}";
+    const customer_discount_url = "{% url 'customer:get_customer_discount_table' %}";
+    const update_form = true;
+    const customer_id = "{{form.instance.id}}";
+</script>
+
+<script>
+    function load_company_sales_rep(){
+      company_id = $("#id_company").val()
+      sales_rep_id = document.getElementById("id_sales_rep")
+      price_level_id = document.getElementById("id_price_level")
+      customer_type_id = document.getElementById("id_customer_type")
+      if (customer_type_id.value===""){
+        $.toast({
+          text: "Please Firstly Select Customer Type",
+          position: "bottom-right",
+          stack: false,
+          icon: "error",
+        });
+      }
+        
+      sales_rep_id.innerHTML=''
+      price_level_id.innerHTML=''
+      $.ajax({
+        type:"GET", 
+        url:"{% url 'customer:load_sales_rep' %}",
+        data:{
+          "company_id":company_id,
+          "customer_type_id":customer_type_id.value,
+        },
+        success: function (data){
+          $("#id_sales_rep").empty().append("<option value = ''>---------</option> ")
+          $("#id_price_level").empty().append("<option value = ''>---------</option> ")
+          list = data;
+          list.sales_rep_list.forEach(el => {
+            el.forEach(element => {
+            option = document.createElement("option");
+            option.value = element.id;
+            option.text = element.full_name;
+            sales_rep_id.options.add(option);
+            });
+          });
+          list.price_level_list.forEach(ele => {
+            ele.forEach(elementt => {
+            option = document.createElement("option");
+            option.value = elementt.id;
+            option.text = elementt.price_level;
+            price_level_id.options.add(option);
+            });
+          });
+        }
+      });
+    }
+</script>
+
+{% comment %} <script src="{% static 'cdns/intl-tel-input.js' %}"></script> {% endcomment %}
+<script src="{% static 'webapp/customer/customer.js' %}"></script>
+
+{% endblock %}

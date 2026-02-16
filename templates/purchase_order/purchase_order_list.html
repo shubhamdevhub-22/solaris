@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Purchase Order List{% endblock title %}
+{% block bodycontent %}
+<div class="company-list-filter px-2">
+  <div class="row border rounded py-2 mb-2 mx-n2">
+    <div class="col-12 col-sm-6 col-lg-2">
+      <label for="users-list-company">Purchase Order Status</label>
+      <fieldset class="form-group">
+        <select id="purchase_order_status" class="form-control">
+          <option value="">All</option>
+          {% for purhase_order_status in purhase_order_statuses %}
+          <option value="{{purhase_order_status.0}}">{{purhase_order_status.1}}</option>
+          {% endfor %}
+        </select>
+      </fieldset>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-2">
+      <label for="purchase_order_vendor">Vendor</label>
+      <fieldset class="form-group">
+        <select id="purchase_order_vendor" class="form-control">
+          <option value="">All</option>
+          {% for obj in vendors %}
+          <option value="{{obj.id}}">{{obj.first_name}}</option>
+          {% endfor %}
+        </select>
+      </fieldset>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-2">
+      {% if request.user.role == "super admin" %}
+      <label for="purchase_order_list_company">Company</label>
+      <fieldset class="form-group">
+        <select id="purchase_order_list_company" class="form-control">
+          <option value="">All</option>
+          {% for company in companies %}
+          <option value="{{company.id}}">{{company.company_name|title}}</option>
+          {% endfor %}
+        </select>
+      </fieldset>
+      {% endif %}
+      
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-2">
+      {% comment %} <label for="purchase_order_bill_number">Bill Number</label>
+      <fieldset class="form-group">
+        <select id="purchase_order_bill_number" class="form-control">
+          <option value="">All</option>
+          {% for obj in object_list %}
+          <option value="{{obj.bill_number}}">{{obj.bill_number}}</option>
+          {% endfor %}
+        </select>
+      </fieldset> {% endcomment %}
+    </div>
+
+     <div class="col-12 col-sm-6 col-lg-3">
+    </div>
+    <div class="col-12 col-sm-6 col-lg-1 d-flex align-items-center">
+      <button type="reset" class="btn btn-primary btn-block company-list-clear glow mb-0">Clear</button>
+    </div>
+  </div>
+
+  {% comment %}<div class="row border rounded py-2 mb-2 mx-n2">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <label for="id_receive_from_date">Receive From Date</label>
+      <div class="" id="payment-receive-from-date">
+          <input type="date" name="receive_from_date" class="form-control" placeholder="Receive From Date" id="id_receive_from_date">
+      </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-3">
+      <label for="id_receive_to_date">Receive To Date</label>
+      <div class="" id="payment-receive-to-date">
+          <input type="date" name="receive_to_date" class="form-control" placeholder="Receive To Date" id="id_receive_to_date">
+      </div>
+  </div>
+  <div class="col-12 col-sm-6 col-lg-2">
+      <button type="submit" id="payments-list-date" class="btn btn-outline-primary glow mt-3">Search</button>
+  </div>
+  </div> {% endcomment %}
+
+</div>
+
+
+<section id="file-export">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex flex-sm-row flex-column justify-content-between">
+            <h4 class="card-title align-self-center">Purchase Order List</h4>
+            <a href="{% url 'purchase_order:purchase_order_create' %}" class="btn btn-primary ml-sm-1">New Purchase Order</a>
+          </div>
+        </div>
+        <div class="card-content ">
+          <div class="card-body">
+            <div class="">
+              <table class="table table-striped table-bordered file-export dataTable" id="table">
+                <thead>
+                  <th>Sr No.</th>
+                  <th>Company</th>
+                  <th>Vendor</th>
+                  <th>Bill Number</th>
+                  <th>Bill Date</th>
+                  <th>Total Price</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-center">Actions</th>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock bodycontent %}
+
+{% block script %}
+<script>
+  $('#purchase_order_status, #purchase_order_list_company,#purchase_order_vendor,#purchase_order_bill_number').select2({
+    width: "100%",
+    
+  });
+  var role = true;
+  if ("{{request.user.role}}" == "company admin" || "{{request.user.role}}" == "sales representative") {
+    role = false;
+  }
+  var i = 1;
+
+  function set_filters(){
+    var data = {}
+    data["purchase_order_status"] = $("#purchase_order_status").val()
+    data["purchase_order_list_company"] = $("#purchase_order_list_company").val()
+    data["purchase_order_vendor"] = $("#purchase_order_vendor").val()
+    data["purchase_order_bill_number"] = $("#purchase_order_bill_number").val()
+    
+
+    return data
+  }
+  var order_false = [-1]
+  var to_center = [3,4,6]
+  var invisible_columns = [1]
+  var filter_id = $("#purchase_order_status,#purchase_order_list_company,#purchase_order_vendor,#purchase_order_bill_number")
+
+  var url = '{% url "purchase_order:purchase_order_list_ajax" %}';
+  var columns = [
+      { data: 'id', name: 'id' },
+      { data: 'company', name: 'company' },
+      { data: 'vendor', name: 'vendor' },
+      { data: 'bill_number', name: 'bill_number' },
+      { data: 'bill_date', name: 'bill_date' },
+      { data: 'total_price', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'total_price' },
+      { data: 'status', name: 'status' },
+      { data: 'actions', name: 'id' },
+    ]
+    
+</script>
+{% comment %} <script src="{% static 'webapp/company/company_scripts.js' %}"></script> {% endcomment %}
+<script src="{% static 'webapp/intailize_datatables.js' %}"></script>
+{% comment %} <script src="{% static 'webapp/purchase_order/purchase_order_scripts.js' %}"></script> {% endcomment %}
+
+<script>
+ 
+
+
+$(document).on('click', '.company-list-clear' , function (){
+  $("#purchase_order_status").val(null).trigger('change');
+  $("#purchase_order_list_company").val(null).trigger('change');
+  $("#purchase_order_vendor").val(null).trigger('change');
+  $("#purchase_order_bill_number").val(null).trigger('change');
+  $("#table").DataTable().destroy();
+  intailize_datatables()
+    });
+ 
+</script>
+
+
+{% endblock script %}

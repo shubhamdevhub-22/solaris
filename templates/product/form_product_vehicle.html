@@ -1,0 +1,20 @@
+
+<form id="product_vehicle_form" novalidate method="post" hx-target="#add_product_vehicle_modal" hx-post="{% url 'product:add_vehicle' %}">
+    {% csrf_token %}
+    <select name="company" id="id_company" class="d-none">
+        {% if user.role == "company admin" or user.role == "sales representative" %}
+            <option value="{{ user.get_company_id }}" selected></option>
+        {% endif %}
+    </select>
+    <div class="form-group row">
+        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.name.label}} {% if form.name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+        <div class="col-md-9">
+        {{form.name}}
+        {% if form.name.errors %}
+            {% for error in form.name.errors %}
+            <p style="color: red;">{{error}}</p>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+</form>

@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if form.instance.id %}
+Update Sales Route
+{% else %}
+Add Sales Route
+{% endif %}
+{% endblock title %}
+
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            {% if form.instance.id %}
+            <h4 class="card-title">Update Sales Route</h4>
+            {% else %}
+            <h4 class="card-title">Add Sales Route</h4> 
+            {% endif %}
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="post" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.route_name.label}}{% if form.route_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.route_name}}
+                        {% if form.route_name.errors %}
+                            {% for error in form.route_name.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.status.label}}{% if form.status.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.status}}
+                        {% if form.status.errors %}
+                            {% for error in form.status.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  {% if not user.role == 'super admin' %}
+                  <input type="hidden" name="company" id="id_company" value="{{user.get_company_id}}">
+                  {% else %}
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.company.label}}{% if form.company.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.company}}
+                          {% if form.company.errors %}
+                              {% for error in form.company.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-6 col-12">
+                      {% if user.role == 'sales representative' %}
+                      <input type="hidden" id="id_sales_rep" name="sales_rep" value="{{user.id}}">
+                      {% else %}
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.sales_rep.label}}{% if form.sales_rep.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {% if not user.role == 'super admin' %}
+                          {{form.sales_rep}}
+                          {% else %}
+                            {% if form.instance.id %}
+                            {{form.sales_rep}}
+                            {% else %}
+                            <select name="sales_rep" class="select2-data-array form-control select2-list" placeholder="Sales Rep" required = "" id="id_sales_rep">
+                              <option value="" selected>---------</option>
+                            </select>
+                            {% endif %}
+                          {% endif %}
+                          {% if form.sales_rep.errors %}
+                              {% for error in form.sales_rep.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer.label}}{% if form.customer.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                        {% if not user.role == 'super admin' %}
+                          {{form.customer}}
+                          {% else %}
+                            {% if form.instance.id %}
+                            {{form.customer}}
+                            {% else %}
+                          <select name="customer" class="select2-data-array form-control select2-list" placeholder="Customer" required = "" id="id_customer" multiple>
+                            <option value="" selected>---------</option>
+                          </select>
+                            {% endif %}
+                          {% endif %}
+                          <!-- {% for customer in form.customer %}
+                          <div class="row">
+                            <div class="col-2">
+                              <input type="checkbox" id="customercheckbox">
+                            </div>
+                            <div class="col-10">
+                              {{customer}}
+                            </div>
+                          </div>
+                          {% endfor %} -->
+                          {% if form.customer.errors %}
+                              {% for error in form.customer.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% comment %} {% include 'customer/salesroute_customer_form.html' %} {% endcomment %}
+                  {% if form.instance.id %}
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+                  {% else %}
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-check-square mr-1"></i>Save</button>
+                  {% endif %}
+                <a href="{% url 'customer:sales_route_list' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+
+  {% block script %} 
+
+  <script>
+   
+    $('.id_customer').select2({
+        width: "100%",
+    });
+
+    $('.select2-list').select2({
+        width: "100%",
+    });
+    
+    if (data["message"]){
+      $.toast({
+          text: data.message,
+          position: 'bottom-right',
+          stack: false,
+          icon: 'success',                    
+      })
+  }
+</script>
+
+<script>
+  function load_customer_sales_rep(){
+    company_id = $("#id_company").val()
+    sales_rep_id = document.getElementById("id_sales_rep")
+    customer_id = document.getElementById("id_customer")
+    
+    sales_rep_id.innerHTML=''
+    customer_id.innerHTML=''
+    $.ajax({
+      type:"GET", 
+      url:"{% url 'customer:load_customer_sales_rep' %}",
+      data:{
+        "company_id":company_id,
+      },
+      success: function (data){
+        $("#id_sales_rep").empty().append("<option value = ''>-----</option> ")
+        $("#id_customer").empty().append("<option value = ''>-----</option> ")
+        list = data;
+        list.sales_rep_list.forEach(el => {
+          el.forEach(element => {
+          option = document.createElement("option");
+          option.value = element.id;
+          option.text = element.full_name;
+          sales_rep_id.options.add(option);
+          });
+        });
+        list.customer_list.forEach(ele => {
+          option = document.createElement("option");
+          option.value = ele.id;
+          option.text = ele.customer_name;
+          customer_id.options.add(option);
+        });
+      }
+    });
+  }
+</script>
+  {% endblock  %}

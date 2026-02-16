@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Details Customer
+{% endblock title %}
+
+
+{% block bodycontent %}
+
+<section id="file-export" >
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                    <h4 class="card-title align-self-center">Customer Details</h4>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Shop Name:</p></b>
+                                <b><p>Customer Type:</p></b>
+                                <b><p>Sales Rep:</p></b>
+                                <b><p>Zone:</p></b>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>{{object.customer_name}} {% if object.is_locked %} <span class="text-danger font-weight-bold">(Locked)</span> {% endif %}</p>
+                                <p>{{object.customer_type.title}}</p>
+                                {% if object.sales_rep %}
+                                <p>{{object.sales_rep}}</p>
+                                {% else %}
+                                <p>-----</p>
+                                {% endif %}
+                                <p>{{customer.zone.zone_code|default:"-----"}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Contact Name:</p></b>
+                                <b><p>Mobile No:</p></b>
+                                <b><p>Transport:</p></b>
+                                <b><p>Area:</p></b>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>{{customer.contact_name|default:"-----"}}</p>
+                                <p>{{customer.mobile|default:"-----"}}</p>
+                                <p>{{customer.transport|default:"-"}}</p>
+                                <p>{{customer.area|default:"-----"}}</p><br>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Due Amount:</p></b>
+                                <b><p>Past Due Amount:</p></b>
+                                <b><p>Available Credit:</p></b>
+                                <b><p>Status:</p></b>
+                            </div>
+                            <div class="col-lg-6">
+                                <p class="badge bg-light-danger">{{due_amount|default:"0"}}</p><br>
+                                <p class="badge bg-light-danger">{{customer.past_due_amount|default:"0"}}</p><br>
+                                <p class="badge bg-light-success">{{customer.credit_amount}}</p><br>
+                                <p>
+                                    {% if customer.status == 'active' %}
+                                    <span class="badge bg-light-success">{{customer.status.title}}</span>
+                                    {% elif customer.status == 'inactive' %}
+                                    <span class="badge bg-light-danger">{{customer.status.title}}</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 sub-tables">
+                    <span data-url={% url 'customer:customer_log_ajax' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_customer_log">Customer Logs</span>
+                    {% if request.user.role != request.user.ACCOUNTANT %}
+                    <span data-url={% url 'customer:customer_order' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_orderlist" >Orders</span>
+                    {% endif %}
+                    <span data-url={% url 'customer:customer_ledger_list' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_ledger">Ledger</span>
+                    {% if request.user.role != request.user.SALES_REPRESENTATIVE %}
+                    <span data-url={% url 'customer:customer_payment_history' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_paymenthistory">Collections</span>
+                    {% endif %}
+                    <span data-url={% url 'customer:customer_replacement' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_replacements" >Replacements</span>
+                    {% comment %} <span data-url={% url 'customer:customer_documents' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_documents"  >Documents</span> {% endcomment %}
+                    {% comment %} <span data-url={% url 'customer:customer_contact_ajax' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_contacts"  >Contacts</span> {% endcomment %}
+                    <span data-url={% url 'customer:customer_addressinfo' pk=object.id %} class="btn btn-outline-primary ml-sm-0 htmx-trigger-btn mt-3" id="id_addressinfo" >Address Info</span>
+              </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                    <div class="table-responsive" id="table-body">
+                        <!-- The Data-Table Insert Here  -->
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <div class="d-flex justify-content-end">
+    <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()">Back</button>
+  </div>
+</section>
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+    $(document).on('click', '.htmx-trigger-btn' , function (e) {
+        url = $(this).data("url")
+        htmx.ajax('GET', 
+            url,
+            {target:'#table-body', 
+            swap:'innerHTML', 
+        })
+    })
+</script>
+
+<script>
+    var replacement_url = '{% url "customer:customer_replacement_list_ajax" %}'
+    var payment_history_url = '{% url "customer:customer_payment_history_list_ajax" %}'
+    var order_url = '{% url "customer:customer_order_list_ajax" %}'
+    var ledger_url = '{% url "customer:customer_ledger_list_ajax" %}'
+
+    $(document).on('click', '#id_customer_log' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "customerLog");
+        return url
+    });
+
+    $(document).on('click', '#id_paymenthistory' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "paymentHistory");
+        return url
+    });
+
+    $(document).on('click', '#id_addressinfo' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "addressInfo");
+        return url
+    });
+
+    $(document).on('click', '#id_replacements' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "replacements");
+        return url
+    });
+
+    $(document).on('click', '#id_orderlist' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "orderList");
+        return url
+    });
+
+    $(document).on('click', '#id_ledger' , function (e) {
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        localStorage.setItem("data" , "ledgerList");
+        return url
+    });
+</script>
+
+
+<script>
+    $( document ).ready(function() {
+        myData = localStorage.getItem('data');
+        if (myData=='orderList'){
+            $("#id_orderlist").trigger("click");
+        }
+        {% comment %} else if (myData=='creditMemo'){
+            $("#id_ctreditmemo").trigger("click");
+        } {% endcomment %}
+        else if (myData=='replacements'){
+            $("#id_replacements").trigger("click");
+        }
+        else if (myData=='paymentHistory'){
+            $("#id_paymenthistory").trigger("click");
+        }
+        {% comment %} else if (myData=='contacts'){
+            $("#id_contacts").trigger("click");
+        } {% endcomment %}
+        {% comment %} else if (myData=='documents'){
+            $("#id_documents").trigger("click");
+        } {% endcomment %}
+        else if (myData=='addressInfo'){
+            $("#id_addressinfo").trigger("click");
+        }
+        else if (myData=='ledgerList'){
+            $("#id_ledger").trigger("click");
+        }
+        else if (myData=='customerLog'){
+            $("#id_customer_log").trigger("click");
+        }
+        else{
+            $("#id_paymenthistory").trigger("click");
+        }
+    });
+</script>
+<script>
+    shipping_columns = [
+            { data: 'id', name: 'id' },
+            { data: 'shipping_address', name: 'shipping_address' },
+            { data: 'is_default', name: 'is_default' },
+            { data: 'actions', name: 'actions' },
+        ]
+    var shipping_address_url = '{% url "customer:customer_addressinfo_shipping_list_ajax" %}'
+    var billing_address_url = '{% url "customer:customer_addressinfo_billing_list_ajax" %}'
+    
+    //ajax for shipping address
+    {% comment %} $(document).on('click', '#id_addressinfo' , function (e) {
+        url = '{% url "customer:customer_addressinfo_shipping_list_ajax" %}'
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        return url
+    }); {% endcomment %}
+    {% comment %} $(document).on('click', '#id_addressinfo' , function (e) {
+        columns = [
+            { data: 'id', name: 'id' },
+            { data: 'shipping_address', name: 'shipping_address' },
+            { data: 'is_default', name: 'is_default' },
+            { data: 'actions', name: 'actions' },
+        ]
+        return columns
+
+    }); {% endcomment %}
+
+
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        // Put the JS code that you want to run here
+        function set_filters(){
+            var data = {}
+            data["id_customer"] = $("#id_customer").val()
+            return data
+          }
+          function initialize_datatable(){
+            $('#shipping_table').DataTable({
+                columnDefs: [{
+                    orderable: false,
+                    targets: [0,1,2,3]
+                },
+                /*{
+                  targets: [],
+                  visible: role // new variable true or false based on user role.
+                }*/
+                ],
+                order: [[0, 'desc']],
+                // Ajax for pagination
+                processing: true,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                serverSide: true,
+                bInfo:false,
+                bLengthChange:false,
+                searching:false,
+                ajax: {
+                    url: shipping_address_url,
+                    type: 'get',
+                    data: set_filters()
+                },
+                columns: shipping_columns,
+                rowCallback: function (nRow, aData, iDisplayIndex) {
+                  var oSettings = this.fnSettings ();
+                  $("td:first", nRow).html(oSettings._iDisplayStart+iDisplayIndex +1);
+                  return nRow;
+                },
+            });
+        }
+        initialize_datatable();
+    });
+
+</script>
+
+
+<script>
+    billings_columns = [
+            { data: 'id', name: 'id' },
+            { data: 'billing_address', name: 'billing_address' },
+            { data: 'is_default', name: 'is_default' },
+            { data: 'actions', name: 'actions' },
+        ]
+    //ajax for billing address
+    {% comment %} $(document).on('click', '#id_addressinfo' , function (e) {
+        url = '{% url "customer:customer_addressinfo_billing_list_ajax" %}'
+        $('.sub-tables .active').removeClass('active');
+        $(this).addClass('active');
+        return url
+    }); {% endcomment %}
+    {% comment %} $(document).on('click', '#id_addressinfo' , function (e) {
+        columns = [
+            { data: 'id', name: 'id' },
+            { data: 'billing_address', name: 'billing_address' },
+            { data: 'is_default', name: 'is_default' },
+            { data: 'actions', name: 'actions' },
+        ]
+        return columns
+
+    }); {% endcomment %}
+
+
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        // Put the JS code that you want to run here
+        function set_filters(){
+            var data = {}
+            data["id_customer"] = $("#id_customer").val()
+            return data
+          }
+          function initialize_datatable2(){
+            $('#billing_table').DataTable({
+                columnDefs: [{
+                    orderable: false,
+                    targets: [0,1,2,3]
+                },
+                /*{
+                  targets: [],
+                  visible: role // new variable true or false based on user role.
+                }*/
+                ],
+                order: [[0, 'desc']],
+      
+                // Ajax for pagination
+                processing: true,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                serverSide: true,
+                bInfo:false,
+                bLengthChange:false,
+                searching:false,
+                ajax: {
+                    url: billing_address_url,
+                    type: 'get',
+                    data: set_filters()
+                },
+                columns: billings_columns,
+                rowCallback: function (nRow, aData, iDisplayIndex) {
+                  var oSettings = this.fnSettings ();
+                  $("td:first", nRow).html(oSettings._iDisplayStart+iDisplayIndex +1);
+                  return nRow;
+                },
+            });
+          }
+          initialize_datatable2();
+    });
+
+</script>
+
+<script>
+      
+    $(document).on('click', '.ajax-delete-btn' , function (e){
+      var id = $(this).data("id")
+      var name = $(this).data("title")
+      if(name == "None"){
+          name = ""
+      }
+      var url = $(this).data("url")
+      var delete_ele = $(this)
+
+
+      Swal.fire({
+          html: `Are you sure you want to delete <b>${name}</b> ?`,
+          icon: 'question',
+          showCloseButton: true,
+          showCancelButton: true,
+          confirmButtonColor: "#7442DB",
+      }).then((result) => {
+          
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  data: {
+                      "id": id,
+                      "csrfmiddlewaretoken": '{{ csrf_token }}'
+                  },
+                  success: function (data) {
+                    $('#billing_table').DataTable().ajax.reload(null, false);
+                    $('#shipping_table').DataTable().ajax.reload(null, false);
+                    if (data["message"]){
+                        $.toast({
+                            text: data.message,
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: data["message_type"],                    
+                        })
+                    }
+                }    
+              });
+          }
+      })
+  })
+
+  </script>
+  
+<script>
+    var csrfm = '{{csrf_token}}'
+</script>
+{% comment %} <script src="{% static 'webapp/customer-details/documents.js' %}"></script> {% endcomment %}
+{% comment %} <script src="{% static 'webapp/customer-details/contacts.js' %}"></script> {% endcomment %}
+{% comment %} <script src="{% static 'webapp/customer-details/creditmemo.js' %}"></script> {% endcomment %}
+<script src="{% static 'webapp/customer-details/replacement.js' %}"></script>
+<script src="{% static 'webapp/customer-details/order.js' %}"></script>
+<script src="{% static 'webapp/customer-details/payment_history.js' %}"></script>
+
+
+{% endblock script %}

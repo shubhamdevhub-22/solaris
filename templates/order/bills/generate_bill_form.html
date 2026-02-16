@@ -1,0 +1,167 @@
+<div>
+    <input type="hidden" name="slip_no" id="id_slip_no" value="{{ slip_no }}" />
+
+    <div class="form-row mx-2 d-flex justify-content-between">
+        <label class="col-form-label font-weight-bold">Bill Details</label>
+        <div>
+            <input type="checkbox" class="mr-1" id="id_local_bill" {% if not order_bill %}checked {% else %} {% if order_bill.is_local_bill %} checked {% endif %} {% endif %} />
+            <label for="id_local_bill">Local Bill</label>
+            <input type="hidden" name="local_bill" id="id_local_bill_value" {% if not order_bill %}value="true" {% else %} {% if order_bill.is_local_bill %}value="true"{% else %}value="false"{% endif %} {% endif %}>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Bill Date <span style="color: red;">*</span>
+            </label>
+            <div class="col-md-12">
+                <input type="date" name="bill_date" id="id_bill_date" value="{{ order_bill.bill_date|date:'Y-m-d' }}" class="form-control" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Due in Days
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="due_days" id="id_due_days" class="form-control" {% if order_bill %}value="{{ order_bill.get_due_days }}"{% else %}value="0"{% endif %} />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Due Date
+            </label>
+            <div class="col-md-12">
+                <input type="date" name="due_date" id="id_due_date" class="form-control" value="{{ order_bill.due_date|date:'Y-m-d' }}" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Written By
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="written_by" id="id_written_by" class="form-control" value="{% if order_bill.written_by %}{{ order_bill.written_by }}{% endif %}" />
+                {% comment %} <select name="written_by" id="id_written_by" class="form-control">
+                    <option value=""></option>
+                </select> {% endcomment %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Checked By
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="checked_by" id="id_checked_by" class="form-control" value="{% if order_bill.checked_by %}{{ order_bill.checked_by }}{% endif %}" />
+                {% comment %} <select name="checked_by" id="id_checked_by" class="form-control">
+                    <option value=""></option>
+                </select> {% endcomment %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Packed By
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="packed_by" id="id_packed_by" class="form-control" value="{% if order_bill.packed_by %}{{ order_bill.packed_by }}{% endif %}" />
+                {% comment %} <select name="packed_by" id="id_packed_by" class="form-control">
+                    <option value=""></option>
+                </select> {% endcomment %}
+            </div>
+        </div>
+    </div>
+    <div class="row {% if not order_bill %}d-none {% else %} {% if order_bill.is_local_bill %} d-none {% endif %} {% endif %}" id="local_bill_fields">
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                G.R. No.
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="gr_number" id="id_gr_number" class="form-control" value="{% if order_bill.gr_number %}{{ order_bill.gr_number }}{% endif %}" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                G.R. Date
+            </label>
+            <div class="col-md-12">
+                <input type="date" name="gr_date" id="id_gr_date" class="form-control" value="{{ order_bill.gr_date|date:'Y-m-d' }}" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Case number
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="case_number" id="id_case_number" class="form-control" {% if order_bill %}value="{% if order_bill.case_number %}{{ order_bill.case_number }}{% else %}0{% endif %}"{% else %}value="0"{% endif %} />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Transporter
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="transporter" id="id_transporter" class="form-control" {% if order_bill %}value="{% if order_bill.transporter %}{{ order_bill.transporter }}{% else %}{{ transport }}{% endif %}"{% else %}value="{{ transport }}"{% endif %} />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row mx-2 mt-3"><label class="col-form-label font-weight-bold">Order Details</label></div>
+    <div class="row">
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Order Total
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="order_total" id="id_order_total" value="{% if item_total %}{{item_total}}{% else %}0{% endif %}" class="form-control" readonly />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Shipping Charge
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="shipping_charges" id="id_shipping_charges" value="{% if shipping_charges %}{{shipping_charges}}{% else %}0{% endif %}" class="form-control" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Packing Charge
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="packing_charges" value="{% if packing_charges %}{{packing_charges}}{% else %}0{% endif %}" id="id_packing_charges" class="form-control" />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Grand Total
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="grand_total" id="id_grand_total" value="{% if grand_total %}{{ grand_total }}{% else %}0{% endif %}" class="form-control" readonly />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Payment Method
+            </label>
+            <div class="col-md-12">
+                <select class="form-control" name="payment_method" id="id_payment_method" {% if order_bill %}disabled{% endif %}>
+                    <option value="credit" {% if payment_method == "credit" %}selected{% endif %} >Credit</option>
+                    <option value="cash" {% if payment_method == "cash" %}selected{% endif %}>Cash</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+</div>

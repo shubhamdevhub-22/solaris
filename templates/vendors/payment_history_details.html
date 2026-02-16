@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Vendor Payment Detail{% endblock title %}
+{% block bodycontent %}
+
+<section id="extended">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex flex-sm-row flex-column justify-content-between">
+              <h4 class="card-title">Payment Detail</h4>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <label class="col-md-5"><b>Company:</b></label>
+                        <label class="col-md-6">{{object.vendor.company|default:"-----"}}</label>
+                    </div>
+                    <div class="col">
+                        <label class="text-dark col-md-5"><b>Vendor:</b></label>
+                        <label class="col-md-6">{{object.vendor|default:"-----"}}</label>
+                    </div>
+                    <div class="col">
+                        <label class="text-dark col-md-5"><b>Payment Date:</b></label>
+                        <label class="col-md-6">{{object.payment_date|default:"-----"}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <label class="col-md-5"><b>Payment Mode:</b></label>
+                        <label class="col-md-6">{{object.payment_mode|title|default:"-----"}}</label>
+                    </div>
+                    <div class="col">
+                        <label class="text-dark col-md-5"><b>Payment Amount:</b></label>
+                        <label class="col-md-6 text-success">{{object.payment_amount|title|intcomma|default:"0"}}</label>
+                    </div>
+                    <div class="col">
+                        <label class="text-dark col-md-5"><b>Reference No:</b></label>
+                        <label class="col-md-6">{{object.reference_number|default:"-----"}}</label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <label class="col-md-5"><b>Remark:</b></label>
+                        <label class="col-md-6"> {% if object.remark == None %}-----{% else %}{{object.remark|title|default:"-----"}}{% endif %}</label>
+                    </div>
+                    <div class="col">
+                        {% comment %} <label class="text-dark col-md-5"><b>Reference No:</b></label>
+                        <label class="col-md-6">{{object.reference_number|default:"-----"}}</label> {% endcomment %}
+                    </div>
+                    <div class="col">
+                        <!--<label class="col-md-5"><b>Remark:</b></label>
+                        <label class="col-md-6"> {% if object.remark == None %}-----{% else %}{{object.remark|title|default:"-----"}}{% endif %}</label>-->
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <code>
+        
+    </code>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <small><b>Purachase Order list</b></small>
+                </div>
+                <div class="card-content">
+                    <div class="card-body table-responsive">
+                      <table id="table_added_products" class="table text-center m-0">
+                        <thead>
+                          <tr>
+                                <th style="width: 10%;">SR NO.</th>
+                                <th style="width: 10%;">Purchase Order Date</th>
+                                <th style="width: 10%;">Total Amount</th>
+                                <th style="width: 10%;">Total Paid Amount</th>
+                                <th style="width: 10%;">Due Amount</th>
+                                <th style="width: 10%;">Status</th>
+                                {% comment %} <th style="width: 10%;">Action</th> {% endcomment %}
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for purchase_order in object.get_purchase_order_detail %}
+                            <tr class="">
+                                <td data-title="purchase_order-id">{{forloop.counter}}</td>
+                                <td data-title="purchase_order-id">{{purchase_order.bill_date}}</td>
+                                <td data-title="purchase_order-id">{{purchase_order.get_total_amount|intcomma}}</td>
+                                <td data-title="purchase_order-id">{{purchase_order.get_paid_amount|intcomma}}</td>
+                                <td data-title="purchase_order-id">{{purchase_order.get_due_amount|intcomma}}</td>
+                                <td data-title="purchase_order-id"><span class="badge bg-light-primary">{{purchase_order.status|capfirst}}</span></td>
+                                {% comment %} <td data-title="purchase_order-id"> <a href="{% url 'purchase_order:purchase_order_detail' purchase_order.id %}" title="Detail"><i class="ft-eye font-medium-3 mr-2"></i></a></td> {% endcomment %}
+                            </tr>
+                            {% comment %} <tr data-id="product_2" product-id="2" purchase-order-product="new" class="product-row">
+                                <td data-title="product-id">{{forloop.counter}}</td>
+                                <td data-title="product-name">Farrah Ortiz<input type="hidden" name="product_2__id" value="2"></td>
+                                <td data-title="unit-type-text">Piece<input type="hidden" name="product_2__unit_type" value="Piece"></td>
+                                <td data-title="quantity"><input type="number" min="1" max="10" name="product_2__quantity" class="form-control text-center" value="1"></td>
+                                <input type="hidden" min="0.00" step="0.01" data-default-value="1" name="product_2__totalpieces" class="form-control text-center" value="1">
+                                <td data-title="unit-price"><input type="number" min="0.00" step="0.01" name="product_2__unitprice" class="form-control text-center" value="12.0" readonly=""></td>
+                                <td data-title="total-price"><input type="number" min="0.00" step="0.01" name="product_2__totalprice" class="form-control text-center product-total-price" value="12.00" readonly=""></td>
+                            </tr> {% endcomment %}
+                            {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    {% comment %} <div class="row">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <small><b>Pricing Details</b></small>
+              </div>
+            </div>
+            
+            <div class="card-content">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <label class="col-md-7"><b>Item Total:</b></label>
+                            <label class="col-md-4">{{object.item_total|default:"-"}}</label>
+                        </div>
+                        <div class="col">
+                            <label class="text-dark col-md-7"><b>Discount(%):</b></label>
+                            <label class="col-md-4">{{object.overall_discount|default:"-"}}</label>
+                        </div>
+                        <div class="col">
+                            <label class="text-dark col-md-7"><b>Grand Total:</b></label>
+                            <label class="col-md-4">{{object.grand_total|default:"-"}}</label>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col">
+                            <label class="text-dark col-md-7"><b>Paid Amount:</b></label>
+                            <label class="col-md-4">{{object.paid_amount|default:"-"}}</label>
+                        </div>
+                        <div class="col">
+                            <label class="text-dark col-md-7"><b>Due Amount:</b></label>
+                            <label class="col-md-4">{{object.get_due_amount|default:"-"}}</label>
+                        </div>
+                        <div class="col">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div> {% endcomment %}
+    <div class="row mt-2">
+        <div class="col-md-12 col-12">
+            <div class="d-flex flex-sm-row flex-column justify-content-end">
+                <button type="button" value="go back" class="btn btn-secondary ml-2 " onclick="history.back()">Back</button>
+            </div>
+        </div>
+    </div>
+  </section>
+
+{% endblock bodycontent %}
+
+{% block script %}
+<script>
+    
+</script>
+{% endblock script %}

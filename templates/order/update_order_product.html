@@ -1,0 +1,126 @@
+<div class="row">
+    
+    <div class="col-md-6">
+        <label class="col-md-10 col-form-label" for="horizontal-form-2">Product</label>
+        <div class="col-md-12">
+            <select class="form-control" name="product" id="id_order_product" disabled>
+                <option value="{{ product.id }}" selected>{{ product.name }}</option>
+            </select>
+        </div>
+    </div>
+
+    {% if is_bill_create %}
+    <div class="form-group col-md-6">
+        <label class="col-md-10 col-form-label">Unit</label>
+        <div class="col-md-12">
+            <input type="text" name="unit" class="form-control" id="id_order_product_unit" value="{{ unit }}" disabled />
+        </div>
+    </div>
+    {% else %}
+    <div class="form-group col-md-6">
+        <label class="col-md-10 col-form-label">Vehicle</label>
+        <div class="col-md-12">
+            <input type="text" name="vehicle" class="form-control" id="id_order_product_vehicle" value="{{ vehicle }}" disabled />
+        </div>
+    </div>
+    {% endif %}
+
+    {% if is_bill_create %}
+    <div class="col-md-6">
+        <label class="col-md-10 col-form-label" for="horizontal-form-2">Select Price</label>
+        <div class="col-md-12">
+            <select name="price_choice" id="id_order_product_price_choice" data-url="{% url 'product:get_product_price' %}" class="form-control">
+                <option value="mrp" {% if price_type == 'mrp' %}selected{% endif %}>MRP</option>
+                {% if customer_type == "wholesale" %}
+                <option value="wholesale" {% if price_type == 'wholesale' %}selected{% endif %}>Wholesale</option>
+                {% endif %}
+                {% if customer_type == "retail" %}
+                <option value="retail" {% if price_type == 'retail' %}selected{% endif %}>Retail</option>
+                {% endif %}
+            </select>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-6">
+        <label class="col-md-10 col-form-label" for="horizontal-form-2">Unit Price</label>
+        <div class="input-group col-md-12">
+            <div class="input-group-prepend">
+                <span class="input-group-text">₹</span>
+            </div>
+            <input type="number" disabled name="mrp" class="form-control" id="id_order_product_mrp"
+            {% if price_type == 'mrp' %}value="{{ product.mrp }}"{% endif %}
+            {% if price_type == 'retail' %}value="{{ product.retail_rate }}"{% endif %}
+            {% if price_type == 'wholesale' %}value="{{ product.wholesale_rate }}"{% endif %}
+            >
+        </div>
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="d-flex justify-content-between col-md-12 col-form-label">
+            <label>Quantity<span style="color: red;">*</span></label>
+            <div class="mr-2"><small class="mr-1">Available Stock: </small><span id="id_order_product_available_stock">{{ available_stock }}</span></div>
+        </div>
+        <div class="col-md-12">
+            <input type="number" name="quantity" min="0" max="{{ available_stock }}" value="{{ qty }}" class="form-control" placeholder="Quantity" required="" id="id_order_product_quantity">
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <label class="col-md-10 col-form-label">Previous Price</label>
+        <div class="col-md-12">
+            <input type="text" name="previous_price" class="form-control" id="id_order_product_previous_price" value="{{ previous_price }}" disabled />
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <label class="col-md-10 col-form-label">Free quantity</label>
+        <div class="col-md-12">
+            <input type="text" name="free_quantity" class="form-control" id="id_order_product_free_quantity" value="{{ free_quantity }}" />
+        </div>
+    </div>
+    
+    <div class="col-md-6 {% if price_type != 'mrp' %}d-none {% endif %}">
+        <label class="col-md-10 col-form-label">Special Rate</label>
+        <div class="col-md-12 input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">₹</span>
+            </div>
+            <input type="number" name="special_rate" class="form-control discounts" id="id_order_product_special_rate" value="{{ special_rate }}" />
+        </div>
+    </div>
+
+    <div class="col-md-6 {% if price_type != 'mrp' %}d-none {% endif %}">
+        <label class="col-md-10 col-form-label">Special Discount</label>
+        <div class="input-group col-md-12">
+            <input type="number" name="special_discount" class="form-control discounts" id="id_order_product_special_discount" value="{{ special_discount }}" />
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+    </div>
+
+    {% if is_bill_create %}
+    <div class="col-md-6 {% if price_type != 'mrp' %}d-none {% endif %}">
+        <label class="col-md-10 col-form-label">Primary Discount</label>
+        <div class="input-group col-md-12">
+            <input type="number" name="brand_primary_discount" class="form-control discounts" id="id_order_product_brand_primary_discount" value="{{ primary_discount }}" />
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+        <span id="id_discount_applied" class="text-success font-weight-bold"></span>
+    </div>
+
+    <div class="col-md-6 {% if price_type != 'mrp' %}d-none {% endif %}">
+        <label class="col-md-10 col-form-label">Secondary Discount</label>
+        <div class="input-group col-md-12">
+            <input type="number" name="brand_secondary_discount" class="form-control discounts" id="id_order_product_brand_secondary_discount" value="{{ secondary_discount }}" />
+            <div class="input-group-append">
+                <span class="input-group-text">%</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>

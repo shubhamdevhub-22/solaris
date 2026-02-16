@@ -1,0 +1,4 @@
+<a href="{% if customer %}{% url 'customer:customer_details' customer.id %}{% endif %}">
+    <div>{{customer.customer_name}}</div>
+    <div>Zone: {{customer.zone.zone_code}} &nbsp&nbsp {{customer.area}}</div>
+</a>

@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Details Vendor    
+{% endblock title %}
+
+
+{% block bodycontent %}
+
+<section id="file-export">
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+                <div class="d-flex flex-sm-row flex-column justify-content-between">
+                    <h4 class="card-title align-self-center">Vendor Details</h4>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Name:</p></b>
+                                <b><p>Last Name:</p></b>
+                                <b><p>Email:</p></b>
+                                <b><p>Website:</p></b><br> 
+                                
+                                {% if user.role == 'super admin' %}
+                                <b><p>Company Name:</p></b>
+                                {% endif %}
+
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <p>{% if object.first_name or object.last_name %}{{object.first_name}} {{object.last_name}} {% else %}-{% endif %}</p>
+                                <p>{{object.last_name|default:"-"}}</p>
+                                <p>{{object.email|default:"-"}}</p>
+                                <p>{{object.website|default:"-"}}</p><br>
+                                {% if user.role == 'super admin' %}
+                                <p>{{object.company.company_name|default:"-"}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Phone No:</p></b>
+                                <b><p>Office Contact No1:</p></b>
+                                <b><p>Office Contact No2:</p></b>
+                                <b><p>Status:</p></b>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>{{object.phone|default:"-"}}</p>
+                                <p>{{object.office_number_1|default:"-"}}</p>
+                                <p>{{object.office_number_2|default:"-"}}</p>
+                                <p>
+                                    {% if object.status == 'active' %}
+                                    <span class="badge bg-light-success">{{object.status.title}}</span>
+                                    {% elif object.status == 'inactive' %}
+                                    <span class="badge bg-light-danger">{{object.status.title}}</span>
+                                    {% endif %}
+                                </p>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row">
+                            <div class="col-lg-6 text-dark">
+                                <b><p>Country:</p></b>
+                                <b><p>State:</p></b>
+                                <b><p>City:</p></b>
+                                <strong>Zip Code:</strong>
+                            </div>
+                            <div class="col-lg-6">
+                                <p>{{object.country|slice:":15"}}</p>
+                                <p>{{object.state|slice:":15"}}</p>
+                                <p>{{object.city|slice:":15"}}</p>
+                                <p>{{object.zip_code|default:"-"}}</p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-items">
+                    <span data-url="{% url 'vendors:received_bills' pk=object.id %}" class="btn btn-outline-primary ml-sm-0 mt-3 htmx-trigger-btn" id="id_received_bills">Recevied Bill</span>
+                    <span data-url="{% url 'vendors:upload_documents' pk=object.id %}" class="btn btn-outline-primary ml-sm-0 mt-3 htmx-trigger-btn" id="id_upload_documents">Vendor Documents</span>
+                    <span data-url="{% url 'vendors:payment_history' pk=object.id %}" , class="btn btn-outline-primary ml-sm-0 mt-3 htmx-trigger-btn" id="id_payment_history">Payment History</span>
+                </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                      <div class="table-responsive" id="table-body">
+                        <!-- The Data-Table Insert Here  -->
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+
+{% endblock %}
+
+
+{% block script %}
+    <script>
+        $(document).on('click', '.htmx-trigger-btn' , function (e) {
+            url = $(this).data("url")
+            htmx.ajax('GET', 
+                url, 
+                {target:'#table-body', 
+                swap:'innerHTML', 
+            })
+        })
+        
+        
+    </script>
+
+    <script>
+        $(document).on('click', '#id_received_bills' , function (e) {
+            url = '{% url "vendors:vendor_recevied_bill_list_ajax" %}'
+            $('.nav-items .active').removeClass('active');
+            $(this).addClass('active');
+            localStorage.setItem("data" , "receivedbills");
+            return url
+        });
+
+        $(document).on('click', '#id_received_bills' , function (e) {
+            columns = [
+                { data: 'id', name: 'id' },
+                { data: 'bill_number', name: 'bill_number' },
+                { data: 'item_count', name: 'item_count' },
+                { data: 'bill_date', name: 'bill_date' },
+                { data: 'total_price', name: 'total_price' },
+                { data: 'paid_amount', name: 'paid_amount' },
+                { data: 'due_amount', name: 'due_amount' },
+            ]
+            return columns
+    
+        });
+
+        $(document).on('click', '#id_upload_documents' , function (e) {
+            url = '{% url "vendors:vendor_document_list_ajax" %}'
+            $('.nav-items .active').removeClass('active');
+            $(this).addClass('active');
+            localStorage.setItem("data" , "uploaddocuments");
+            return url
+    
+        });
+        $(document).on('click', '#id_upload_documents' , function (e) {
+            columns = [
+                { data: 'id', name: 'id' },
+                { data: 'vendor', name: 'vendor' },
+                { data: 'document_name', name: 'document_name' },
+                { data: 'document', name: 'document' },
+                { data: 'action', name: 'action' },
+            ]
+            return columns
+        });
+
+        $(document).on('click', '#id_payment_history' , function (e) {
+            url = '{% url "vendors:vendor_payment_history_list_ajax" %}'
+            $('.nav-items .active').removeClass('active');
+            $(this).addClass('active');
+            localStorage.setItem("data" , "paymenthistory");
+            return url
+        });
+        $(document).on('click', '#id_payment_history' , function (e) {
+            columns = [
+                { data: 'id', name: 'id' },
+                { data: 'payment_date', name: 'payment_date' },
+                { data: 'payment_mode', name: 'payment_mode' },
+                { data: 'reference_number', name: 'reference_number' },
+                { data: 'payment_amount', name: 'payment_amount' },
+                { data: 'get_no_of_bills', name: 'get_no_of_bills' },
+                { data: 'remark', name: 'remark' },
+                { data: 'actions', name: 'actions' },
+            ]
+            return columns
+        });
+
+        document.addEventListener('htmx:afterRequest', function(evt) {
+            // Put the JS code that you want to run here
+            function set_filters(){
+                var data = {}
+                data["id_vendor"] = $("#id_vendor").val()
+                return data
+              }
+              function initialize_datatable(){
+                $('#table').DataTable({
+                    columnDefs: [{
+                        orderable: false,
+                        targets: [-1,-2,-3,-5]
+                    },
+                    /*{
+                      targets: [],
+                      visible: role // new variable true or false based on user role.
+                    }*/
+                    ],
+          
+                    // Ajax for pagination
+                    processing: true,
+                    language: {
+                        processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                    },
+                    serverSide: true,
+                    ajax: {
+                        url: url,
+                        type: 'get',
+                        data: set_filters()
+                    },
+                    columns: columns,
+                    rowCallback: function (nRow, aData, iDisplayIndex) {
+                      var oSettings = this.fnSettings ();
+                      $("td:first", nRow).html(oSettings._iDisplayStart+iDisplayIndex +1);
+                      return nRow;
+                    },
+                });
+              }
+              initialize_datatable();
+        });
+        
+    </script>
+    <script src="{% static 'webapp/intailize_datatables.js' %}"></script>
+    <script>
+        $(document).on('click', '.ajax-delete-btn' , function (e){
+          var id = $(this).data("id")
+          var name = $(this).data("title")
+          if(name == "None"){
+              name = ""
+          }
+          var url = $(this).data("url")
+          var delete_ele = $(this)
+          Swal.fire({
+              html: `Are you sure you want to delete <b>${name}</b> ?`,
+              icon: 'question',
+              showCloseButton: true,
+              showCancelButton: true,
+              confirmButtonColor: "#7442DB",
+          }).then((result) => {
+              /* Read more about isConfirmed, isDenied below */
+              if (result.isConfirmed) {
+                  $.ajax({
+                      type: "POST",
+                      url: url,
+                      data: {
+                          "id": id,
+                          "csrfmiddlewaretoken": '{{ csrf_token }}'
+                      },
+                      success: function (data) {
+                        $('#table').DataTable().ajax.reload(null, false);
+                        if (data["message"]){
+                          $.toast({
+                              text: data.message,
+                              position: 'bottom-right',
+                              stack: false,
+                              icon: 'success',                    
+                          })
+                      }
+                    }    
+                  });
+              }
+          })
+      })
+      
+    </script>
+
+
+    <script>
+        $( document ).ready(function() {
+            myData = localStorage.getItem('data');
+            if (myData == 'receivedbills'){
+                $("#id_received_bills").trigger("click");
+            }
+            else if (myData == 'uploaddocuments'){
+                $("#id_upload_documents").trigger("click");
+            }
+            else if (myData == 'paymenthistory'){
+                $("#id_payment_history").trigger("click");
+            } else {
+                $("#id_received_bills").trigger("click");
+
+            }
+           
+        });
+    </script>
+
+{% endblock script %}
+    
+
+

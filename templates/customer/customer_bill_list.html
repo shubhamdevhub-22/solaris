@@ -1,0 +1,66 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex flex-sm-row flex-column justify-content-between">
+          <h4 class="card-title">Pending Bill List</h4>
+          <div class="d-flex">
+            <label class="col-6 my-auto" for="">Credit Amount :</label>
+            <input type="text" name="credit_amount" id="id_credit_amount" value="{{ credit_amount }}" class="col-6 form-control" readonly />
+          </div>
+        </div>
+      </div>
+      <div class="card-content">
+        <div class="card-body">
+          <input type="hidden" name="total_due_amount" value="{{total_due_amount}}" id="id_total_due_amount">
+          <input type="hidden" name="available_credit" value="{{available_credit}}" id="id_available_credit" />
+          <table class="table table-striped table-bordered file-export customerTable text-center" id="table_customer_payment">
+            {{customer}}
+            <thead>
+              <tr>
+                <th>Sr No.</th>
+                <th>Bill Date</th>
+                <th>Bill Amount (₹)</th>
+                <th>Paid Amount (₹)</th>
+                <th>Due Amount (₹)</th>
+                <th>Select Bill</th>
+                <th>Pay Amount (₹)</th>
+                <th>Due Balance (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+              {% for object in object_list %}
+              <tr data-id="{{object.id}}" customer-id={{object.customer.id}} purchase-order-customer_bill_id={{object.purchase_order.id}} class="customer-row">
+                <td id="id_object_td">{{forloop.counter}} <input type="hidden" id="id_{{object.id}}__object_id" value="{{object.id}}" name = 'customer_bill_{{object.id}}__object_id'> </td>
+                <td>{{object.order.order_date}}</td>
+                <td>{{object.bill_amount}}</td>
+                <td>{{object.paid_amount}}</td>
+                <td>{{object.due_amount}} <input type="hidden" name="customer_{{object.id}}_due_amount" value="{{object.due_amount}}" class='' id="id_{{object.id}}__due_amount" > </td>
+                <td id="id_{{object.id}}__checkbox_td"> <input type="checkbox" class="checkbox" name = 'customer_{{object.id}}_checkbox' id ="id_{{object.id}}__checkbox" style="height: 30px; width: 30px" /> </td>
+                <td> <input type="number" name="customer_{{object.id}}__paid_amount" value="0" class='form-control' id="id_{{object.id}}__paid_amount" readonly> </td>
+                <td> <input type="number" name="customer_{{object.id}}__due_balance" value="0" class='form-control' id="id_{{object.id}}__due_balance" readonly>  </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td style="width: 100%" class="text-center" colspan="8">No bills found</td>
+              </tr>
+              {% endfor %}
+
+              {% if customer %}
+                <tr data-id="{{customer.id}}" class="customer-past-due">
+                  <td colspan = 4 class="text-center"><strong>Past Due Amount</strong><input type="hidden" value="{{customer.id}}" name = "id_customer"> </td>
+                  <td>{{customer.past_due_amount}} <input type="hidden" name="customer_due_amount" value="{{customer.past_due_amount}}" class='' id="id_past_due_amount" ></td>
+                  <td id="id_customer_checkbox_td"> <input type="checkbox" class="customer_checkbox" name = 'customer_checkbox' id ="id_customer_checkbox" style="height: 30px; width: 30px"> </td>
+                  <td> <input type="number" name="customer__paid_amount" value="" class='form-control' id="id_customer__paid_amount" readonly> </td>
+                  <td> <input type="number" name="customer__due_balance" value="" class='form-control' id="id_customer__due_balance" readonly>  </td>
+                </tr>
+              {% endif %}
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

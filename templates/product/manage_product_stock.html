@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage-Stock Product{% endblock title %} 
+{% block style %}
+<style>
+    .table-responsive {
+        display: inline-table;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block bodycontent %}
+
+<section id="basic-hidden-label-form-layouts">
+    <div class="d-flex flex-sm-row flex-column justify-content-between">
+        <h4 class="card-title align-self-center">Manage Stock</h4>
+        <div>
+            <a href="{% url 'product:add_stock_from_csv' %}" class="btn btn-primary ml-sm-1">Import CSV</a>
+        </div>
+    </div>
+    {% comment %} <h4 class="card-title">Manage Stock</h4> {% endcomment %}
+    <hr>
+    <div class="row match-height">
+        <!-- Basic Form starts -->
+        <div class="col-lg-12 col-12" id="id_stock_form">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-body">
+            
+                        <div class="row">
+                            <div class="form-group col-4 d-none">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Product code</label>
+                                <div class="col-md-12">
+                                    <fieldset class="form-group">
+                                        <input type="text" class="form-control" data-url = "{% url 'order:ajax_get_product_for_order_by_barcode' %}" name="barcode" id="id_barcode">
+                                    </fieldset>
+                                </div>
+                            </div>
+                            {% if user.role == "super admin" %}
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Brand<span class="text-danger">*</span></label>
+                                <div class="col-md-9">
+                                    <fieldset class="form-group">
+                                        <select id="id_company" class="select2-data-array form-control select2-list"
+                                        onchange="loadWareHouse()">
+                                            <option value="">All</option>
+                                            {% for company in company_list %}
+                                            <option value="{{company.id}}">{{company.company_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Product<span class="text-danger">*</span></label>
+                                <div class="col-md-9">
+                                    <fieldset class="form-group">
+                                        <select id="id_product" class="select2-data-array form-control select2-list">
+                                            <option value="">All</option>
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Vehicle</label>
+                                <div class="col-md-9">
+                                    <fieldset class="form-group">
+                                        <select id="id_vehicle" class="select2-data-array form-control select2-list">
+                                            <option value="">All</option>
+                                            {% for vehicle in vehicle_list_for_cadmin %}
+                                            <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Warehouse<span class="text-danger">*</span></label>
+                                <div class="col-md-9">
+                                    <fieldset class="form-group">
+                                        <select id="id_warehouse" class="select2-data-array form-control select2-list"
+                                        onchange="loadstockproductform()">
+                                            <option value="">All</option>
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if user.role == "company admin" or user.role == "sales representative" %}
+                            <input type="hidden" name="company" value="{{user.get_company_id}}" id="id_company">
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Product<span class="text-danger">*</span></label>
+                                <div class="col-md-12">
+                                    <fieldset class="form-group">
+                                        <select id="id_product" class="select2-data-array form-control select2-list">
+                                            {% comment %} <option value="">All</option>
+                                            {% for product in product_list_for_cadmin  %}
+                                            <option value="{{product.id}}">{{product.name}} {% if product.vehicle %}- {{product.vehicle.name}}{% endif %}</option>
+                                            {% endfor %} {% endcomment %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Vehicle</label>
+                                <div class="col-md-12">
+                                    <fieldset class="form-group">
+                                        <select id="id_vehicle" class="select2-data-array form-control select2-list" disabled>
+                                            <option value="">All</option>
+                                            {% for vehicle in vehicle_list_for_cadmin %}
+                                            <option value="{{ vehicle.id }}">{{ vehicle.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="col-md-12 col-form-label" for="horizontal-form-2">Warehouse<span class="text-danger">*</span></label>
+                                <div class="col-md-12">
+                                    <fieldset class="form-group">
+                                        <select id="id_warehouse" class="select2-data-array form-control select2-list"
+                                        onchange="loadstockproductform()">
+                                            <option value="">All</option>
+                                            {% for warehouse in warehouse_list_for_cadmin  %}
+                                            <option value="{{warehouse.id}}">{{warehouse.name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            {% endif %}
+            
+                            <div class="form-group col-4">
+                                <label class="col-md-6 col-form-label" for="horizontal-form-2">Available Stock</label>
+                                <div class="col-md-12">
+                                    <fieldset class="form-group">
+                                        <input type="number" class="form-control" name="available_stock" id="id_available_stock" value="0" disabled />
+                                    </fieldset>
+                                </div>
+                            </div>
+            
+                            <div class="col-8 my-auto text-end">
+                                <button type="button" class="btn btn-primary add-stock mr-2" id='id_add_stock_button'><i class="ft-edit mr-2"></i>Add Stock</button>
+                                <button type="button" class="btn btn-primary update-stock mr-2" id='id_update_stock_button'><i class="ft-edit mr-2"></i>Update Stock</button>
+                            </div>
+                        </div>
+            
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} <div class="col-lg-6 col-12">
+            <div class="card" style="height: 679.375px;">
+                <div class="card-content">
+                    <div class="card-body">
+                        <div class="container" id="table-body">
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    <label>Unit Type</label>
+                                </div>
+                                <div class="col-3">
+                                    <label>Quantity Per Unit</label>
+                                </div>
+                                <div class="col-3">
+                                    <label>Quantity</label>
+                                </div>
+                                <div class="col-3">
+                                    <label>Total Quantity</label>
+                                </div>
+                            </div>
+                            <div class="form-group row mt-2">
+                                <div class="col-3">
+                                    <label>Piece</label>
+                                </div>
+                                <div class="col-3">
+                                    <input class="form-control" type="number" id="id_pieces" value="1" disabled>
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" class="form-control" value="0" id='id_piece' readonly>
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" class="form-control" readonly value="0" id="id_piece_total">
+                                </div>
+                            </div>
+                            <div class="form-group row mt-2">
+                                <div class="col-5">
+                                </div>
+                                <div class="col-4 mt-2">
+                                    <label><b>Total Quantity (Piece)</b></label>
+                                </div>
+                                <div class="col-3">
+                                    <input type="number" class="form-control" name="stock" required="" value='0' id="id_stock" readonly>
+                                </div>
+                            </div>
+                            <div class="row d-flex justify-content-between mt-auto">
+                                <div class="text-danger font-weight-bold">Please select the product and warehouse to add stock</div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary form-control update-stock mr-2" id='id_update_stock_button' disabled><i class="ft-edit mr-2"></i> Save</button>
+                                    <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()"><i class="ft-x mr-1"></i>Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> {% endcomment %}
+    </div>
+</section>
+
+{% include "product/product_stock_history.html" %}
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="addStockModal" tabindex="-1" role="dialog" aria-labelledby="addStockModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Stock</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="add_stock_modal">
+            {% include 'product/manage_stock_form.html' %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" id="add_stock_btn" class="btn btn-primary">Add Stock</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" data-keyboard="false" id="updateStockModal" tabindex="-1" role="dialog" aria-labelledby="updateStockModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update Stock</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="update_stock_modal">
+            {% include 'product/manage_stock_form.html' %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" id="update_stock_btn" class="btn btn-primary">Update Stock</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+{% endblock bodycontent %}
+
+
+{% block script %}
+
+<script>
+    const stock_url = "{% url 'product:update_stock' %}";
+    const stock_update_url = "{% url 'product:stock_update' 0 %}";
+    const stock_form_url = "{% url 'product:stock_form_url' %}";
+    var product_search_url = "{% url 'product:product_search' %}";
+
+    const csrf_token = '{{ csrf_token }}';
+
+    var role = true;
+    if ("{{request.user.role}}" == "company admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "sales representative") {
+        role = false;
+    }
+
+    {% if request.user.role == 'company admin' or request.user.role == 'sales representative'  %}
+        var company_admin_company_id = '{{request.user.get_company_id}}';
+    {% else %}
+        var company_admin_company_id = null
+    {% endif %}
+    var i = 1;
+
+
+    function set_filters(){
+        var data = {}
+        data["company"] = $("#id_company").val()
+        data["product"] = $("#id_product").val()
+        data["warehouse"] = $("#id_warehouse").val()
+        return data
+    }
+
+
+    var order_false = [-1]
+    var to_center = "_all"
+    var invisible_columns = [0,3]
+    var filter_id = $("#id_brand,#id_company,#id_product,#id_warehouse")
+    var url = '{% url "product:stock_history" %}'
+    var columns = [
+        { data: 'product__code', name: 'product__code' },
+        { data: 'product', name: 'product' },
+        { data: 'vehicle', name: 'vehicle' },
+        { data: 'product__brand', name: 'product__brand' },
+        { data: 'warehouse', name: 'warehouse' }, 
+        { data: 'created_at', name: 'created_at' }, 
+        { data: 'before_stock', name: 'before_stock' },
+        { data: 'affected_stock', name: 'affected_stock' },
+        { data: 'stock', name: 'stock' },
+        //{ data: 'ready_for_dispatch', name: 'ready_for_dispatch' },
+    ]
+
+</script>
+
+<script>
+    function intailize_datatables() {
+        $('#table').DataTable({
+            scrollX: true,
+            scrollY: 500,
+            columnDefs: [{
+                    targets: to_center,
+                    className: "text-center",
+                },
+                {
+                    orderable: false,
+                    targets: [-1]
+                },
+                {
+                    targets: [invisible_columns],
+                    visible: role // new variable true or false based on user role.
+                },
+                
+            ],
+            order: [],
+            // Ajax for pagination
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: url,
+                type: 'get',
+                data: set_filters(),
+            },
+            columns: columns
+        })
+    }
+    intailize_datatables()
+
+    filter_id.on("change", function() {
+        $("#table").DataTable().destroy();
+        intailize_datatables()
+    });
+
+</script>
+
+
+<script src="{% static 'webapp/custom.js' %}"></script>
+<script src="{% static 'webapp/stock/stock.js' %}"></script>
+<script src="{% static 'webapp/product/load_warhouse.js' %}"></script>
+
+
+
+{% endblock script %}

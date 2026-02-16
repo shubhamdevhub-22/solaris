@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+
+
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Add Billing Address</h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body">
+                        <form action="" method="post" novalidate>
+                            {% csrf_token %}
+                <div class="row">
+                    <input type="text" value="{{customer_id}}" name="customer" id="id_customer" hidden>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.billing_address_line_1.label}}{% if form.billing_address_line_1.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.billing_address_line_1}}
+                        {% if form.billing_address_line_1.errors %}
+                            {% for error in form.billing_address_line_1.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_address_line_2.label}}{% if form.billing_address_line_2.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.billing_address_line_2}}
+                        {% if form.billing_address_line_2.errors %}
+                            {% for error in form.billing_address_line_2.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    
+                    <div class="col-md-6 col-12 ">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.billing_suite_apartment.label}}{% if form.billing_suite_apartment.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.billing_suite_apartment}}
+                          {% if form.billing_suite_apartment.errors %}
+                              {% for error in form.billing_suite_apartment.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_city.label}}{% if form.billing_city.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.billing_city}}
+                            {% if form.billing_city.errors %}
+                                {% for error in form.billing_city.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                <div class="row">
+                    
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.billing_state.label}}{% if form.billing_state.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.billing_state}}
+                          {% if form.billing_state.errors %}
+                              {% for error in form.billing_state.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_country.label}}{% if form.billing_country.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.billing_country}}
+                            {% if form.billing_country.errors %}
+                                {% for error in form.billing_country.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                    </div>
+                  <div class="row">
+                    
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.billing_zip_code.label}}{% if form.billing_zip_code.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.billing_zip_code}}
+                          {% if form.billing_zip_code.errors %}
+                              {% for error in form.billing_zip_code.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.billing_latitude.label}}{% if form.billing_latitude.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.billing_latitude}}
+                            {% if form.billing_latitude.errors %}
+                                {% for error in form.billing_latitude.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.billing_longitude.label}}{% if form.billing_longitude.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.billing_longitude}}
+                          {% if form.billing_longitude.errors %}
+                              {% for error in form.billing_longitude.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.is_default.label}}{% if form.is_default.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.is_default}}
+                            {% if form.is_default.errors %}
+                                {% for error in form.is_default.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                  </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Save</button>
+                <a href="{% url 'customer:customer_details' customer_id  %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+
+  {% block script %}
+  <script>
+    $('.select2-list').select2({
+        width: "100%",
+    });
+</script>
+  {% endblock  %}

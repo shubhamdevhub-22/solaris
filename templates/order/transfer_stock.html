@@ -1,0 +1,127 @@
+{% load static %}
+
+<style>
+    .table-responsive {
+        display: inline-table;
+        width: 100%;
+    }
+</style>
+
+<section id="basic-hidden-label-form-layouts">
+
+    <input type="hidden" name="company" value="{{user.get_company_id}}" id="id_company">
+    
+    <div class="row">
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">From Warehouse</label>
+            <div class="col-md-12">
+                <fieldset class="form-group">
+                    <select id="id_from_warehouse" class="select2-data-array form-control select2-list" name="from_warehouse" onchange="loadproduct()">
+                        <option value="">-----</option>
+                        {% for warehouse in warehouse_list_for_cadmin  %}
+                        <option value=" {{warehouse.id}} " {% if warehouse.name == "WAREHOUSE 2" %}selected{% endif %}>{{warehouse.name}}</option>
+                        {% endfor %}
+                    </select>
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">To Warehouse</label>
+            <div class="col-md-12">
+                <fieldset class="form-group">
+                    <select id="id_to_warehouse" class="select2-data-array form-control select2-list" name="to_warehouse">
+                        <option value="">-----</option>
+                        {% for warehouse in warehouse_list_for_cadmin  %}
+                        <option value=" {{warehouse.id}} " {% if warehouse.name == "WAREHOUSE 1" %}selected{% endif %}>{{warehouse.name}}</option>
+                        {% endfor %}
+                    </select>
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Product</label>
+            <div class="col-md-12">
+                <fieldset class="form-group">
+                    <input type="text" name="product_name" class="form-control" disabled id="id_product_name" value="{{ product.name }}" />
+                    <input type="hidden" name="product" class="form-control" disabled id="id_product" value="{{ product.id }}" />
+                </fieldset>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Available Stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number"  name="available_stock" id="id_available_stock" value="{{ stock }}" disabled>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Ordered Stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number"  name="order_product_stock" id="id_ordered_stock" value="{{ order_product_stock }}" disabled>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <label class="col-md-10 col-form-label" for="horizontal-form-2">Transfer Stock</label>
+            <div class="col-md-12">
+                <input class="form-control" type="number" name="transfer_stock" id="id_transfer_stock" value="0" />
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% block script %}
+<script src="{% static 'webapp/custom.js' %}"></script>
+
+<script>
+
+    function loadproduct(){
+        var id_company = document.getElementById('id_company');
+        var id_from_warehouse = document.getElementById('id_from_warehouse');
+        
+        $.ajax({
+            type: "GET",
+            url: "{% url 'product:load_product' %}",
+            data: {
+                "id_company": id_company.value,
+                "id_warehouse": id_from_warehouse.value,
+                "id_product": "{{ product.id }}",
+            },
+            success: function (data) {
+                $("#id_to_warehouse").empty().append("<option value=''>-----</option>");
+                $("#id_available_stock").val(data.stock);
+
+                var list = data;
+                list.warehouse_list.forEach(element => {
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.name;
+                    id_to_warehouse.options.add(option);
+                });
+            
+            }
+        });
+    }
+
+    $("#id_transfer_stock").on("input", function (e) {
+        var available_stock = $("#id_available_stock").val();
+        var transfer_stock = $("#id_transfer_stock").val();
+        var ordered_stock = $("#id_ordered_stock").val();
+        var transferable_stock = Math.min(parseInt(available_stock), parseInt(ordered_stock));
+
+        if (parseInt(transfer_stock) > parseInt(transferable_stock)) {
+            $("#id_transfer_stock").val(transferable_stock);
+        }
+        if (parseInt(transfer_stock) < 0 ) {
+            $("#id_transfer_stock").val(0);
+        }
+    });
+
+</script>
+
+{% endblock script %}

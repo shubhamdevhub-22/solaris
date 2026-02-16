@@ -1,0 +1,25 @@
+<input type="text" value="{{customer_id}}" id="id_customer" hidden>
+
+<section>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered file-export" id="payment_history_table">
+                <div class="mb-2">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <h4 class="card-title align-self-center">Collection List</h4>
+                      </div>
+                </div>
+                <thead>
+                    <tr>
+                        <th>Sr no</th>
+                        <th>Payment Date</th>
+                        <th>Payment Mode</th>
+                        {% comment %} <th>Total Orders</th> {% endcomment %}
+                        <th>Total Paid Amount (₹)</th>
+                        {% comment %} <th>Action</th> {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+</section>

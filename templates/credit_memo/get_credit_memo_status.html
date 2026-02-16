@@ -1,0 +1,9 @@
+{% if obj.status == 'cancelled' %}
+<center><span class="badge bg-warning">{{obj.status.title}}</span></center>
+{% elif obj.status == 'approved' %}
+<center><span class="badge bg-info">{{obj.status.title}}</span></center>
+{% elif obj.status == 'new' %}
+<center><span class="badge bg-primary">{{obj.status.title}}</span></center>
+{% elif obj.status == 'Decline' %}
+<center><span class="badge bg-danger">{{obj.status.title}}</span></center>
+{% endif %}

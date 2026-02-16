@@ -1,0 +1,83 @@
+
+<div class="row">
+    <div class="col-md-2">
+        <label class="label-control mt-2 font-weight-bold" for="id_additional_charges">Discount Details :</label>
+    </div>
+    <div class="col-md-12">
+        <table class="table table-bordered inline-formset mt-3"id="">
+          <thead>
+            <th>Brand</th>
+            <th>Primary Discount</th>
+            <th>Percentage (%)</th>
+            <th>Additional Discount</th>
+            <th>Percentage (%)</th>
+          </thead>
+          <tbody>
+          
+          {% for brand in brands %}
+            <tr>
+              <td>{{ brand.name }}</td>
+              <td>
+                <select class="form-control discount-select2-list" name="discount-{{ brand.id }}-primary_discount" data-brand_id="{{brand.id}}" data-discount="primary">
+                  <option value="0">Discount A</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" class="form-control customer-discount" name="percent-{{ brand.id }}-primary_discount" value="{% if brand.discount_a %}{{ brand.discount_a }}{% else %}0{% endif %}" id="id_percent-{{ brand.id }}-primary_discount"/>
+              </td>
+              <td>
+                <select class="form-control discount-select2-list" name="discount-{{ brand.id }}-secondary_discount" data-brand_id="{{brand.id}}" data-discount="secondary">
+                  <option value="0">Discount B</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" class="form-control customer-discount" name="percent-{{ brand.id }}-secondary_discount" value="{% if brand.discount_b %}{{ brand.discount_b }}{% else %}0{% endif %}"  id="id_percent-{{ brand.id }}-secondary_discount"/>
+              </td>
+            </tr>
+          {% endfor %}
+          
+          {% for customer_discount in customer_discounts %}
+          <tr>
+            <td>{{ customer_discount.brand.name }}</td>
+            <td>
+              <select class="form-control discount-select2-list" name="discount-{{ customer_discount.brand.id }}-primary_discount" data-brand_id="{{customer_discount.brand.id}}" data-discount_id="{% if customer_discount.primary_discount %}{{ customer_discount.primary_discount.id }}{% else %}0{% endif %}" data-discount="primary">
+                
+                {% if customer_discount.is_primary_brand_discount %}
+                <option value="0" selected>Discount A</option>
+                {% else %}
+                <option value="">---------</option>
+                {% endif %}
+                  
+                {% for discount in discounts %}
+                <option value="{{ discount.id }}" {% if customer_discount.primary_discount.id == discount.id %}selected{% endif %}>{{ discount.category }}</option>
+                {% endfor %}
+                    
+              </select>
+            </td>
+            <td>
+              <input type="number" class="form-control customer-discount" name="percent-{{ customer_discount.brand.id }}-primary_discount" value="{{ customer_discount.primary_percent }}" id="id_percent-{{ customer_discount.brand.id }}-primary_discount"/>
+            </td>
+            <td>
+              <select class="form-control discount-select2-list" name="discount-{{ customer_discount.brand.id }}-secondary_discount" data-brand_id="{{customer_discount.brand.id}}" data-discount_id="{% if customer_discount.additional_discount %}{{ customer_discount.additional_discount.id }}{% else %}0{% endif %}" data-discount="secondary">
+
+                {% if customer_discount.is_secondary_brand_discount %}
+                <option value="0" selected>Discount B</option>
+                {% else %}
+                <option value="">---------</option>
+                {% endif %}
+
+                {% for discount in discounts %}
+                <option value="{{ discount.id }}" {% if customer_discount.additional_discount.id == discount.id %}selected{% endif %}>{{ discount.category }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td>
+              <input type="number" class="form-control customer-discount" name="percent-{{ customer_discount.brand.id }}-secondary_discount" value="{{ customer_discount.additional_percent }}"  id="id_percent-{{ customer_discount.brand.id }}-secondary_discount"/>
+            </td>
+          </tr>
+          {% endfor %}
+
+          </tbody>
+        </table>
+    </div>
+</div>

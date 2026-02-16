@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- {% block title %}List|Price|Product{% endblock title %} -->
+
+
+
+{% block bodycontent %}
+
+<div class="users-list-filter px-2">
+    <div class="row border rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="id_brand">Brand</label>
+            <fieldset class="form-group">
+                <select id="id_brand" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for brand in brand_list %}
+                    <option value="{{brand.id}}">{{brand.name}}</option>
+                    {% endfor %}
+                </select>
+                <small class ='assign-routes-not-select' style="color: red;"></small>
+            </fieldset>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="id_company">Status</label>
+            <fieldset class="form-group">
+                <select id="id_status" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for obj in object_list|slice:":1" %}
+                    <option value="{{obj.STATUS_CHOICES.0.0}}">{{obj.STATUS_CHOICES.0.1}}</option>
+                    <option value="{{obj.STATUS_CHOICES.1.0}}">{{obj.STATUS_CHOICES.1.1}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+            {% if request.user.role == "super admin" %}
+            <label for="id_company">Company</label>
+            <fieldset class="form-group">
+                <select id="id_company" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for company in company_list %}
+                    <option value="{{company.id}}">{{company.company_name}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+            {% endif %}
+        </div>
+        <div class="col-12 col-sm-6 col-lg-5">
+        </div>
+        <div class="col-12 col-sm-6 col-lg-1 d-flex align-items-center">
+            <button type="reset" class="btn btn-primary btn-block users-list-clear glow mb-0">Clear</button>
+        </div>
+    </div>
+</div>
+<section id="file-export">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                        <h4 class="card-title align-self-center">Product Price List</h4>
+                    </div>
+                </div>
+                <div class="card-content ">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered file-export" id="table">
+                                <thead>
+                                    <tr>
+                                        <th>code</th>
+                                        <th>name</th>
+                                        <th>company</th>
+                                        <th>brand</th>
+                                        <th>mrp</th>
+                                        <th>wholesale rate</th>
+                                        <th>retail rate</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock bodycontent %}
+
+{% block script %}
+<script src="{% static 'webapp/custom.js' %}"></script>
+
+<script>
+    var role = true;
+    if ("{{request.user.role}}" == "company admin") {
+        role = false;
+    }
+    if ("{{request.user.role}}" == "sales representative") {
+        role = false;
+    }
+    var i = 1;
+    function set_filters() {
+        var data = {}
+        data["brand"] = $("#id_brand").val();
+        data["company"] = $("#id_company").val();
+        data["status"] = $("#id_status").val();
+        return data
+    };
+    var order_false= [0,-1]
+    var to_center=[0]
+    var invisible_columns=[2]
+    var filter_id = $("#id_brand, #id_company, #id_status")
+    var url = '{% url "product:product-price-list-ajax" %}';
+    var  columns = [
+        { data: 'code', name: 'code' },
+        { data: 'name', name: 'name' },
+        { data: 'company', name: 'company' },
+        { data: 'brand', name: 'brand' },
+        { data: 'mrp', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'mrp' },
+        { data: 'wholesale_rate', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'wholesale_rate' },
+        { data: 'retail_rate', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'retail_rate' },
+        { data: 'actions', name: 'actions' },
+    ]
+</script>
+
+<script>
+    function intailize_datatables() {
+        $('#table').DataTable({
+            columnDefs: [{
+                    targets: to_center,
+                    className: "text-center",
+                },
+
+                {
+                    orderable: false,
+                    targets: order_false,
+                },
+                {
+                    targets: invisible_columns,
+                    visible: role // new variable true or false based on user role.
+                },
+            ],
+            order: [],
+            // Ajax for pagination
+            processing: true,
+            serverSide: true,
+            // pageLength: 4,
+            ajax: {
+                url: '{% url "product:product-price-list-ajax" %}',
+                type: 'get',
+                data: set_filters(),
+            },
+            columns: columns,
+        })
+    }
+    intailize_datatables()
+
+    filter_id.on("change", function() {
+        $("#table").DataTable().destroy();
+        intailize_datatables()
+    });
+</script>
+
+<script>
+    $(document).on('click', '.users-list-clear' , function (){
+        $("#id_brand").val(null).trigger('change');
+        $("#id_company").val(null).trigger('change');
+        $("#id_status").val(null).trigger('change');
+        $("#table").DataTable().destroy();
+        intailize_datatables()
+    });
+
+    $(document).on("click", ".update-price", function(){
+        var product_id = $(this).data('id');
+        
+        $(document).find(`#id_${product_id}_mrp`).attr("disabled", false);
+        $(document).find(`#id_${product_id}_wholesale_rate`).attr("disabled", false);
+        $(document).find(`#id_${product_id}_retail_rate`).attr("disabled", false);
+
+        $(this).siblings(":last").removeClass("d-none")
+        $(this).addClass("d-none");
+    });
+
+    $(document).on("click", ".change-price", function(){
+        var product_id = $(this).data('id');
+        var mrp = $(document).find(`#id_${product_id}_mrp`);
+        var wholesale_rate = $(document).find(`#id_${product_id}_wholesale_rate`);
+        var retail_rate = $(document).find(`#id_${product_id}_retail_rate`);
+
+        const url = "{% url 'product:update_product_price' 0 %}".replace("0", product_id);
+        
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                "mrp": mrp.val(),
+                "wholesale_rate": wholesale_rate.val(),
+                "retail_rate": retail_rate.val(),
+                "csrfmiddlewaretoken": '{{ csrf_token }}',
+            },
+            success: function (data) {
+                if (data["message"]){
+                    $('#table').DataTable().ajax.reload(null, false);
+                    $.toast({
+                        text: data.message,
+                        position: 'bottom-right',
+                        stack: false,
+                        icon: 'success',
+                    })
+                }
+            }
+        });
+        
+        mrp.attr("disabled", true);
+        wholesale_rate.attr("disabled", true);
+        retail_rate.attr("disabled", true);
+
+        $(this).siblings(":last").removeClass("d-none");
+        $(this).addClass("d-none");
+    });
+</script>
+
+
+
+
+
+{% endblock script %}

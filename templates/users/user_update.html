@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}Update User{% endblock title %}
+{% block lazy_cdns %}
+{% comment %} <link rel="stylesheet" href="{% static 'cdns/intl-tel-input.css' %}" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" /> {% endcomment %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/18.1.7/css/intlTelInput.css" integrity="sha512-Ky9SFgkYYIAWfFbsz+Tvrs+kpW7mgyQu+glUEnVV60+nxDPe64w0CrYRSMKsmTwJtN2jXNmU5SBgcyzKOwsn3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock lazy_cdns %}
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Update User</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="post" novalidate>
+                {% csrf_token %}
+                {% comment %} {{form.as_p}} {% endcomment %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.email.label}}{% if form.email.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.email}}
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.username.label}}{% if form.username.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {{form.username}}
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.full_name.label}}{% if form.full_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {{form.full_name}}
+                        {% if form.full_name.errors %}
+                            {% for error in form.full_name.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.role.label}}{% if form.role.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {{form.role}}
+                        {% if form.role.errors %}
+                            {% for error in form.role.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 col-12" id="id-company">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.company.label}}<span style="color: red;">*</span></label>
+                      <div class="col-md-9">
+                        {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                        {{form.company}}
+                        {% if form.company.errors %}
+                            {% for error in form.company.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %} 
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.phone.label}}{% if form.phone.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.phone}}
+                        {% if form.phone.errors %}
+                            {% for error in form.phone.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                
+                <button type="submit" class="btn btn-primary mr-2"><i class="ft-check-square mr-1"></i>Save</button>
+                <a href="{% url 'users:user_list' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+              
+               <!-- Tab Navigation -->
+               <ul class="nav nav-tabs mt-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="working-hours-tab" data-toggle="tab" href="#working-hours" role="tab" aria-controls="working-hours" aria-selected="true">Working Hours</a>
+                </li>
+                {% if request.user.role == "company admin" %}
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="change-password-tab" data-toggle="tab" href="#change-password" role="tab" aria-controls="change-password" aria-selected="false">Change Password</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content mt-3" id="myTabContent">
+                <div class="tab-pane fade show active" id="working-hours" role="tabpanel" aria-labelledby="working-hours-tab">
+                  {% if request.user.role != "company super admin" and user_obj.role in "sales representative,driver,accountant,company admin" %}
+                        <!-- Working Hours Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Working Hours</h5>
+                                <div id="working-hours">
+                                    {% if working_hours %}
+                                        {% for wh in working_hours %}
+                                            <div class="form-group row">
+                                                <label class="col-md-1 col-form-label">{{ wh.day_name }}</label>
+                                                <div class="col-md-1">
+                                                    <div class="custom-control custom-switch">
+                                                        <input type="checkbox" class="custom-control-input" id="day_status_{{ wh.week_day }}" data-week-day="{{ wh.week_day }}" {% if wh.day_status %}checked{% endif %}>
+                                                        <label class="custom-control-label" for="day_status_{{ wh.week_day }}"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <input type="time" class="form-control" id="start_time_{{ wh.week_day }}" value="{{ wh.start_time|date:'H:i' }}" data-week-day="{{ wh.week_day }}">
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <input type="time" class="form-control" id="end_time_{{ wh.week_day }}" value="{{ wh.end_time|date:'H:i' }}" data-week-day="{{ wh.week_day }}">
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p>No working hours set.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if request.user.role == "company admin" %}
+                <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="change-password-tab">
+                  <div class="card-header">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between">
+                      <h4 class="card-title align-self-center">Change Password</h4>
+                    </div>
+                  </div>
+                  <div class="card-content ">
+                    <div class="card-body">
+                      <form id="password-reset-form" method="POST" action="{% url 'users:user_account_reset_password' %}" novalidate>
+                        {% csrf_token %}
+                        <div id="form-errors" class="alert alert-danger" style="display: none;"></div>
+                        <input type="hidden" name="user_id" value="{{ user_obj.pk }}">
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="id_password1">New Password {% if user_password_reset_form.password1.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                                <input type="password" name="password1" class="form-control mb-2" placeholder="New Password" autocomplete="new-password" required id="id_password1">
+                                <span id="id_password1-error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="id_password2">Confirm New Password {% if user_password_reset_form.password2.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+                                <input type="password" name="password2" class="form-control mb-2" placeholder="Confirm New Password" required id="id_password2">
+                                <span id="id_password2-error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between flex-sm-row flex-column mt-3">
+                            <div>
+                                <button type="submit" class="btn btn-primary mr-2" name="action"><i class="ft-edit mr-1"></i>Reset Password</button>
+                                <button type="button" id="cancel-button" class="btn btn-secondary" onclick="window.history.back();"><i class="ft-x mr-1"></i>Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+  {% endblock %}
+
+  {% block script %}
+  <script src="{% static 'cdns/intl-tel-input.js' %}"></script>
+  <script>
+    
+    $('.company-list, .user-role').select2({
+      width: "100%",
+    });
+
+    const input = document.querySelector("#id_phone");
+    window.intlTelInput(input, {
+      onlyCountries: ['in'],
+      separateDialCode: true,
+      nationalMode: false
+    })
+  
+    var select = document.getElementById('id_role');
+      if ($("#id_role").val() == "super admin" || $("#id_role").val() == "admin") {
+          $("#id-company").hide();
+      }
+      if ("{{request.user.role}}" == "company admin") {
+          $("#id-company").hide();
+      }
+      $("#id_role").on('change', function(){
+          var role_value = $(this).val();
+          if ("{{request.user.role}}" == "super admin" || "{{request.user.role}}" == "admin")
+          {   
+              var role_value = $(this).val();
+              if(role_value=="admin" || role_value=="super admin"){
+                  $("#id-company").hide();
+                  $("#id_company").val('');
+              }
+              else{
+                  
+                  $("#id-company").show();
+              }
+          }
+      });
+  </script>
+  <script>
+  function updateWorkingHours(weekDay, dayStatus, startTime, endTime) {
+    var update_user_id = "{{ user_obj.pk }}"
+    $.ajax({
+      url: "{% url 'users:update_working_hours' %}",  // URL to your class-based view
+      method: "POST",
+      data: {
+        week_day: weekDay,
+        day_status: dayStatus,
+        start_time: startTime,
+        end_time: endTime,
+        update_user_id:update_user_id,
+        csrfmiddlewaretoken: "{{ csrf_token }}"
+      },
+      success: function(response) {
+        console.log("Working hours updated successfully.");
+        $.toast({
+          text: 'Working Hours Updated Successfully.',
+          position: 'bottom-right',
+          stack: false,
+          icon: 'success',                    
+      })
+      },
+      error: function(xhr, status, error) {
+        console.error("Error updating working hours:", error);
+      }
+    });
+  }
+  $('#working-hours').on('change', 'input[type="checkbox"]', function() {
+    var weekDay = $(this).data('week-day');
+    var dayStatus = $(this).is(':checked');
+    var startTime = $('#start_time_' + weekDay).val();
+    var endTime = $('#end_time_' + weekDay).val();
+    updateWorkingHours(weekDay, dayStatus, startTime, endTime);
+  });
+
+  $('#working-hours').on('change', 'input[type="time"]', function() {
+    var weekDay = $(this).data('week-day');
+    var dayStatus = $('#day_status_' + weekDay).is(':checked');
+    var startTime = $('#start_time_' + weekDay).val();
+    var endTime = $('#end_time_' + weekDay).val();
+    updateWorkingHours(weekDay, dayStatus, startTime, endTime);
+  });
+  </script>
+  <script>
+    $(document).ready(function() {
+        $('#password-reset-form').on('submit', function(event) {
+            event.preventDefault(); 
+            $('#form-errors').hide().empty();
+            $('span[id$="-error"]').empty();
+    
+            var form = $(this);
+            var formData = form.serialize(); 
+    
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                success: function(data) {
+                    console.log('Raw data:', data);
+    
+                    if (data.success) {
+                        $.toast({
+                            text: 'Password has been updated successfully.',
+                            position: 'bottom-right',
+                            stack: false,
+                            icon: 'success',
+                        });
+    
+                        setTimeout(function() {
+                            window.history.back();
+                        }, 1000); 
+                    } else {
+                        var messageData;
+    
+                        // Check if message is a JSON string and parse it
+                        try {
+                            messageData = typeof data.message === 'string' ? JSON.parse(data.message) : data.message;
+                        } catch (e) {
+                            console.error('Error parsing JSON:', e);
+                            $('#form-errors').show().html('An unexpected error occurred.');
+                            return;
+                        }
+    
+                        console.log('messageData:', messageData);
+    
+                        // Handle general errors (errors related to the entire form)
+                        if (messageData.__all__ && Array.isArray(messageData.__all__)) {
+                            console.log("---------in here if ");
+                            var errorMessages = messageData.__all__.map(function(error) {
+                                return error.message;
+                            }).join('<br>');
+                            $('#form-errors').show().html(errorMessages);
+                        } else {
+                            console.log("---------in here else ");
+                            // Handle field-specific errors
+                            if (messageData && typeof messageData === 'object') {
+                                console.log("---------in here else's if ");
+                                $.each(messageData, function(field, messages) {
+                                    var errorSpan = $('#id_' + field + '-error');
+                                    console.log('errorSpan for field ' + field + ': ', errorSpan);
+                                    if (Array.isArray(messages)) {
+                                        errorSpan.html(
+                                            messages.map(function(error) {
+                                                return error.message;
+                                            }).join('<br>')
+                                        );
+                                    } else {
+                                        errorSpan.empty(); // Clear previous errors if no new errors
+                                    }
+                                });
+                            }
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    $('#form-errors').show().html('An unexpected error occurred.');
+                }
+            });
+        });
+    });
+    </script>
+  {% endblock script %}

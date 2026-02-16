@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if form.instance.id %}
+Update Car
+{% else %}
+Add Car
+{% endif %}
+{% endblock title %}
+
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            {% if form.instance.id %}
+            <h4 class="card-title">Update Car</h4>
+            {% else %}
+            <h4 class="card-title">Add Car</h4> 
+            {% endif %}
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="post" novalidate>
+                {% csrf_token %}
+                {% if user.role == 'super admin' %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.company.label}}{% if form.company.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.company}}
+                        {% if form.company.errors %}
+                            {% for error in form.company.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <input type="hidden" name="company" id="id_company" value="{{user.get_company_id}}">
+                {% endif %}
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.car_nickname.label}}{% if form.car_nickname.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.car_nickname}}
+                        {% if form.car_nickname.errors %}
+                            {% for error in form.car_nickname.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.year.label}}{% if form.year.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                      <div class="col-md-9">
+                        {{form.year}}
+                        {% if form.year.errors %}
+                            {% for error in form.year.errors %}
+                              <p style="color: red;">{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.model.label}}{% if form.model.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.model}}
+                          {% if form.model.errors %}
+                              {% for error in form.model.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12 ">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.licence_plate.label}}{% if form.licence_plate.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          <div class="input-group">
+                          {{form.licence_plate}}
+                        </div>
+                        {% if form.licence_plate.errors %}
+                              {% for error in form.licence_plate.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.start_mileage.label}}{% if form.start_mileage.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.start_mileage}}
+                          {% if form.start_mileage.errors %}
+                              {% for error in form.start_mileage.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.make.label}}{% if form.make.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.make}}
+                            {% if form.make.errors %}
+                                {% for error in form.make.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.vin_number.label}}{% if form.vin_number.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.vin_number}}
+                          {% if form.vin_number.errors %}
+                              {% for error in form.vin_number.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.inspect_exp_date.label}}{% if form.inspect_exp_date.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.inspect_exp_date}}
+                            {% if form.inspect_exp_date.errors %}
+                                {% for error in form.inspect_exp_date.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.status.label}}{% if form.status.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          {{form.status}}
+                          {% if form.status.errors %}
+                              {% for error in form.status.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                      <div class="form-group row">
+                        <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.driver.label}}{% if form.driver.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                        <div class="col-md-9">
+                          
+                          {% if user.role == "super admin" %}
+                          
+                          {% if form.instance.id %}
+                          {{form.driver}}
+                          {% else %}
+                          <select name="driver" class="select2-data-array form-control select2-list" placeholder="driver" required = "" id="id_driver">
+                            <option value="" selected>---------</option>
+                          </select> 
+                          {% endif %}                          
+                          {% else %}
+                          {{form.driver}}
+                          {% endif %}
+                          {% if form.driver.errors %}
+                              {% for error in form.driver.errors %}
+                                <p style="color: red;">{{error}}</p>
+                              {% endfor %}
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <div class="form-group row">
+                          <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.description.label}}{% if form.description.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                          <div class="col-md-9">
+                            {{form.description}}
+                            {% if form.description.errors %}
+                                {% for error in form.description.errors %}
+                                  <p style="color: red;">{{error}}</p>
+                                {% endfor %}
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  {% if form.instance.id %}
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+                  {% else %}
+                  <button type="submit" class="btn btn-primary mr-2"><i class="ft-check-square mr-1"></i>Save</button>
+                  {% endif %}
+                <a href="{% url 'order:car_list' %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock bodycontent %}
+
+{% block script %}
+<script>
+    $('.select2-list').select2({
+        width: "100%",
+    });
+</script>
+<script>
+  function loadDriver(){
+    var company = document.getElementById('id_company');
+        var driver_id = document.getElementById('id_driver');
+        driver_id.innerHTML = '';
+        $.ajax({
+            type: "GET",
+            url: "{% url 'order:load_driver' %}",
+            data: {
+                "company_id": company.value,
+            },
+            success: function (data) {
+                $("#id_driver").empty().append("<option value=''>---------</option>");
+                data.driver.forEach(element => {
+                    var option = document.createElement("option");
+                    option.value = element.id;
+                    option.text = element.full_name;
+                    driver_id.options.add(option);
+                })
+                                
+            }
+        })
+
+  }
+</script>
+{% endblock script %}

@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+List Discount
+{% endblock title %}
+
+{% block bodycontent %}
+
+<div class="users-list-filter px-2">
+
+</div>
+
+<section id="file-export">
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title align-self-center">Discount List</h4>
+                 <div>
+                  <a data-url="{% url 'customer:discount_create' %}" class="btn btn-primary ml-sm-1 add-discount">Add</a>
+                </div>
+              </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                    <div class="table-responsive ">
+                        <table class="table table-striped table-bordered file-export" id="table">
+                              <thead>
+                                  <tr>
+                                    <th>Sr. no</th>
+                                    {% comment %} <th>Brand</th> {% endcomment %}
+                                    <th>Category</th>
+                                    <th>Company</th>
+                                    <th>Discount (%)</th>
+                                    {% comment %} <th>Type</th> {% endcomment %}
+                                    <th class="text-center" style="width: 13%;">Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+ 
+<div class="modal fade" id="discountForm" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="ProductVehicleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Discount</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="add_discount_modal">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" form="discount_form" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="modal fade" id="updateDiscountForm" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="ProductVehicleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Update Discount</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="update_discount_modal">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" form="discount_form" class="btn btn-primary">Update</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+    $(document).on('click', '.add-discount' , function (e) {
+        url = $(this).data("url");
+        $("#add_discount_modal").html("");
+
+        htmx.ajax('GET', url, 
+            {target:'#add_discount_modal', 
+            swap:'innerHTML', 
+        }).then(() => {
+            $("#discountForm").modal("show");
+            $(document).find(".select2-list").select2({
+              width: "100%",
+              dropdownParent: $('#discountForm'),
+            });
+            $(document).find("#add_discount_modal #id_discount").on("input", function(){
+              var value = $(this).val();
+      
+              if(value){
+                  value = parseFloat(value);
+                  if(value > 100){
+                      $(this).val(100);
+                  }
+              }
+            });
+        });
+    });
+    $(document).on('click', '.update-discount' , function (e) {
+        url = $(this).data("url");
+        $("#update_discount_modal").html("");
+        
+        htmx.ajax('GET', url, 
+            {target:'#update_discount_modal', 
+            swap:'innerHTML', 
+        }).then(() => {
+            $("#updateDiscountForm").modal("show");
+            $(document).find(".select2-list").select2({
+              width: "100%",
+              dropdownParent: $('#updateDiscountForm'),
+            });
+            $(document).find("#update_discount_modal #id_discount").on("input", function(){
+              var value = $(this).val();
+      
+              if(value){
+                  value = parseFloat(value);
+                  if(value > 100){
+                      $(this).val(100);
+                  }
+              }
+            });
+        });
+    });
+
+    document.addEventListener('htmx:afterRequest', function(evt) {
+      if(evt.detail.xhr.status == 201){
+        $(document).find("#update_discount_modal #id_brand").css("display", "none")
+        $(document).find("#update_discount_modal #id_brand").select2({
+          width: "100%",
+          dropdownParent: $('#updateDiscountForm'),
+        });
+      }
+    })
+
+    document.body.addEventListener("customerDiscountCreate", function(evt){
+        $('#discountForm').modal('hide');
+        $('#updateDiscountForm').modal('hide');
+
+        $("#add_discount_modal").html("");
+        $("#update_discount_modal").html("");
+        
+        $('#table').DataTable().destroy();
+        initialize_datatable();
+
+        $.toast({
+          text: evt.detail.message,
+          position: 'bottom-right',
+          stack: false,
+          icon: evt.detail.level,
+        });
+
+    });
+
+    var to_center = [0]
+    var order_false = [-1]
+    var invisible_columns = [2]
+    var role = false;
+
+    {% if request.user.is_superuser %}
+    role = true;
+    {% endif %}
+
+    function initialize_datatable(){
+        $('#table').DataTable({
+            columnDefs: [{
+                targets: "_all",
+                className: "text-center",
+              },
+              {
+                  orderable: false,
+                  targets: order_false,
+              },
+              {
+                targets: invisible_columns,
+                visible: role // new variable true or false based on user role.
+              },
+            ],
+
+            // Ajax for pagination
+            processing: true,
+            language: {
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+            },
+            serverSide: true,
+            ajax: {
+                url: '{% url "customer:discount_list_ajax" %}',
+                type: 'get',
+                //data: set_filters(), // this line also in dropdown filter
+            },
+            columns: [
+                // data: json key from prepare_results, name: model field name
+                { data: 'id', name: 'id' },
+                { data: 'category', name: 'category' },
+                { data: 'company', name: 'company' },
+                { data: 'discount', name: 'discount' },
+                { data: 'actions', name: 'actions' },
+            ],
+            rowCallback: function (nRow, aData, iDisplayIndex) {
+                var oSettings = this.fnSettings();
+                $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                return nRow;
+            },
+        });
+    }
+
+    initialize_datatable();
+
+</script>
+<script>
+    $(document).on('click', '.ajax-delete-btn' , function (e){
+    var id = $(this).data("id")
+    var name = $(this).data("title")
+    if(name == "None"){
+        name = ""
+    }
+    var url = $(this).data("url")
+    var delete_ele = $(this)
+
+
+    Swal.fire({
+        html: `Are you sure you want to delete <b>${name}</b> ?`,
+        icon: 'question',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonColor: "#7442DB",
+      }).then((result) => {
+          
+          /* Read more about isConfirmed, isDenied below */
+          if (result.isConfirmed) {
+              $.ajax({
+                  type: "POST",
+                  url: url,
+                  data: {
+                      "id": id,
+                      "csrfmiddlewaretoken": '{{ csrf_token }}'
+                  },
+                  success: function (data) {
+                  $('#table').DataTable().ajax.reload(null, false);
+                  if (data["message"]){
+                      $.toast({
+                          text: data.message,
+                          position: 'bottom-right',
+                          stack: false,
+                          icon: 'success',                    
+                      })
+                  }
+              }    
+              });
+          }
+      })
+    })
+</script>
+
+<script>
+
+  $(document).on('change', '.lock-switch', function(e){
+    const val = $(this).prop('checked');
+    const customer_id = $(this).data("id");
+
+    $.ajax({
+      url: "{% url 'customer:customer_billing_lock' %}",
+      type: "POST",
+      data: {
+        'csrfmiddlewaretoken': "{{ csrf_token }}",
+        'value': val,
+        'customer_id': customer_id,
+      },
+      success: function(data) {
+        $.toast({
+          text: data.message,
+          position: "bottom-right",
+          stack: false,
+          icon: data.level,
+        });
+      },
+      error: function(xhr, ajaxOptions, thrownError) {
+          //console.log(thrownError);
+      }
+    });
+  })
+
+  $(document).on("change", "#id_primary, #id_secondary", function(){
+
+    const primary = $(document).find("#id_primary");
+    const secondary = $(document).find("#id_secondary");
+    
+    if($(this).prop("checked")==true){
+      if($(this).attr("id")=="id_primary"){
+        secondary.prop('checked', false);
+      }
+      else{
+        primary.prop('checked', false);
+      }
+    }
+  })
+
+</script>
+
+{% endblock script %}

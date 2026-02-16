@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bill Summary Report{% endblock title %}
+
+{% block style %}
+<style>
+.buttons-html5 {
+    display:none;
+ }
+</style>
+{% endblock style %}
+
+{% block bodycontent %}
+
+<div class="users-list-filter px-2">
+    <div class="row border rounded py-2 mb-2 mx-n2">
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="report-list-customer">Zone</label>
+            <fieldset class="form-group">
+                <select id="id_zone" class="select2-data-array form-control select2-list">
+                    <option value="">All</option>
+                    {% for zone in zone_list %}
+                    <option value="{{zone.id}}">{{zone.zone_code}}</option>
+                    {% endfor %}
+                </select>
+            </fieldset>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="id_start_date">From Date</label>
+            <div class="" id="report-due-from-date">
+                <input type="date" name="due_from_date" class="form-control" placeholder="From Date"  id="id_start_date">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-2">
+            <label for="end_date">To Date</label>
+            <div class="" id="report-due-to-date">
+                <input type="date" name="end_date" class="form-control" placeholder="To Date"  id="id_end_date">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-lg-6">
+            <div class="d-flex justify-content-end">
+                {% comment %} <button type="button" id="reports-list-date" class="btn btn-outline-primary mr-2 mt-2">Search</button> {% endcomment %}
+                <button type="reset" class="btn btn-primary report-list-clear mt-2">Clear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section id="file-export">
+  <div class="row">
+      <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex flex-sm-row flex-column justify-content-between">
+                <h4 class="card-title">Bill Summary Report</h4>
+                <div>
+                    <button class="btn btn-primary export-report" data-url="{% url 'reports:export_bill_summary_report' %}" title="Export PDF">Export Report</button>
+                </div>
+              </div>
+            </div>
+              <div class="card-content ">
+                  <div class="card-body">
+                      <div class="table-responsive">
+                          <table class="table table-striped table-bordered file-export" id="bill-summary-table">
+                              <thead>
+                                  <tr>
+                                    <th>Sr. No.</th>
+                                    <th>Customer</th>
+                                    <th>Bill Amount</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>                        
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'app-assets/js/net_plug-ins_2.1.2_api_sum().js' %}"></script>
+    <script>
+
+        $('.select2-list').select2({
+            width: "100%",
+        });
+
+        function dateFormat(date) {
+            var year = date.getFullYear();
+            var month = String(date.getMonth() + 1).padStart(2, '0');
+            var day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        let startDateElement = document.getElementById("id_start_date")
+        let endDateElement = document.getElementById("id_end_date")
+
+        var today = new Date();
+        var firstDate = new Date(today.getFullYear(), today.getMonth(), 1);
+        var lastDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+        startDateElement.value = dateFormat(firstDate);
+        endDateElement.value = dateFormat(lastDate);
+
+        function set_filters(){
+            var data = {}
+            data["zone"] = $("#id_zone").val()
+            data["from_date"] = document.getElementById("id_start_date").value
+            data["to_date"] = document.getElementById("id_end_date").value
+            return data;
+        }
+
+        function initialize_datatable(){
+            $('#bill-summary-table').DataTable({
+                columnDefs: [{
+                        orderable: false,
+                        targets: []
+                    },
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                processing: true,
+                language: {
+                    processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                },
+                serverSide: true,
+                ajax: {
+                    url: '{% url "reports:bill_summary_report_ajax" %}',
+                    type: 'get',
+                    data: set_filters(),
+                },
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'customer', name: 'customer' },
+                    { data: 'bill_amount', render: function ( number ) {return number.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'})}, name: 'bill_amount' },
+                ],
+                rowCallback: function (nRow, aData, iDisplayIndex) {
+                    var oSettings = this.fnSettings();
+                    $("td:first", nRow).html(oSettings._iDisplayStart + iDisplayIndex + 1);
+                    return nRow;
+                },
+                footerCallback: function ( row, data, start, end, display ) {
+                    var api = this.api(), data;
+                    var intVal = function ( i ) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '')*1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                    };
+
+                    var monTotal = api
+                        .column( 2 )
+                        .data()
+                        .reduce( function (a, b) {
+                            return intVal(a) + intVal(b);
+                        }, 0 );
+                    
+                    $( api.column( 1 ).footer() ).html('Total Bill Amount');
+                    $( api.column( 2 ).footer() ).html(monTotal.toLocaleString('en-IN', {maximumFractionDigits: 2, style: 'currency', currency: 'INR'}));
+                },
+            });
+        }
+
+        initialize_datatable();
+
+        $(document).on("change", ".select2-list", function(){
+            $("#bill-summary-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("input", "#id_start_date, #id_end_date", function(){
+            $("#bill-summary-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("click",".report-list-clear",function(){
+            document.getElementById("id_start_date").value = ""
+            document.getElementById("id_end_date").value = ""
+            $("#bill-summary-table").DataTable().destroy();
+            initialize_datatable();
+        });
+
+        $(document).on("click", ".export-report" , function() {
+            var url = $(this).data("url");
+            var zone = $("#id_zone").val();
+            var start_date = $("#id_start_date").val();
+            var end_date = $("#id_end_date").val();
+    
+            $.ajax({
+                type: "GET",
+                url: url,
+                data: {
+                    "zone": zone,
+                    "start_date": start_date,
+                    "end_date": end_date,
+                },
+                success: function (data) {
+                    var file = new Blob([data], {type: 'application/pdf'});
+                    var fileURL = URL.createObjectURL(file);
+                    window.open(fileURL);
+                }
+            });
+        });
+    </script>
+    
+{% endblock script %}

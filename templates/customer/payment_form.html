@@ -1,0 +1,580 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+{% if form.instance.id %}
+Update Customer Payment
+{% else %}
+Add Customer Payment
+{% endif %}
+{% endblock title %}
+
+{% block bodycontent %}
+
+
+<section id="horizontal-form-layout">
+  <div class="content-header">Customer Payment</div>
+      <div class="row match-height">
+          <form action=""
+                  method="post"
+                  class="w-100"
+                  id="form_payment"
+                  enctype="multipart/form-data"
+                  novalidate
+                  >
+              {% csrf_token %}
+              <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="card-content">
+                        <div class="row">
+
+                          {% if not user.role == 'super admin' %}
+                          <input type="hidden" id="id_company" name="company" value="{{user.get_company_id}}">
+                          {% else %}
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">Company</label>
+                              <div class="col-md-9">
+                                <select class="form-control select2-list" id="company" onchange="loadCustomer()">
+                                  <option value="" selected>---------</option>
+                                {% for company_name in company %}
+                                  <option value="{{company_name}}">{{company_name.company_name}}</option>
+                                {% endfor %}
+                                </select>
+                                {% if company.errors %}
+                                    {% for error in company.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          {% endif %}
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.receive_date.label}}{% if form.receive_date.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {{form.receive_date}}
+                                {% if form.receive_date.errors %}
+                                    {% for error in form.receive_date.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer_name.label}}{% if form.customer_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {% if not user.role == "super admin" %}
+                                {{form.customer_name}}
+                                {% else %}
+                                <select name="customer_name" class="select2-data-array form-control select2-list" placeholder="Customer" required = "" id="id_customer_name" onchange="changeCustomer()">
+                                  <option value="" selected>---------</option>
+                                </select>
+                                {% endif %}
+                                {% if form.customer_name.errors %}
+                                    {% for error in form.customer_name.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          {% comment %} <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.entry_date.label}}{% if form.entry_date.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {{form.entry_date}}
+                                {% if form.entry_date.errors %}
+                                    {% for error in form.entry_date.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div> {% endcomment %}
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">Due Amount</label>
+                              <div class="col-md-9">
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">₹</span>
+                                  </div>
+                                  <input type="number" class="form-control"  name="due-amount" value="0" id="id_due_amount" readonly>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">Available Credit</label>
+                              <div class="col-md-9">
+                                <div class="input-group">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">₹</span>
+                                  </div>
+                                  <input type="number" class="form-control" name="available_credit" value="0" id="id_available_credit" readonly>
+                                  <div class="my-auto mx-2">
+                                    <input type="checkbox" name="use_credit" id="id_use_credit" /> <label for="id_use_credit">Use available credit</label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12 ">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.receive_amount.label}}{% if form.receive_amount.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                <div class="input-group mb-0">
+                                  <div class="input-group-prepend">
+                                    <span class="input-group-text">₹</span>
+                                  </div>
+                                  {{form.receive_amount}}
+                                </div>
+                                {% if form.receive_amount.errors %}
+                                  {% for error in form.receive_amount.errors %}
+                                    <p style="color: red;">{{error}}</p>
+                                  {% endfor %}
+                                {% endif %}
+                                <span id="id_receive_amount_in_words" class="small"></span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.reference_id.label}}{% if form.reference_id.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {{form.reference_id}}
+                                {% if form.reference_id.errors %}
+                                    {% for error in form.reference_id.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.remark.label}}{% if form.remark.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                                {{form.remark}}
+                                {% if form.remark.errors %}
+                                    {% for error in form.remark.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.payment_mode.label}}{% if form.customer_name.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {{form.payment_mode}}
+                                {% if form.payment_mode.errors %}
+                                    {% for error in form.payment_mode.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-12" id="id_check_no">
+                            <div class="form-group row">
+                              <label class="col-md-3 col-form-label" for="horizontal-form-2">{{form.check_no.label}}{% if form.check_no.field.required %}<span style="color: red;">*</span>{% endif %}</label>
+                              <div class="col-md-9">
+                                {% comment %} <input type="text" class="form-control square" id="horizontal-form-2" name="last-name"> {% endcomment %}
+                                {{form.check_no}}
+                                {% if form.check_no.errors %}
+                                    {% for error in form.check_no.errors %}
+                                      <p style="color: red;">{{error}}</p>
+                                    {% endfor %}
+                                {% endif %}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <section class="" id="extended">
+                {% include 'customer/customer_bill_list.html' %}
+              </section>
+              <div class="row">
+                <div class="col-md-12 col-12">
+                  <div class="d-flex flex-sm-row flex-column justify-content-end">
+                    <input type="hidden" id="customer_bill_id_list" name="customer_bill_id_list" value="">
+                    <button type="button" form="form_payment" class="btn btn-primary mr-2 customer-bill-save-btn" disabled><i class="ft-check-square mr-1"></i>Save</button>
+                    <button type="button" value="go back" class="btn btn-secondary" onclick="history.back()"><i class="ft-x mr-1"></i>Cancel</button>
+                  </div>
+                </div>
+              </div>
+          </form>
+      </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+  $('.select2-list').select2({
+      width: "100%",
+  });
+</script>
+
+<script>
+  url = '{% url "customer:load_customer_for_payment_ajax" %}'
+  {% comment %} bill_url = '{% url "customer:load_order_for_payment_ajax" %}' {% endcomment %}
+</script>
+
+<script src="{% static 'webapp/customer/payment.js' %}"></script>
+
+
+<script>
+  
+  function changeCustomer(){
+    added_bill_ids = []
+    $("#customer_bill_id_list").val(added_bill_ids);
+    loadcustomerbill();
+  }
+
+  function loadcustomerbill(){
+    const customer_id = $("#id_customer_name").val();
+    var receive_amount = $("#id_receive_amount").val();
+    var total_amount = 0;
+
+    if(receive_amount){
+      receive_amount = parseFloat(receive_amount);
+      total_amount = receive_amount;
+    }
+    var credit_amount = parseFloat($("#id_credit_amount").val());
+
+    if($("#id_use_credit").prop('checked') == true){
+      var available_credit = parseFloat($("#id_available_credit").val());
+      credit_amount += available_credit;
+    }
+  
+    $.ajax({
+      type: "GET",
+      url: "{% url 'customer:customer_bill_list_ajax' %}",
+      data: {
+        customer_id: customer_id,
+        receive_amount: receive_amount,
+        is_credit_used: $("#id_use_credit").prop('checked'),
+      },
+      success: function (data) {
+        $("#extended").html(data.html);
+        var $response = $(data.html);
+        var inputValue = $response.find("#id_total_due_amount").val();
+        var available_credit = $response.find("#id_available_credit").val();
+
+        if(available_credit){
+          $("#id_available_credit").val(available_credit);
+        } else {
+          $("#id_available_credit").val(0);
+        }
+        //$("#id_credit_amount").val(credit_amount.toFixed(2));
+
+        if(data.amount_in_words){
+          $("#id_receive_amount_in_words").text(data.amount_in_words);
+        } else {
+          $("#id_receive_amount_in_words").text("");
+        }
+
+        if(receive_amount > 0){
+          $(".checkbox").prop("disabled", false);
+          $(".customer_checkbox").prop("disabled", false);
+        }
+        else{
+          $(".checkbox").prop("disabled", true);
+          $(".customer_checkbox").prop("disabled", true);
+          $(".customer-bill-save-btn").prop("disabled", true);
+        }
+
+        if($("#id_use_credit").prop('checked') == true){
+          var credit = parseFloat($("#id_available_credit").val());
+          total_amount += credit;
+
+          if(credit > 0){
+            $(".checkbox").prop("disabled", false);
+            $(".customer_checkbox").prop("disabled", false);
+          }
+        }
+        
+        if (inputValue > 0) {
+          $("#id_due_amount").val(inputValue);
+        } else {
+          $("#id_due_amount").val(0);
+        }
+        
+        payment_amount = autoSelectBills(total_amount);
+      },
+    });
+  }
+</script>
+
+<script>
+  
+  var td_checkbox = null;
+  var payment_amount = 0;
+
+  $(document).ready(function(){
+
+    $(document).on("click", ".customer-bill-save-btn", function(){
+      var credit_amount = parseFloat($(document).find("#id_credit_amount").val());
+      
+      if(credit_amount && credit_amount>0) {
+        
+        Swal.fire({
+          html: `Credit amount is ₹ ${credit_amount}<br> Are sure you want to continue ?`,
+          icon: 'question',
+          showCloseButton: true,
+          showCancelButton: true,
+          confirmButtonColor: "#7442DB",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $("#form_payment").submit();
+          }
+        })
+  
+      } else {
+        $("#form_payment").submit();
+      }
+    })
+
+    $("#id_receive_amount").on("input", function (e) {
+      const value = $(this).val()
+      payment_amount = parseFloat(value);
+
+      if($("#id_use_credit").prop('checked') == true){
+        var credit = parseFloat($("#id_available_credit").val());
+        payment_amount += credit;
+      }
+
+      if(parseFloat(value) <= 0){
+        $(this).val(0);
+        $(".checkbox").prop("disabled", true);
+        $(".customer_checkbox").prop("disabled", true);
+        $(".customer-bill-save-btn").prop("disabled", true);
+      }
+      else {
+        $(".customer-bill-save-btn").prop("disabled", false);
+        $(".checkbox").prop("disabled", false);
+        if($("#id_customer_name").val()) {
+          $(".customer_checkbox").prop("disabled", false);
+        }
+
+        if(value){
+          $("#id_credit_amount").val(parseFloat(value));
+        } else {
+          $("#id_credit_amount").val(0);
+        }
+
+        loadcustomerbill();
+
+      }
+    });
+
+    $("#id_use_credit").on("change", function(e){
+      if($(this).prop('checked') == true){
+        var credit = parseFloat($("#id_available_credit").val());
+        if(credit > 0){
+          payment_amount += credit;
+          $(".checkbox").prop("disabled", false);
+          $(".customer_checkbox").prop("disabled", false);
+        }
+      } else {
+        var receive_amount = $("#id_receive_amount").val();
+        $("#id_credit_amount").val(receive_amount);
+        if(receive_amount <= 0) {
+          $(".checkbox").prop("disabled", true);
+          $(".customer_checkbox").prop("disabled", true);
+        }
+      }
+      loadcustomerbill();
+    })
+  })
+
+
+  function validation_pay_amount() {
+    due_amount = $("#id_due_amount").val();
+    payment_amount = $("#id_receive_amount").val();
+    
+    if (parseInt(payment_amount) > parseInt(due_amount)) {
+      $.toast({
+        text: "Payment Amount is not Greater than the Due Amount",
+        position: "bottom-right",
+        stack: false,
+        icon: "error",
+      });
+      $("#id_receive_amount").val(0);
+      $(".checkbox").prop("disabled", true);
+      $(".customer_checkbox").prop("disabled", true);
+    };
+    if (parseInt(payment_amount) <= 0) {
+      $.toast({
+        text: "Payment Amount is not less than the 0",
+        position: "bottom-right",
+        stack: false,
+        icon: "error",
+      });
+      $("#id_receive_amount").val(0);
+      $(".checkbox").prop("disabled", true);
+      $(".customer_checkbox").prop("disabled", true);
+    };
+  }
+
+
+
+  $(document).on("change", ".customer_checkbox", function(){
+    customer_past_due_amount = $("#id_past_due_amount")
+    customer_paid_amount = $("#id_customer__paid_amount")
+    customer_due_balance= $("#id_customer__due_balance")
+
+    if ($(this).is(':checked')) {
+      customerbill_id = $(this).closest("tr").attr("data-id");
+      
+      if (parseInt(payment_amount) >= parseInt(customer_past_due_amount.val()) ){
+        customer_paid_amount.val(parseInt(customer_past_due_amount.val()))
+        customer_due_balance.val(parseInt(customer_past_due_amount.val())-parseInt(customer_paid_amount.val()))
+        payment_amount = parseInt(payment_amount) - parseInt(customer_paid_amount.val())
+
+      } else if (parseInt(payment_amount) <= parseInt(customer_past_due_amount.val()) ){
+        customer_paid_amount.val(parseInt(payment_amount))
+        customer_due_balance.val(parseInt(customer_past_due_amount.val())-parseInt(customer_paid_amount.val()))
+        payment_amount = parseInt(payment_amount) - parseInt(customer_paid_amount.val())
+      }
+    } else {
+        payment_amount = parseInt(payment_amount) + parseInt(customer_paid_amount.val())
+        customer_paid_amount.val(0)
+        customer_due_balance.val(parseInt(customer_past_due_amount.val()))
+        if (parseInt(payment_amount) > 0  ) {
+          $(".checkbox").prop("disabled", false);
+          $(".customer_checkbox").prop("disabled", false);
+        }
+    }
+
+    var total_paid_amount = 0;
+    $(document).find(".checkbox:checked").each(function(){
+      var customerbill_id = $(this).closest("tr").attr("data-id");
+      var paid_amount = $("#id_" + customerbill_id  + "__paid_amount")
+      total_paid_amount += parseFloat(paid_amount.val());
+    });
+
+    $(document).find(".customer_checkbox:checked").each(function(){
+      var paid_amount = parseFloat($("#id_past_due_amount").val())
+      total_paid_amount += paid_amount;
+    });
+
+    var received_amount = parseFloat($("#id_receive_amount").val());
+    if($("#id_use_credit").prop('checked') == true){
+      var credit = parseFloat($("#id_available_credit").val());
+      received_amount += credit;
+    }
+    if(total_paid_amount >= received_amount){
+      $("#id_credit_amount").val(0.00);
+    }
+    else {
+      $("#id_credit_amount").val((received_amount - total_paid_amount).toFixed(2))
+    }
+
+    if(parseInt(payment_amount) === 0 ){
+      $(".checkbox").prop("disabled", true);
+      $(".customer_checkbox").prop("disabled", true);
+      $(this).prop("disabled", false);
+    }
+
+  })
+
+
+  $(document).on("change", ".checkbox", function(){
+    if ($(this).is(':checked')) {
+      //console.log("%ctarget", 'color: red');
+      customerbill_id = $(this).closest("tr").attr("data-id");
+      due_amount = $("#id_" + customerbill_id  + "__due_amount")
+      paid_amount = $("#id_" + customerbill_id  + "__paid_amount")
+      due_balance = $("#id_" + customerbill_id  + "__due_balance")
+
+      if (parseInt(payment_amount) >= parseInt(due_amount.val()) ){
+        paid_amount.val(due_amount.val())
+        due_balance.val(parseInt(due_amount.val()) - parseInt(paid_amount.val()))
+        payment_amount = parseInt(payment_amount) - parseInt(paid_amount.val())
+      
+      } else if (parseInt(payment_amount) <= parseInt(due_amount.val()) ){
+          paid_amount.val(parseInt(payment_amount)) 
+          due_balance.val(parseInt(due_amount.val()) - parseInt(paid_amount.val()))
+          payment_amount = parseInt(payment_amount) - parseInt(paid_amount.val())
+      }
+    } else {
+      customerbill_id = $(this).closest("tr").attr("data-id");
+      due_amount = $("#id_" + customerbill_id  + "__due_amount")
+      paid_amount = $("#id_" + customerbill_id  + "__paid_amount")
+      due_balance = $("#id_" + customerbill_id  + "__due_balance")
+      payment_amount += parseInt(paid_amount.val())
+      paid_amount.val(0)
+      due_balance.val(parseInt(due_amount.val()))
+
+      if (parseInt(payment_amount) > 0  ) {
+        $(".checkbox").prop("disabled", false);
+        $(".customer_checkbox").prop("disabled", false);
+      }
+    }
+  
+    var total_paid_amount = 0;
+    $(document).find(".checkbox:checked").each(function(){
+      var customerbill_id = $(this).closest("tr").attr("data-id");
+      var paid_amount = $("#id_" + customerbill_id  + "__paid_amount")
+      total_paid_amount += parseFloat(paid_amount.val());
+    });
+
+    var received_amount = parseFloat($("#id_receive_amount").val());
+    if($("#id_use_credit").prop('checked') == true){
+      var credit = parseFloat($("#id_available_credit").val());
+      received_amount += credit;
+    }
+    if(total_paid_amount >= received_amount){
+      $("#id_credit_amount").val(0.00);
+    }
+    else {
+      $("#id_credit_amount").val((received_amount - total_paid_amount).toFixed(2))
+    }
+
+    if(parseInt(payment_amount) === 0 ){
+      $(".checkbox").prop("disabled", true);
+      $(".customer_checkbox").prop("disabled", true);
+      $(this).prop("disabled", false);
+
+    }
+  })
+
+  var added_bill_ids = [];
+  $(document).on("change", ".checkbox", function(){
+      if ($(this).is(':checked')) {
+        customerbill_id = $(this).closest("tr").attr("data-id");
+        added_bill_ids.push(customerbill_id)
+      } else {
+        added_bill_ids.pop(customerbill_id)
+      }
+      $("#customer_bill_id_list").val(added_bill_ids)
+  })
+    
+</script>
+
+{% endblock %}

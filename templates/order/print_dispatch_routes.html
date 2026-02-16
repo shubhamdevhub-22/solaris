@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html class="loading" lang="en">
+    <head>
+        <style>
+            body {
+                margin: 0;
+                font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5;
+                color: #212529;
+                text-align: left;
+                background-color: #fff;
+                -webkit-text-size-adjust: 100%;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+            }
+
+            .text-start {
+                text-align: left !important;
+            }
+            
+            .text-end {
+                text-align: right !important;
+            }
+
+            .text-center {
+                text-align: center !important;
+            }
+
+            .w-100 {
+                width: 100% !important;
+            }
+
+            .table {
+                width: 100%;
+                margin-bottom: 1rem;
+                color: #031b4e;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 0.75rem;
+                vertical-align: top;
+                border-top: 1px solid #dedcfb;
+            }
+
+            .table thead th {
+                vertical-align: bottom;
+                border-bottom: 2px solid #dedcfb;
+            }
+
+            .table tbody+tbody {
+                border-top: 2px solid #dedcfb;
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.05);
+                /* background-color: #5683ff2e; */
+            
+            }
+
+            .table-striped tbody tr:nth-of-type(odd) {
+                background-color: #5683ff2e;
+                /* background-color: #f0eeff; */
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <div class="text-center">
+                <b>{{ driver_route.name }}</b>
+            </div>
+            <div>
+                Start location: {{ driver_route.start_location.name }}
+            </div>
+            <div>
+                Driver: {{ driver_route.driver.full_name|default:"-" }}
+            </div>
+            <table class="table w-100">
+                <thead>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Customer Name</th>
+                        <th>Area</th>
+                        <th style="width:30%">Customer Address</th>
+                        <th>Mobile No.</th>
+                        <th>Order ID</th>
+                        <th>Payment Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    {% for assigned_route in assigned_routes %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">{{ assigned_route.order.customer.customer_name }}</td>
+                        <td class="text-center">{{ assigned_route.order.customer.area }}</td>
+                        <td class="text-center">
+                            {{ assigned_route.order.shipping_address_line_1 }}, {{ assigned_route.order.shipping_address_line_2 }},
+                            {{ assigned_route.order.shipping_city }} {% if assigned_route.order.shipping_zip_code %}-{{ assigned_route.order.shipping_zip_code }}{% endif %},
+                            {% if assigned_route.order.shipping_state %}{{ assigned_route.order.shipping_state }},{% endif %}
+                            {{ assigned_route.order.shipping_country }}
+                        </td>
+                        <td class="text-center">{{ assigned_route.order.customer.mobile }}</td>
+                        <td class="text-center">{{ assigned_route.order.order_id }}</td>
+                        <td class="text-center">{{ assigned_route.order.payment_method }}</td>
+                    </tr>
+                    {% endfor %}
+                        
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+{% if company_customers %}
+    {% for company_customer in company_customers %}
+        <option data-area="{{ company_customer.area }}" value="{{company_customer.id}}">{{company_customer.customer_name}} [{{company_customer.customer_type.title}}]</option>
+    {% endfor %}
+{% endif %}
+
+{% if company_warehouses %}
+    {% for company_warehouse in company_warehouses  %}
+        <option value="{{company_warehouse.id}}">{{company_warehouse.name}}</option>
+    {% endfor %}
+{% endif %}
+
+{% if company_products %}
+    {% for company_product in company_products %}
+        <option value="{{company_product.id}}">{{company_product.name}} {% if company_product.vehicle %}({{company_product.vehicle.name}}) {% endif %}</option>
+    {% endfor %}
+{% endif %}
+
+{% if warehouse_products %}
+    {% for warehouse_product in warehouse_products %}
+        <option value="{{warehouse_product.product.id}}">{{warehouse_product.product.name}}</option>
+    {% endfor %}
+{% endif %}

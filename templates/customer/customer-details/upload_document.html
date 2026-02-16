@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- {% block title %}{% if form.instance.id %}Update|Brand|Product{% else %}Add|Brand|Product{% endif %}{% endblock title %} -->
+{% block bodycontent %}
+<section id="action-form-layout">
+    <div class="row match-height">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="card-title">Upload Document</h4>
+          </div>
+          <div class="card-content">
+            <div class="card-body">
+              <form action="" method="POST" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                
+
+                <div class="row" hidden>
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.customer.label}}</label></label>
+                      <div class="col-md-9">
+                        {{form.customer}}
+                        {% if form.customer.errors %}
+                        {% for error in form.customer.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                    {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.document_name.label}}  {% if form.document_name.field.required %}<span style="color: red;">*</span>{% endif %}</label></label>
+                      <div class="col-md-9">
+                        {{form.document_name}}
+                        {% if form.document_name.errors %}
+                        {% for error in form.document_name.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                    {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 col-12">
+                    <div class="form-group row">
+                      <label class="col-md-3 col-form-label" for="horizontal-form-1">{{form.document.label}}   {% if form.document.field.required %}<span style="color: red;">*</span>{% endif %}</label></label>
+                      <div class="col-md-9">
+                        {{form.document}}
+                        {% if form.document.errors %}
+                        {% for error in form.document.errors %}
+                          <p style="color: red;">{{error}}</p>
+                        {% endfor %}
+                    {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                    {% if form.instance.id %} 
+                      <button type="submit" class="btn btn-primary mr-2"><i class="ft-edit mr-1"></i>Update</button>
+                     {% else %}
+                      <button type="submit" class="btn btn-primary mr-2"><i class="ft-check-square mr-1"></i>Save</button>
+                      {% endif %}
+                      <a href="{% url 'customer:customer_details' customer_id  %}"><button type="button" class="btn btn-secondary"><i class="ft-x mr-1"></i>Cancel</button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+
+  
+  {% block script %}
+    <script src="{% static 'webapp/custom.js' %}"></script>
+  {% endblock script %}
+    
+  
+        
+    
+
+

@@ -1,0 +1,10 @@
+{% if order_bill.status == 'complete' %}
+<center><span class="badge bg-light-success">{{order_bill.status.title}}</span></center>>
+
+{% elif order_bill.status in 'incomplete' %}
+<center><span class="badge bg-danger">{{order_bill.status.title}}</span></center>
+
+{% else %}
+<center><span class="badge bg-light">{{order_bill.status.title}}</span></center>
+
+{% endif %}

@@ -1,0 +1,36 @@
+<div>
+    <input type="hidden" name="slip_no" id="id_slip_no" value="{{ slip_no }}" />
+
+    <div class="row">
+        <div class="{% if type == 'generate' %} col-md-6 {% else %} col-md-12{% endif %}">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Bill Date <span style="color: red;">*</span>
+            </label>
+            <div class="col-md-12">
+                <input type="date" name="bill_date" id="id_bill_date" value="{{ order_bill.bill_date|date:'Y-m-d' }}" class="form-control" />
+            </div>
+        </div>
+
+        <div class="{% if type == 'generate' %} col-md-6 {% else %} col-md-12{% endif %}">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Transporter
+            </label>
+            <div class="col-md-12">
+                <input type="text" name="transporter" id="id_transporter" class="form-control" {% if order_bill %}value="{{ order_bill.transporter }}"{% else %}value="{{ transport }}"{% endif %} />
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="row">
+        <div class="{% if type == 'generate' %} col-md-6 {% else %} col-md-12{% endif %}">
+            <label class="col-md-12 col-form-label" for="horizontal-form-2">
+                Order Total
+            </label>
+            <div class="col-md-12">
+                <input type="number" name="order_total" id="id_order_total" value="{% if item_total %}{{item_total}}{% else %}0{% endif %}" class="form-control" readonly />
+            </div>
+        </div>
+    </div>
+
+</div>
