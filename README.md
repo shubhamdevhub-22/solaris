@@ -399,11 +399,18 @@ The application uses Django ORM with PostgreSQL. Key model relationships:
 
 ## 📄 License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**MIT License Summary:**
+- ✅ Commercial use allowed
+- ✅ Modification allowed
+- ✅ Distribution allowed
+- ✅ Private use allowed
+- ⚠️ Liability and warranty disclaimers apply
 
 ## 📧 Support
 
-For support and questions, please contact: [support email]
+For support and questions, please contact: shubham.devhub@gmail.com
 
 ---
 
