@@ -13,7 +13,6 @@ A comprehensive Customer Relationship Management (CRM) system built with Django,
 - [Usage](#usage)
 - [Development](#development)
 - [Deployment](#deployment)
-- [API Modules](#api-modules)
 - [Database Models](#database-models)
 - [Contributing](#contributing)
 
@@ -328,66 +327,15 @@ chmod +x deploy.sh
 - [ ] Set up proper logging
 - [ ] Enable CSRF protection
 
-## 📊 API Modules
-
-### Company Module (`app_modules/company/`)
-Manages company information and settings.
-- Models: Company configuration and details
-- Views: CRUD operations for company data
-- Tasks: Background jobs for company operations
-
-### Customers Module (`app_modules/customers/`)
-Complete customer lifecycle management.
-- Features: Customer profiles, contact info, validation
-- Signals: Automatic actions on customer creation/update
-- Tasks: Automated customer-related tasks
-
-### Product Module (`app_modules/product/`)
-Product catalog and inventory management.
-- Features: Product listing, pricing, images
-- Signals: Auto-update product stats
-- Tasks: Bulk product operations
-
-### Order Module (`app_modules/order/`)
-Order creation, processing, and tracking.
-- Features: Order workflows, item management, status tracking
-- Utils: Order processing utilities
-- Context Processors: Shared order context
-- Template Tags: Custom template filters
-
-### Purchase Order Module (`app_modules/purchase_order/`)
-Vendor purchase order management.
-- Features: PO creation, tracking, receipt management
-- Integrations: Vendor tracking and updates
-
-### Credit Memo Module (`app_modules/credit_memo/`)
-Credit transaction processing.
-- Features: Credit creation, approval, application
-
-### Expense Management Module (`app_modules/expanse_management/`)
-Business expense tracking and management.
-- Features: Expense categorization, reporting
-
-### Vendors Module (`app_modules/vendors/`)
-Vendor information and relationship management.
-- Features: Vendor profiles, contact details, ratings
-
-### Reports Module (`app_modules/reports/`)
-Business analytics and reporting.
-- Features: Sales reports, financial summaries, custom exports
-
-### Users Module (`app_modules/users/`)
-User authentication and authorization.
-- Features: User profiles, roles, permissions
-- Integrations: Django-AllAuth for social authentication
-
 ## 🗄️ Database Models
 
 The application uses Django ORM with PostgreSQL. Key model relationships:
 - **Customers**: Central to orders and credit memos
-- **Orders**: Contain line items linking to products
+- **Purchase Orders**: Contain line items linking to products
+- **Stock**: Contain product case wise quantity in and out from warehouse
 - **Products**: Catalog with pricing and inventory
 - **Vendors**: Source for purchase orders and products
+- **Sales Orders**: Customer make an order
 - **Users**: Role-based access control
 
 ## 📝 Contributing
