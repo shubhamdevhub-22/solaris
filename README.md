@@ -66,7 +66,7 @@ Solaris CRM is a full-featured CRM platform tailored for wholesale businesses. I
 ## 📁 Project Structure
 
 ```
-solaris-crm/
+solaris/
 ├── app_modules/                    # Main application modules
 │   ├── base/                       # Base models, middleware, permissions
 │   │   ├── middleware.py
@@ -143,17 +143,6 @@ solaris-crm/
 │   └── asgi.py                    # ASGI configuration
 ├── templates/                      # HTML templates
 │   ├── base.html
-│   ├── dashboard.html
-│   ├── company/
-│   ├── customer/
-│   ├── order/
-│   ├── product/
-│   ├── purchase_order/
-│   ├── credit_memo/
-│   ├── expanse_management/
-│   ├── vendors/
-│   ├── reports/
-│   ├── users/
 │   └── ...
 ├── static/                         # Static files (CSS, JS, images)
 │   ├── css/
@@ -162,19 +151,13 @@ solaris-crm/
 │   ├── assets/
 │   └── ...
 ├── media/                          # User-uploaded media
-│   ├── company-logo/
-│   ├── product-images/
-│   ├── sales-bills/
-│   └── csv/
 ├── services/                       # External services
-│   └── email_service.py           # Email service integration
 ├── requirements/                   # Dependency specifications
 │   ├── base.txt                   # Base requirements
 │   ├── local.txt                  # Local development requirements
 │   └── production.txt             # Production requirements
 ├── manage.py                       # Django management script
 ├── deploy.sh                       # Deployment script
-└── venv2/                          # Python virtual environment
 ```
 
 ## 📦 Installation
